@@ -1,0 +1,90 @@
+<?php
+
+use App\Http\Controllers\AIAssistantController;
+use App\Http\Controllers\BrandController;
+use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\ContentSprintController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\Public\BlogController;
+use App\Http\Controllers\Public\SubscribeController;
+use App\Http\Controllers\SocialPostController;
+use App\Http\Controllers\SubscriberController;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+
+// Public landing page
+Route::get('/', function () {
+    return Inertia::render('Welcome');
+});
+
+// Public blog routes (/@username format)
+Route::get('/@{brand:slug}', [BlogController::class, 'index'])->name('public.blog.index');
+Route::get('/@{brand:slug}/{post:slug}', [BlogController::class, 'show'])->name('public.blog.show');
+
+// Public subscription routes
+Route::post('/@{brand:slug}/subscribe', [SubscribeController::class, 'store'])->name('public.subscribe');
+Route::get('/@{brand:slug}/confirm/{token}', [SubscribeController::class, 'confirm'])->name('public.subscribe.confirm');
+Route::get('/@{brand:slug}/unsubscribe/{token}', [SubscribeController::class, 'unsubscribe'])->name('public.subscribe.unsubscribe');
+
+// Authenticated routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Calendar route
+    Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
+
+    // Content Sprint routes
+    Route::resource('content-sprints', ContentSprintController::class)->only(['index', 'create', 'store', 'show']);
+    Route::post('/content-sprints/{contentSprint}/accept', [ContentSprintController::class, 'accept'])->name('content-sprints.accept');
+    Route::post('/content-sprints/{contentSprint}/retry', [ContentSprintController::class, 'retry'])->name('content-sprints.retry');
+
+    // Brand routes
+    Route::get('/brands/create', [BrandController::class, 'create'])->name('brands.create');
+    Route::post('/brands', [BrandController::class, 'store'])->name('brands.store');
+    Route::get('/settings/brand', [BrandController::class, 'edit'])->name('settings.brand');
+    Route::put('/settings/brand/{brand}', [BrandController::class, 'update'])->name('settings.brand.update');
+
+    // Post routes
+    Route::delete('/posts/bulk-delete', [PostController::class, 'bulkDestroy'])->name('posts.bulk-destroy');
+    Route::resource('posts', PostController::class);
+    Route::post('/posts/{post}/publish', [PostController::class, 'publish'])->name('posts.publish');
+
+    // Subscriber routes
+    Route::get('/subscribers', [SubscriberController::class, 'index'])->name('subscribers.index');
+    Route::delete('/subscribers/{subscriber}', [SubscriberController::class, 'destroy'])->name('subscribers.destroy');
+    Route::get('/subscribers/export', [SubscriberController::class, 'export'])->name('subscribers.export');
+    Route::post('/subscribers/import', [SubscriberController::class, 'import'])->name('subscribers.import');
+
+    // Social Post routes
+    Route::get('/social-posts', [SocialPostController::class, 'index'])->name('social-posts.index');
+    Route::get('/social-posts/queue', [SocialPostController::class, 'queue'])->name('social-posts.queue');
+    Route::post('/social-posts', [SocialPostController::class, 'store'])->name('social-posts.store');
+    Route::put('/social-posts/{socialPost}', [SocialPostController::class, 'update'])->name('social-posts.update');
+    Route::delete('/social-posts/{socialPost}', [SocialPostController::class, 'destroy'])->name('social-posts.destroy');
+    Route::post('/social-posts/{socialPost}/queue', [SocialPostController::class, 'queuePost'])->name('social-posts.queue-post');
+    Route::post('/social-posts/{socialPost}/schedule', [SocialPostController::class, 'schedule'])->name('social-posts.schedule');
+    Route::post('/social-posts/bulk-schedule', [SocialPostController::class, 'bulkSchedule'])->name('social-posts.bulk-schedule');
+
+    // AI Assistant routes
+    Route::prefix('ai')->group(function () {
+        Route::post('/draft', [AIAssistantController::class, 'draft'])->name('ai.draft');
+        Route::post('/polish', [AIAssistantController::class, 'polish'])->name('ai.polish');
+        Route::post('/continue', [AIAssistantController::class, 'continue'])->name('ai.continue');
+        Route::post('/outline', [AIAssistantController::class, 'outline'])->name('ai.outline');
+        Route::post('/tone', [AIAssistantController::class, 'changeTone'])->name('ai.tone');
+        Route::post('/shorter', [AIAssistantController::class, 'shorter'])->name('ai.shorter');
+        Route::post('/longer', [AIAssistantController::class, 'longer'])->name('ai.longer');
+        Route::post('/ask', [AIAssistantController::class, 'ask'])->name('ai.ask');
+        Route::post('/atomize', [AIAssistantController::class, 'atomize'])->name('ai.atomize');
+    });
+
+    // Logout route
+    Route::post('/logout', function () {
+        auth()->logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+
+        return redirect('/');
+    })->name('logout');
+});

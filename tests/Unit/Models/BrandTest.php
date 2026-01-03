@@ -1,0 +1,50 @@
+<?php
+
+use App\Models\Brand;
+use App\Models\Post;
+use App\Models\Subscriber;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
+
+test('brand belongs to a user', function () {
+    $brand = Brand::factory()->create();
+
+    expect($brand->user)->toBeInstanceOf(User::class);
+});
+
+test('brand has many posts', function () {
+    $brand = Brand::factory()->create();
+    Post::factory()->count(3)->forBrand($brand)->create();
+
+    expect($brand->posts)->toHaveCount(3);
+});
+
+test('brand has many subscribers', function () {
+    $brand = Brand::factory()->create();
+    Subscriber::factory()->count(5)->forBrand($brand)->create();
+
+    expect($brand->subscribers)->toHaveCount(5);
+});
+
+test('brand url uses custom domain when verified', function () {
+    $brand = Brand::factory()->withCustomDomain('example.com')->create();
+
+    expect($brand->url)->toBe('https://example.com');
+});
+
+test('brand url uses app url with slug when no custom domain', function () {
+    $brand = Brand::factory()->create(['slug' => 'test-brand']);
+
+    expect($brand->url)->toBe(config('app.url').'/@test-brand');
+});
+
+test('active subscribers count only includes confirmed subscribers', function () {
+    $brand = Brand::factory()->create();
+    Subscriber::factory()->count(3)->confirmed()->forBrand($brand)->create();
+    Subscriber::factory()->count(2)->pending()->forBrand($brand)->create();
+    Subscriber::factory()->count(1)->unsubscribed()->forBrand($brand)->create();
+
+    expect($brand->active_subscribers_count)->toBe(3);
+});

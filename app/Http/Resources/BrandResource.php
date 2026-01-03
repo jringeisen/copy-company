@@ -1,0 +1,41 @@
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class BrandResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'tagline' => $this->tagline,
+            'description' => $this->description,
+            'industry' => $this->industry,
+            'logo_path' => $this->logo_path,
+            'favicon_path' => $this->favicon_path,
+            'primary_color' => $this->primary_color,
+            'secondary_color' => $this->secondary_color,
+            'custom_domain' => $this->custom_domain,
+            'domain_verified' => $this->domain_verified,
+            'newsletter_provider' => $this->newsletter_provider?->value,
+            'voice_settings' => $this->voice_settings,
+            'url' => $this->url,
+            'active_subscribers_count' => $this->when(
+                $this->relationLoaded('subscribers'),
+                fn () => $this->active_subscribers_count
+            ),
+            'created_at' => $this->created_at?->format('M d, Y g:i A'),
+            'updated_at' => $this->updated_at?->format('M d, Y g:i A'),
+        ];
+    }
+}

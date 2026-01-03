@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(test:*)",
+      "Bash(php artisan:*)",
+      "Bash(npm run build:*)",
+      "WebSearch",
+      "Bash(php -l:*)",
+      "mcp__laravel-boost__application-info",
+      "mcp__laravel-boost__search-docs"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "laravel-boost"
+  ]
+}
