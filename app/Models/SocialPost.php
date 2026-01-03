@@ -5,13 +5,16 @@ namespace App\Models;
 use App\Enums\SocialFormat;
 use App\Enums\SocialPlatform;
 use App\Enums\SocialPostStatus;
+use App\Models\Concerns\HasStatusScopes;
+use App\Services\SocialPlatforms\PlatformFactory;
+use App\Services\SocialPlatforms\PlatformInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SocialPost extends Model
 {
-    use HasFactory;
+    use HasFactory, HasStatusScopes;
 
     protected $fillable = [
         'post_id',
@@ -55,30 +58,29 @@ class SocialPost extends Model
         return $this->belongsTo(Post::class);
     }
 
-    // Scopes
     public function scopeDraft($query)
     {
-        return $query->where('status', SocialPostStatus::Draft);
+        return $this->scopeWithStatus($query, SocialPostStatus::Draft);
     }
 
     public function scopeQueued($query)
     {
-        return $query->where('status', SocialPostStatus::Queued);
+        return $this->scopeWithStatus($query, SocialPostStatus::Queued);
     }
 
     public function scopeScheduled($query)
     {
-        return $query->where('status', SocialPostStatus::Scheduled);
+        return $this->scopeWithStatus($query, SocialPostStatus::Scheduled);
     }
 
     public function scopePublished($query)
     {
-        return $query->where('status', SocialPostStatus::Published);
+        return $this->scopeWithStatus($query, SocialPostStatus::Published);
     }
 
     public function scopeFailed($query)
     {
-        return $query->where('status', SocialPostStatus::Failed);
+        return $this->scopeWithStatus($query, SocialPostStatus::Failed);
     }
 
     public function scopeForPlatform($query, SocialPlatform $platform)
@@ -101,30 +103,22 @@ class SocialPost extends Model
         ]);
     }
 
+    /**
+     * Get the platform strategy instance for this social post.
+     */
+    public function getPlatformStrategy(): PlatformInterface
+    {
+        return PlatformFactory::fromEnum($this->platform);
+    }
+
     public function getCharacterLimitAttribute(): int
     {
-        return match ($this->platform) {
-            SocialPlatform::Twitter => 280,
-            SocialPlatform::Instagram => 2200,
-            SocialPlatform::Facebook => 63206,
-            SocialPlatform::LinkedIn => 3000,
-            SocialPlatform::Pinterest => 500,
-            SocialPlatform::TikTok => 2200,
-            default => 2200,
-        };
+        return $this->getPlatformStrategy()->getCharacterLimit();
     }
 
     public function getPlatformDisplayNameAttribute(): string
     {
-        return match ($this->platform) {
-            SocialPlatform::Instagram => 'Instagram',
-            SocialPlatform::Facebook => 'Facebook',
-            SocialPlatform::Pinterest => 'Pinterest',
-            SocialPlatform::LinkedIn => 'LinkedIn',
-            SocialPlatform::TikTok => 'TikTok',
-            SocialPlatform::Twitter => 'X (Twitter)',
-            default => ucfirst($this->platform->value),
-        };
+        return $this->getPlatformStrategy()->getDisplayName();
     }
 
     public function getStatusColorAttribute(): string

@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\HasBrandAuthorization;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class DashboardController extends Controller
 {
+    use HasBrandAuthorization;
+
     public function index(): Response
     {
         $user = auth()->user();
-        $brand = $user->currentBrand();
+        $brand = $this->currentBrand();
 
         return Inertia::render('Dashboard', [
             'user' => $user,

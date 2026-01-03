@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\HasBrandAuthorization;
 use App\Models\NewsletterSend;
 use App\Models\Post;
 use App\Models\SocialPost;
@@ -14,12 +15,14 @@ use Inertia\Response;
 
 class CalendarController extends Controller
 {
+    use HasBrandAuthorization;
+
     public function index(Request $request): Response|RedirectResponse
     {
-        $brand = auth()->user()->currentBrand();
+        $brand = $this->requireBrand();
 
-        if (! $brand) {
-            return redirect()->route('brands.create');
+        if ($this->isRedirect($brand)) {
+            return $brand;
         }
 
         $month = $request->get('month', now()->format('Y-m'));

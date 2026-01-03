@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\SocialPostStatus;
+use App\Http\Controllers\Concerns\HasBrandAuthorization;
 use App\Http\Requests\SocialPost\BulkScheduleSocialPostRequest;
 use App\Http\Requests\SocialPost\ScheduleSocialPostRequest;
 use App\Http\Requests\SocialPost\StoreSocialPostRequest;
@@ -16,12 +17,14 @@ use Inertia\Response;
 
 class SocialPostController extends Controller
 {
+    use HasBrandAuthorization;
+
     public function index(): Response|RedirectResponse
     {
-        $brand = auth()->user()->currentBrand();
+        $brand = $this->requireBrand();
 
-        if (! $brand) {
-            return redirect()->route('brands.create');
+        if ($this->isRedirect($brand)) {
+            return $brand;
         }
 
         $query = $brand->socialPosts()->with('post:id,title');
@@ -74,10 +77,10 @@ class SocialPostController extends Controller
 
     public function queue(): Response|RedirectResponse
     {
-        $brand = auth()->user()->currentBrand();
+        $brand = $this->requireBrand();
 
-        if (! $brand) {
-            return redirect()->route('brands.create');
+        if ($this->isRedirect($brand)) {
+            return $brand;
         }
 
         $queuedPosts = $brand->socialPosts()
@@ -94,7 +97,7 @@ class SocialPostController extends Controller
 
     public function store(StoreSocialPostRequest $request): RedirectResponse
     {
-        $brand = auth()->user()->currentBrand();
+        $brand = $this->currentBrand();
         $validated = $request->validated();
 
         $brand->socialPosts()->create([
@@ -150,6 +153,8 @@ class SocialPostController extends Controller
 
     public function schedule(ScheduleSocialPostRequest $request, SocialPost $socialPost): RedirectResponse
     {
+        $this->authorize('update', $socialPost);
+
         if (! in_array($socialPost->status, [SocialPostStatus::Draft, SocialPostStatus::Queued])) {
             return back()->with('error', 'This post cannot be scheduled.');
         }
@@ -166,7 +171,7 @@ class SocialPostController extends Controller
 
     public function bulkSchedule(BulkScheduleSocialPostRequest $request): RedirectResponse
     {
-        $brand = auth()->user()->currentBrand();
+        $brand = $this->currentBrand();
         $validated = $request->validated();
 
         $scheduledAt = \Carbon\Carbon::parse($validated['scheduled_at']);

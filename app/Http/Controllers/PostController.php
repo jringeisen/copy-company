@@ -2,29 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\NewsletterSendStatus;
-use App\Enums\PostStatus;
+use App\Http\Controllers\Concerns\HasBrandAuthorization;
 use App\Http\Requests\Post\BulkDeletePostsRequest;
 use App\Http\Requests\Post\PublishPostRequest;
 use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
 use App\Http\Resources\BrandResource;
 use App\Http\Resources\PostResource;
-use App\Jobs\ProcessNewsletterSend;
 use App\Models\Post;
+use App\Services\PostService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class PostController extends Controller
 {
+    use HasBrandAuthorization;
+
+    public function __construct(
+        protected PostService $postService
+    ) {}
+
     public function index(): Response|RedirectResponse
     {
-        $brand = auth()->user()->currentBrand();
+        $brand = $this->requireBrand();
 
-        if (! $brand) {
-            return redirect()->route('brands.create');
+        if ($this->isRedirect($brand)) {
+            return $brand;
         }
 
         $posts = $brand->posts()
@@ -39,10 +43,10 @@ class PostController extends Controller
 
     public function create(): Response|RedirectResponse
     {
-        $brand = auth()->user()->currentBrand();
+        $brand = $this->requireBrand();
 
-        if (! $brand) {
-            return redirect()->route('brands.create');
+        if ($this->isRedirect($brand)) {
+            return $brand;
         }
 
         return Inertia::render('Posts/Create', [
@@ -52,25 +56,8 @@ class PostController extends Controller
 
     public function store(StorePostRequest $request): RedirectResponse
     {
-        $brand = auth()->user()->currentBrand();
-        $validated = $request->validated();
-
-        $post = $brand->posts()->create([
-            'user_id' => auth()->id(),
-            'title' => $validated['title'],
-            'slug' => Str::slug($validated['title']),
-            'content' => $validated['content'],
-            'content_html' => $validated['content_html'] ?? null,
-            'excerpt' => $validated['excerpt'] ?? null,
-            'featured_image' => $validated['featured_image'] ?? null,
-            'seo_title' => $validated['seo_title'] ?? null,
-            'seo_description' => $validated['seo_description'] ?? null,
-            'tags' => $validated['tags'] ?? [],
-            'publish_to_blog' => $validated['publish_to_blog'] ?? true,
-            'send_as_newsletter' => $validated['send_as_newsletter'] ?? true,
-            'generate_social' => $validated['generate_social'] ?? true,
-            'status' => PostStatus::Draft,
-        ]);
+        $brand = $this->currentBrand();
+        $post = $this->postService->create($brand, auth()->id(), $request->validated());
 
         return redirect()->route('posts.edit', $post)->with('success', 'Post created!');
     }
@@ -89,21 +76,7 @@ class PostController extends Controller
 
     public function update(UpdatePostRequest $request, Post $post): RedirectResponse
     {
-        $validated = $request->validated();
-
-        $post->update([
-            'title' => $validated['title'],
-            'content' => $validated['content'],
-            'content_html' => $validated['content_html'] ?? null,
-            'excerpt' => $validated['excerpt'] ?? null,
-            'featured_image' => $validated['featured_image'] ?? null,
-            'seo_title' => $validated['seo_title'] ?? null,
-            'seo_description' => $validated['seo_description'] ?? null,
-            'tags' => $validated['tags'] ?? [],
-            'publish_to_blog' => $validated['publish_to_blog'] ?? true,
-            'send_as_newsletter' => $validated['send_as_newsletter'] ?? true,
-            'generate_social' => $validated['generate_social'] ?? true,
-        ]);
+        $this->postService->update($post, $request->validated());
 
         return back()->with('success', 'Post saved!');
     }
@@ -120,7 +93,7 @@ class PostController extends Controller
     public function bulkDestroy(BulkDeletePostsRequest $request): RedirectResponse
     {
         $validated = $request->validated();
-        $brand = auth()->user()->currentBrand();
+        $brand = $this->currentBrand();
 
         $deleted = Post::whereIn('id', $validated['ids'])
             ->where('brand_id', $brand->id)
@@ -133,50 +106,18 @@ class PostController extends Controller
     public function publish(PublishPostRequest $request, Post $post): RedirectResponse
     {
         $validated = $request->validated();
-
         $isScheduled = ($validated['schedule_mode'] ?? 'now') === 'scheduled';
 
         if ($isScheduled) {
-            $post->update([
-                'status' => PostStatus::Scheduled,
-                'scheduled_at' => $validated['scheduled_at'],
-                'publish_to_blog' => $validated['publish_to_blog'] ?? true,
-                'send_as_newsletter' => $validated['send_as_newsletter'] ?? false,
-            ]);
+            $this->postService->schedule($post, $validated);
 
-            if ($validated['send_as_newsletter'] ?? false) {
-                $post->newsletterSend()->create([
-                    'brand_id' => $post->brand_id,
-                    'subject_line' => $validated['subject_line'],
-                    'preview_text' => $validated['preview_text'] ?? null,
-                    'provider' => $post->brand->newsletter_provider,
-                    'status' => NewsletterSendStatus::Scheduled,
-                    'scheduled_at' => $validated['scheduled_at'],
-                ]);
-            }
-
-            return redirect()->route('posts.index')->with('success', 'Post scheduled for '.\Carbon\Carbon::parse($validated['scheduled_at'])->format('M d, Y \a\t g:i A').'!');
+            return redirect()->route('posts.index')->with(
+                'success',
+                'Post scheduled for '.\Carbon\Carbon::parse($validated['scheduled_at'])->format('M d, Y \a\t g:i A').'!'
+            );
         }
 
-        $post->update([
-            'status' => PostStatus::Published,
-            'published_at' => now(),
-            'publish_to_blog' => $validated['publish_to_blog'] ?? true,
-            'send_as_newsletter' => $validated['send_as_newsletter'] ?? false,
-        ]);
-
-        if ($validated['send_as_newsletter'] ?? false) {
-            $newsletterSend = $post->newsletterSend()->create([
-                'brand_id' => $post->brand_id,
-                'subject_line' => $validated['subject_line'],
-                'preview_text' => $validated['preview_text'] ?? null,
-                'provider' => $post->brand->newsletter_provider,
-                'status' => NewsletterSendStatus::Scheduled,
-                'scheduled_at' => now(),
-            ]);
-
-            ProcessNewsletterSend::dispatch($newsletterSend);
-        }
+        $this->postService->publish($post, $validated);
 
         return redirect()->route('posts.index')->with('success', 'Post published!');
     }

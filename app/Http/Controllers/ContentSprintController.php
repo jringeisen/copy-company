@@ -3,23 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ContentSprintStatus;
-use App\Enums\PostStatus;
+use App\Http\Controllers\Concerns\HasBrandAuthorization;
 use App\Http\Requests\ContentSprint\AcceptContentSprintRequest;
 use App\Http\Requests\ContentSprint\StoreContentSprintRequest;
 use App\Jobs\GenerateContentSprint;
 use App\Models\ContentSprint;
+use App\Services\ContentSprintService;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ContentSprintController extends Controller
 {
+    use HasBrandAuthorization;
+
+    public function __construct(
+        protected ContentSprintService $contentSprintService
+    ) {}
+
     public function index(): Response|RedirectResponse
     {
-        $brand = auth()->user()->currentBrand();
+        $brand = $this->requireBrand();
 
-        if (! $brand) {
-            return redirect()->route('brands.create');
+        if ($this->isRedirect($brand)) {
+            return $brand;
         }
 
         $sprints = $brand->contentSprints()
@@ -44,10 +51,10 @@ class ContentSprintController extends Controller
 
     public function create(): Response|RedirectResponse
     {
-        $brand = auth()->user()->currentBrand();
+        $brand = $this->requireBrand();
 
-        if (! $brand) {
-            return redirect()->route('brands.create');
+        if ($this->isRedirect($brand)) {
+            return $brand;
         }
 
         return Inertia::render('ContentSprint/Create', [
@@ -57,7 +64,7 @@ class ContentSprintController extends Controller
 
     public function store(StoreContentSprintRequest $request): RedirectResponse
     {
-        $brand = auth()->user()->currentBrand();
+        $brand = $this->currentBrand();
         $validated = $request->validated();
 
         $sprint = $brand->contentSprints()->create([
@@ -80,7 +87,7 @@ class ContentSprintController extends Controller
     {
         $this->authorize('view', $contentSprint);
 
-        $brand = auth()->user()->currentBrand();
+        $brand = $this->currentBrand();
 
         return Inertia::render('ContentSprint/Show', [
             'sprint' => [
@@ -107,54 +114,16 @@ class ContentSprintController extends Controller
         }
 
         $validated = $request->validated();
-        $brand = auth()->user()->currentBrand();
-        $generatedContent = $contentSprint->generated_content ?? [];
-        $postsCreated = 0;
+        $brand = $this->currentBrand();
 
-        foreach ($validated['idea_indices'] as $index) {
-            if (! isset($generatedContent[$index])) {
-                continue;
-            }
+        $posts = $this->contentSprintService->acceptIdeas(
+            $contentSprint,
+            $brand,
+            auth()->id(),
+            $validated['idea_indices']
+        );
 
-            $idea = $generatedContent[$index];
-
-            $keyPoints = $idea['key_points'] ?? [];
-            $listItems = array_map(fn ($point) => [
-                'type' => 'listItem',
-                'content' => [
-                    [
-                        'type' => 'paragraph',
-                        'content' => [
-                            ['type' => 'text', 'text' => $point],
-                        ],
-                    ],
-                ],
-            ], $keyPoints);
-
-            $brand->posts()->create([
-                'user_id' => auth()->id(),
-                'title' => $idea['title'],
-                'slug' => \Illuminate\Support\Str::slug($idea['title']),
-                'excerpt' => $idea['description'] ?? null,
-                'content' => [
-                    'type' => 'doc',
-                    'content' => count($listItems) > 0 ? [
-                        [
-                            'type' => 'bulletList',
-                            'content' => $listItems,
-                        ],
-                    ] : [],
-                ],
-                'status' => PostStatus::Draft,
-            ]);
-
-            $postsCreated++;
-        }
-
-        // Track which ideas have been converted to posts
-        $existingConverted = $contentSprint->converted_indices ?? [];
-        $newConverted = array_values(array_unique(array_merge($existingConverted, $validated['idea_indices'])));
-        $contentSprint->update(['converted_indices' => $newConverted]);
+        $postsCreated = $posts->count();
 
         return redirect()->route('posts.index')
             ->with('success', "{$postsCreated} draft posts created from sprint!");

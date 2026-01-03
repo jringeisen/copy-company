@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use App\Enums\ContentSprintStatus;
+use App\Models\Concerns\HasStatusScopes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ContentSprint extends Model
 {
-    use HasFactory;
+    use HasFactory, HasStatusScopes;
 
     protected $fillable = [
         'brand_id',
@@ -42,22 +43,22 @@ class ContentSprint extends Model
 
     public function scopePending($query)
     {
-        return $query->where('status', ContentSprintStatus::Pending);
+        return $this->scopeWithStatus($query, ContentSprintStatus::Pending);
     }
 
     public function scopeGenerating($query)
     {
-        return $query->where('status', ContentSprintStatus::Generating);
+        return $this->scopeWithStatus($query, ContentSprintStatus::Generating);
     }
 
     public function scopeCompleted($query)
     {
-        return $query->where('status', ContentSprintStatus::Completed);
+        return $this->scopeWithStatus($query, ContentSprintStatus::Completed);
     }
 
     public function scopeFailed($query)
     {
-        return $query->where('status', ContentSprintStatus::Failed);
+        return $this->scopeWithStatus($query, ContentSprintStatus::Failed);
     }
 
     public function getIdeasCountAttribute(): int

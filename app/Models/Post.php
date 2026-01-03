@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\PostStatus;
+use App\Models\Concerns\HasStatusScopes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,7 +13,7 @@ use Illuminate\Support\Str;
 
 class Post extends Model
 {
-    use HasFactory;
+    use HasFactory, HasStatusScopes;
 
     protected $fillable = [
         'brand_id',
@@ -96,17 +97,17 @@ class Post extends Model
 
     public function scopePublished($query)
     {
-        return $query->where('status', PostStatus::Published);
+        return $this->scopeWithStatus($query, PostStatus::Published);
     }
 
     public function scopeDraft($query)
     {
-        return $query->where('status', PostStatus::Draft);
+        return $this->scopeWithStatus($query, PostStatus::Draft);
     }
 
     public function scopeScheduled($query)
     {
-        return $query->where('status', PostStatus::Scheduled);
+        return $this->scopeWithStatus($query, PostStatus::Scheduled);
     }
 
     public function getUrlAttribute(): string

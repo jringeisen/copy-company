@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\SubscriberStatus;
+use App\Http\Controllers\Concerns\HasBrandAuthorization;
 use App\Http\Requests\Subscriber\ImportSubscribersRequest;
 use App\Http\Resources\SubscriberResource;
 use App\Models\Subscriber;
@@ -13,12 +14,14 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SubscriberController extends Controller
 {
+    use HasBrandAuthorization;
+
     public function index(): Response|RedirectResponse
     {
-        $brand = auth()->user()->currentBrand();
+        $brand = $this->requireBrand();
 
-        if (! $brand) {
-            return redirect()->route('brands.create');
+        if ($this->isRedirect($brand)) {
+            return $brand;
         }
 
         $subscribers = $brand->subscribers()
@@ -46,7 +49,7 @@ class SubscriberController extends Controller
 
     public function export(): StreamedResponse|RedirectResponse
     {
-        $brand = auth()->user()->currentBrand();
+        $brand = $this->currentBrand();
 
         if (! $brand) {
             return back()->with('error', 'No brand found.');
@@ -81,7 +84,7 @@ class SubscriberController extends Controller
 
     public function import(ImportSubscribersRequest $request): RedirectResponse
     {
-        $brand = auth()->user()->currentBrand();
+        $brand = $this->currentBrand();
 
         $file = $request->file('file');
         $handle = fopen($file->getPathname(), 'r');
