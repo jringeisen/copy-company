@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Enums\SocialPlatform;
 use App\Http\Controllers\Concerns\HasBrandAuthorization;
+use App\Services\SocialPublishing\FacebookPagesService;
+use App\Services\SocialPublishing\PinterestBoardsService;
 use App\Services\SocialPublishing\PublisherFactory;
 use App\Services\SocialPublishing\TokenManager;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -18,7 +21,9 @@ class SocialSettingsController extends Controller
     use HasBrandAuthorization;
 
     public function __construct(
-        protected TokenManager $tokenManager
+        protected TokenManager $tokenManager,
+        protected FacebookPagesService $facebookPagesService,
+        protected PinterestBoardsService $pinterestBoardsService
     ) {}
 
     /**
@@ -49,6 +54,23 @@ class SocialSettingsController extends Controller
             $identifier = $platform->value;
             $isSupported = PublisherFactory::isSupported($identifier);
             $connectionInfo = $this->tokenManager->getConnectionInfo($brand, $identifier);
+            $credentials = $this->tokenManager->getCredentials($brand, $identifier);
+
+            // Check if platform needs additional configuration
+            $needsConfiguration = false;
+            $configuredAccount = null;
+
+            if ($connectionInfo !== null) {
+                if ($identifier === 'facebook' && empty($credentials['page_id'])) {
+                    $needsConfiguration = true;
+                } elseif ($identifier === 'pinterest' && empty($credentials['board_id'])) {
+                    $needsConfiguration = true;
+                } elseif ($identifier === 'facebook' && ! empty($credentials['page_name'])) {
+                    $configuredAccount = $credentials['page_name'];
+                } elseif ($identifier === 'pinterest' && ! empty($credentials['board_name'])) {
+                    $configuredAccount = $credentials['board_name'];
+                }
+            }
 
             return [
                 'identifier' => $identifier,
@@ -57,6 +79,8 @@ class SocialSettingsController extends Controller
                 'supported' => $isSupported,
                 'account_name' => $connectionInfo['account_name'] ?? null,
                 'connected_at' => $connectionInfo['connected_at'] ?? null,
+                'needs_configuration' => $needsConfiguration,
+                'configured_account' => $configuredAccount,
             ];
         });
 
@@ -116,6 +140,12 @@ class SocialSettingsController extends Controller
 
             $this->tokenManager->storeCredentials($brand, $platform, $credentials);
 
+            // Redirect to account selection for platforms that require it
+            if (in_array($platform, ['facebook', 'pinterest'])) {
+                return redirect()->route('settings.social.select', ['platform' => $platform])
+                    ->with('info', 'Please select which account to publish to.');
+            }
+
             return redirect()->route('settings.social')
                 ->with('success', ucfirst($platform).' connected successfully!');
         } catch (\Exception $e) {
@@ -143,6 +173,93 @@ class SocialSettingsController extends Controller
         $this->tokenManager->removeCredentials($brand, $platform);
 
         return back()->with('success', ucfirst($platform).' disconnected.');
+    }
+
+    public function showAccountSelection(string $platform): Response|RedirectResponse
+    {
+        if (! in_array($platform, ['facebook', 'pinterest'])) {
+            return redirect()->route('settings.social')->with('error', 'Account selection is not required for this platform.');
+        }
+
+        $brand = $this->currentBrand();
+
+        if (! $brand) {
+            return redirect()->route('brands.create');
+        }
+
+        $credentials = $this->tokenManager->getCredentials($brand, $platform);
+
+        if (! $credentials) {
+            return redirect()->route('settings.social')->with('error', 'Please connect your '.$platform.' account first.');
+        }
+
+        $accounts = [];
+        $platformName = ucfirst($platform);
+        $accountType = '';
+
+        if ($platform === 'facebook') {
+            $accounts = $this->facebookPagesService->fetchUserPages($credentials['access_token']);
+            $accountType = 'page';
+        } elseif ($platform === 'pinterest') {
+            $accounts = $this->pinterestBoardsService->fetchUserBoards($credentials['access_token']);
+            $accountType = 'board';
+        }
+
+        if (empty($accounts)) {
+            return redirect()->route('settings.social')
+                ->with('error', "No {$accountType}s found. Please create a {$accountType} on {$platformName} first.");
+        }
+
+        return Inertia::render('Settings/SocialAccountSelect', [
+            'platform' => $platform,
+            'platformName' => $platformName,
+            'accountType' => $accountType,
+            'accounts' => $accounts,
+            'currentSelection' => $platform === 'facebook'
+                ? ($credentials['page_id'] ?? null)
+                : ($credentials['board_id'] ?? null),
+        ]);
+    }
+
+    public function storeAccountSelection(Request $request, string $platform): RedirectResponse
+    {
+        if (! in_array($platform, ['facebook', 'pinterest'])) {
+            return redirect()->route('settings.social')->with('error', 'Invalid platform.');
+        }
+
+        $brand = $this->currentBrand();
+
+        if (! $brand) {
+            return redirect()->route('brands.create');
+        }
+
+        $validated = $request->validate([
+            'account_id' => 'required|string',
+            'account_name' => 'required|string',
+            'access_token' => 'nullable|string', // Only for Facebook pages
+        ]);
+
+        $credentials = $this->tokenManager->getCredentials($brand, $platform);
+
+        if (! $credentials) {
+            return redirect()->route('settings.social')->with('error', 'Please connect your account first.');
+        }
+
+        if ($platform === 'facebook') {
+            $credentials['page_id'] = $validated['account_id'];
+            $credentials['page_name'] = $validated['account_name'];
+            if (! empty($validated['access_token'])) {
+                $credentials['page_access_token'] = $validated['access_token'];
+            }
+        } elseif ($platform === 'pinterest') {
+            $credentials['board_id'] = $validated['account_id'];
+            $credentials['board_name'] = $validated['account_name'];
+        }
+
+        $this->tokenManager->storeCredentials($brand, $platform, $credentials);
+
+        return redirect()->route('settings.social')
+            ->with('success', ucfirst($platform).' configured successfully!');
     }
 
     protected function isValidPlatform(string $platform): bool

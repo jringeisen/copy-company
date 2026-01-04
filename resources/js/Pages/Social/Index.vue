@@ -1,6 +1,6 @@
 <script setup>
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
-import { ref, watch } from 'vue';
+import { Head, Link, router, useForm, usePoll } from '@inertiajs/vue3';
+import { ref, watch, computed } from 'vue';
 import axios from 'axios';
 import AppNavigation from '@/Components/AppNavigation.vue';
 import SocialPostCard from '@/Components/Social/SocialPostCard.vue';
@@ -13,7 +13,33 @@ const props = defineProps({
     filters: Object,
     platforms: Array,
     statuses: Array,
+    connectedPlatforms: {
+        type: Array,
+        default: () => [],
+    },
 });
+
+// Check if there are any posts in "active" states that might change
+const hasActiveStatuses = computed(() => {
+    const activeStatuses = ['queued', 'scheduled'];
+    return props.socialPosts.data.some(post => activeStatuses.includes(post.status));
+});
+
+// Poll for updates when there are posts that might change status
+const { stop: stopPolling, start: startPolling } = usePoll(5000, {
+    only: ['socialPosts'],
+}, {
+    autoStart: false,
+});
+
+// Start polling if there are active statuses
+watch(hasActiveStatuses, (hasActive) => {
+    if (hasActive) {
+        startPolling();
+    } else {
+        stopPolling();
+    }
+}, { immediate: true });
 
 const selectedPlatform = ref(props.filters.platform);
 const selectedStatus = ref(props.filters.status);
@@ -184,6 +210,7 @@ const availablePlatformsForGenerate = [
                     v-for="socialPost in socialPosts.data"
                     :key="socialPost.id"
                     :social-post="socialPost"
+                    :connected-platforms="connectedPlatforms"
                     @edit="handleEdit"
                     @schedule="handleSchedule"
                 />

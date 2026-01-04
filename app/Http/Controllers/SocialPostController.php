@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PostStatus;
+use App\Enums\SocialPlatform;
 use App\Enums\SocialPostStatus;
 use App\Http\Controllers\Concerns\HasBrandAuthorization;
 use App\Http\Requests\SocialPost\BulkScheduleSocialPostRequest;
@@ -50,10 +52,12 @@ class SocialPostController extends Controller
             ->paginate(20);
 
         $posts = $brand->posts()
-            ->where('status', 'published')
-            ->orWhere('status', 'draft')
+            ->whereIn('status', [PostStatus::Published, PostStatus::Draft])
             ->orderByDesc('updated_at')
             ->get(['id', 'title', 'status']);
+
+        // Get fully configured platforms (connected AND have page/board selected where required)
+        $connectedPlatforms = $this->getFullyConfiguredPlatforms($brand);
 
         return Inertia::render('Social/Index', [
             'socialPosts' => SocialPostResource::collection($socialPosts),
@@ -63,23 +67,9 @@ class SocialPostController extends Controller
                 'platform' => request()->platform ?? 'all',
                 'status' => request()->status ?? 'all',
             ],
-            'platforms' => [
-                ['value' => 'all', 'label' => 'All Platforms'],
-                ['value' => 'instagram', 'label' => 'Instagram'],
-                ['value' => 'twitter', 'label' => 'X (Twitter)'],
-                ['value' => 'facebook', 'label' => 'Facebook'],
-                ['value' => 'linkedin', 'label' => 'LinkedIn'],
-                ['value' => 'pinterest', 'label' => 'Pinterest'],
-                ['value' => 'tiktok', 'label' => 'TikTok'],
-            ],
-            'statuses' => [
-                ['value' => 'all', 'label' => 'All Statuses'],
-                ['value' => 'draft', 'label' => 'Draft'],
-                ['value' => 'queued', 'label' => 'Queued'],
-                ['value' => 'scheduled', 'label' => 'Scheduled'],
-                ['value' => 'published', 'label' => 'Published'],
-                ['value' => 'failed', 'label' => 'Failed'],
-            ],
+            'platforms' => SocialPlatform::toDropdownOptions(includeAll: true),
+            'statuses' => SocialPostStatus::toDropdownOptions(includeAll: true),
+            'connectedPlatforms' => $connectedPlatforms,
         ]);
     }
 
@@ -273,5 +263,38 @@ class SocialPostController extends Controller
         PublishSocialPost::dispatch($socialPost);
 
         return back()->with('success', 'Retrying publication to '.$socialPost->platform->displayName().'...');
+    }
+
+    /**
+     * Get list of fully configured platform identifiers.
+     *
+     * @return array<string>
+     */
+    protected function getFullyConfiguredPlatforms(\App\Models\Brand $brand): array
+    {
+        $configuredPlatforms = [];
+
+        foreach (SocialPlatform::cases() as $platform) {
+            $identifier = $platform->value;
+            $credentials = $this->tokenManager->getCredentials($brand, $identifier);
+
+            if (! $credentials) {
+                continue;
+            }
+
+            // Facebook requires page_id to be configured
+            if ($identifier === 'facebook' && empty($credentials['page_id'])) {
+                continue;
+            }
+
+            // Pinterest requires board_id to be configured
+            if ($identifier === 'pinterest' && empty($credentials['board_id'])) {
+                continue;
+            }
+
+            $configuredPlatforms[] = $identifier;
+        }
+
+        return $configuredPlatforms;
     }
 }

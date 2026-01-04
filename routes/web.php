@@ -50,6 +50,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/settings/social', [SocialSettingsController::class, 'index'])->name('settings.social');
     Route::get('/settings/social/{platform}/redirect', [SocialSettingsController::class, 'redirect'])->name('settings.social.redirect');
     Route::get('/settings/social/{platform}/callback', [SocialSettingsController::class, 'callback'])->name('settings.social.callback');
+    Route::get('/settings/social/{platform}/select', [SocialSettingsController::class, 'showAccountSelection'])->name('settings.social.select');
+    Route::post('/settings/social/{platform}/select', [SocialSettingsController::class, 'storeAccountSelection'])->name('settings.social.select.store');
     Route::delete('/settings/social/{platform}', [SocialSettingsController::class, 'disconnect'])->name('settings.social.disconnect');
 
     // Post routes

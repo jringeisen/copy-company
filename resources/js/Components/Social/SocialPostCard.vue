@@ -1,15 +1,25 @@
 <script setup>
-import { computed } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
+import { router, Link } from '@inertiajs/vue3';
 
 const props = defineProps({
     socialPost: {
         type: Object,
         required: true,
     },
+    connectedPlatforms: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const emit = defineEmits(['edit', 'delete', 'queue', 'schedule']);
+
+const isPublishing = ref(false);
+
+const isPlatformConnected = computed(() => {
+    return props.connectedPlatforms.includes(props.socialPost.platform);
+});
 
 const platformIcons = {
     instagram: 'M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z',
@@ -53,6 +63,26 @@ const handleDelete = () => {
 const handleQueue = () => {
     router.post(`/social-posts/${props.socialPost.id}/queue`);
 };
+
+const handlePublishNow = () => {
+    if (!isPlatformConnected.value) return;
+    isPublishing.value = true;
+    router.post(`/social-posts/${props.socialPost.id}/publish-now`, {}, {
+        onFinish: () => {
+            isPublishing.value = false;
+        },
+    });
+};
+
+const handleRetry = () => {
+    if (!isPlatformConnected.value) return;
+    isPublishing.value = true;
+    router.post(`/social-posts/${props.socialPost.id}/retry`, {}, {
+        onFinish: () => {
+            isPublishing.value = false;
+        },
+    });
+};
 </script>
 
 <template>
@@ -82,6 +112,17 @@ const handleQueue = () => {
             >
                 {{ socialPost.status.charAt(0).toUpperCase() + socialPost.status.slice(1) }}
             </span>
+        </div>
+
+        <!-- Connection Warning -->
+        <div v-if="!isPlatformConnected && connectedPlatforms.length > 0" class="mx-4 mt-2 p-2 bg-amber-50 border border-amber-200 rounded-lg">
+            <div class="flex items-center gap-2 text-xs text-amber-700">
+                <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+                <span>{{ socialPost.platform_display }} is not connected.</span>
+                <Link href="/settings/social" class="font-medium underline hover:no-underline">Connect</Link>
+            </div>
         </div>
 
         <!-- Content Preview -->
@@ -131,12 +172,23 @@ const handleQueue = () => {
             </div>
         </div>
 
+        <!-- Failure Reason -->
+        <div v-if="socialPost.status === 'failed' && socialPost.failure_reason" class="mx-4 mb-3 p-2 bg-red-50 border border-red-200 rounded-lg">
+            <div class="flex items-start gap-2 text-xs text-red-700">
+                <svg class="w-4 h-4 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+                <span>{{ socialPost.failure_reason }}</span>
+            </div>
+        </div>
+
         <!-- Actions -->
         <div class="flex items-center justify-between p-4 border-t border-gray-100 bg-gray-50 rounded-b-lg">
             <div class="flex items-center space-x-2">
                 <button
                     @click="emit('edit', socialPost)"
                     class="text-sm text-gray-600 hover:text-gray-900 flex items-center"
+                    :disabled="isPublishing"
                 >
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -148,6 +200,7 @@ const handleQueue = () => {
                     v-if="socialPost.status === 'draft'"
                     @click="handleQueue"
                     class="text-sm text-yellow-600 hover:text-yellow-700 flex items-center"
+                    :disabled="isPublishing"
                 >
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -159,17 +212,53 @@ const handleQueue = () => {
                     v-if="['draft', 'queued'].includes(socialPost.status)"
                     @click="emit('schedule', socialPost)"
                     class="text-sm text-blue-600 hover:text-blue-700 flex items-center"
+                    :disabled="isPublishing"
                 >
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     Schedule
                 </button>
+
+                <!-- Publish Now button -->
+                <button
+                    v-if="['draft', 'queued', 'scheduled'].includes(socialPost.status) && isPlatformConnected"
+                    @click="handlePublishNow"
+                    :disabled="isPublishing"
+                    class="text-sm text-green-600 hover:text-green-700 flex items-center disabled:opacity-50"
+                >
+                    <svg v-if="isPublishing" class="w-4 h-4 mr-1 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <svg v-else class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    {{ isPublishing ? 'Publishing...' : 'Publish Now' }}
+                </button>
+
+                <!-- Retry button for failed posts -->
+                <button
+                    v-if="socialPost.status === 'failed' && isPlatformConnected"
+                    @click="handleRetry"
+                    :disabled="isPublishing"
+                    class="text-sm text-orange-600 hover:text-orange-700 flex items-center disabled:opacity-50"
+                >
+                    <svg v-if="isPublishing" class="w-4 h-4 mr-1 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <svg v-else class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    {{ isPublishing ? 'Retrying...' : 'Retry' }}
+                </button>
             </div>
 
             <button
                 @click="handleDelete"
                 class="text-sm text-red-600 hover:text-red-700"
+                :disabled="isPublishing"
             >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

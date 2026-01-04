@@ -50,12 +50,14 @@ class Subscriber extends Model
     }
 
     /**
+     * Scope to confirmed (active) subscribers.
+     *
      * @param  Builder<Subscriber>  $query
      * @return Builder<Subscriber>
      */
-    public function scopeActive(Builder $query): Builder
+    public function scopeConfirmed(Builder $query): Builder
     {
-        return $query->where('status', 'active');
+        return $query->where('status', SubscriberStatus::Confirmed);
     }
 
     public function getFullNameAttribute(): string

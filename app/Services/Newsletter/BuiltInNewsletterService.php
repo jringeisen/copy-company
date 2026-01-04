@@ -2,18 +2,18 @@
 
 namespace App\Services\Newsletter;
 
+use App\Enums\NewsletterSendStatus;
 use App\Jobs\SendNewsletterToSubscriber;
 use App\Models\Brand;
 use App\Models\NewsletterSend;
 use App\Models\Post;
-use App\Models\Subscriber;
 
 class BuiltInNewsletterService implements NewsletterServiceInterface
 {
     public function send(Brand $brand, Post $post, string $subjectLine, ?string $previewText = null): NewsletterSend
     {
         $subscribers = $brand->subscribers()
-            ->where('status', 'confirmed')
+            ->confirmed()
             ->get();
 
         $newsletterSend = NewsletterSend::create([
@@ -21,7 +21,7 @@ class BuiltInNewsletterService implements NewsletterServiceInterface
             'post_id' => $post->id,
             'subject' => $subjectLine,
             'preview_text' => $previewText,
-            'status' => 'sending',
+            'status' => NewsletterSendStatus::Sending,
             'total_recipients' => $subscribers->count(),
             'sent_count' => 0,
             'failed_count' => 0,
@@ -39,7 +39,7 @@ class BuiltInNewsletterService implements NewsletterServiceInterface
     public function getSubscriberCount(Brand $brand): int
     {
         return $brand->subscribers()
-            ->where('status', 'confirmed')
+            ->confirmed()
             ->count();
     }
 }

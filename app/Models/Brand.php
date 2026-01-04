@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Enums\NewsletterProvider;
-use App\Enums\SubscriberStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -81,6 +80,6 @@ class Brand extends Model
 
     public function getActiveSubscribersCountAttribute(): int
     {
-        return $this->subscribers()->where('status', SubscriberStatus::Confirmed)->count();
+        return $this->subscribers()->confirmed()->count();
     }
 }

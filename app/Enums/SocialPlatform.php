@@ -22,4 +22,27 @@ enum SocialPlatform: string
             self::Twitter => 'X (Twitter)',
         };
     }
+
+    /**
+     * Get all platforms as dropdown options.
+     *
+     * @return array<int, array{value: string, label: string}>
+     */
+    public static function toDropdownOptions(bool $includeAll = false): array
+    {
+        $options = [];
+
+        if ($includeAll) {
+            $options[] = ['value' => 'all', 'label' => 'All Platforms'];
+        }
+
+        foreach (self::cases() as $platform) {
+            $options[] = [
+                'value' => $platform->value,
+                'label' => $platform->displayName(),
+            ];
+        }
+
+        return $options;
+    }
 }

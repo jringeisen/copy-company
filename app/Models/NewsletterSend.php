@@ -4,11 +4,14 @@ namespace App\Models;
 
 use App\Enums\NewsletterProvider;
 use App\Enums\NewsletterSendStatus;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class NewsletterSend extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'post_id',
         'brand_id',

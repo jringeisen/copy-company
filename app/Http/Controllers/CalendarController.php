@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\NewsletterSendStatus;
+use App\Enums\PostStatus;
+use App\Enums\SocialPostStatus;
 use App\Http\Controllers\Concerns\HasBrandAuthorization;
 use App\Models\NewsletterSend;
 use App\Models\Post;
@@ -39,7 +42,7 @@ class CalendarController extends Controller
                 $q->whereBetween('scheduled_at', [$startOfMonth, $endOfMonth])
                     ->orWhereBetween('published_at', [$startOfMonth, $endOfMonth]);
             })
-            ->whereIn('status', ['scheduled', 'published'])
+            ->whereIn('status', [PostStatus::Scheduled, PostStatus::Published])
             ->get();
 
         $socialPosts = SocialPost::where('brand_id', $brand->id)
@@ -47,7 +50,7 @@ class CalendarController extends Controller
                 $q->whereBetween('scheduled_at', [$startOfMonth, $endOfMonth])
                     ->orWhereBetween('published_at', [$startOfMonth, $endOfMonth]);
             })
-            ->whereIn('status', ['scheduled', 'published'])
+            ->whereIn('status', [SocialPostStatus::Scheduled, SocialPostStatus::Published])
             ->with('post:id,title')
             ->get();
 
@@ -56,7 +59,7 @@ class CalendarController extends Controller
                 $q->whereBetween('scheduled_at', [$startOfMonth, $endOfMonth])
                     ->orWhereBetween('sent_at', [$startOfMonth, $endOfMonth]);
             })
-            ->whereIn('status', ['scheduled', 'sent'])
+            ->whereIn('status', [NewsletterSendStatus::Scheduled, NewsletterSendStatus::Sent])
             ->with('post:id,title')
             ->get();
 
