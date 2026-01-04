@@ -21,8 +21,10 @@ class PublishScheduledPosts implements ShouldQueue
 
     public function handle(): void
     {
+        // Eager load relationships to avoid N+1 queries
         $posts = Post::where('status', PostStatus::Scheduled)
             ->where('scheduled_at', '<=', now())
+            ->with(['newsletterSend', 'brand'])
             ->get();
 
         foreach ($posts as $post) {
@@ -56,12 +58,13 @@ class PublishScheduledPosts implements ShouldQueue
 
     private function dispatchNewsletter(NewsletterSend $newsletterSend): void
     {
+        // Eager load if not already loaded
+        $newsletterSend->loadMissing('post.brand');
         $brand = $newsletterSend->post->brand;
-        $subscribers = $brand->subscribers()
-            ->confirmed()
-            ->get();
 
-        if ($subscribers->isEmpty()) {
+        $subscriberCount = $brand->subscribers()->confirmed()->count();
+
+        if ($subscriberCount === 0) {
             $newsletterSend->update(['status' => NewsletterSendStatus::Sent]);
 
             return;
@@ -69,13 +72,18 @@ class PublishScheduledPosts implements ShouldQueue
 
         $newsletterSend->update([
             'status' => NewsletterSendStatus::Sending,
-            'total_recipients' => $subscribers->count(),
+            'total_recipients' => $subscriberCount,
             'sent_count' => 0,
             'failed_count' => 0,
         ]);
 
-        foreach ($subscribers as $subscriber) {
-            SendNewsletterToSubscriber::dispatch($newsletterSend, $subscriber);
-        }
+        // Use chunkById to avoid loading all subscribers into memory
+        $brand->subscribers()
+            ->confirmed()
+            ->chunkById(100, function ($subscribers) use ($newsletterSend) {
+                foreach ($subscribers as $subscriber) {
+                    SendNewsletterToSubscriber::dispatch($newsletterSend, $subscriber);
+                }
+            });
     }
 }

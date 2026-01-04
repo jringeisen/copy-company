@@ -25,7 +25,9 @@ Route::get('/@{brand:slug}', [BlogController::class, 'index'])->name('public.blo
 Route::get('/@{brand:slug}/{post:slug}', [BlogController::class, 'show'])->name('public.blog.show');
 
 // Public subscription routes
-Route::post('/@{brand:slug}/subscribe', [SubscribeController::class, 'store'])->name('public.subscribe');
+Route::post('/@{brand:slug}/subscribe', [SubscribeController::class, 'store'])
+    ->middleware('throttle:6,1') // Rate limit: 6 requests per minute
+    ->name('public.subscribe');
 Route::get('/@{brand:slug}/confirm/{token}', [SubscribeController::class, 'confirm'])->name('public.subscribe.confirm');
 Route::get('/@{brand:slug}/unsubscribe/{token}', [SubscribeController::class, 'unsubscribe'])->name('public.subscribe.unsubscribe');
 

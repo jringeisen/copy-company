@@ -2,13 +2,31 @@
 
 namespace App\Http\Requests\SocialPost;
 
+use App\Models\SocialPost;
 use Illuminate\Foundation\Http\FormRequest;
 
 class BulkScheduleSocialPostRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->currentBrand() !== null;
+        $brand = $this->user()->currentBrand();
+
+        if (! $brand) {
+            return false;
+        }
+
+        // Verify all social posts belong to the user's brand
+        $ids = $this->input('social_post_ids', []);
+
+        if (empty($ids)) {
+            return true; // Validation will catch empty array
+        }
+
+        $ownedCount = SocialPost::whereIn('id', $ids)
+            ->where('brand_id', $brand->id)
+            ->count();
+
+        return $ownedCount === count($ids);
     }
 
     public function rules(): array

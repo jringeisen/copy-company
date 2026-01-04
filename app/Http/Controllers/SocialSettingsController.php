@@ -170,6 +170,8 @@ class SocialSettingsController extends Controller
             return redirect()->route('brands.create');
         }
 
+        $this->authorize('update', $brand);
+
         $this->tokenManager->removeCredentials($brand, $platform);
 
         return back()->with('success', ucfirst($platform).' disconnected.');
@@ -232,6 +234,8 @@ class SocialSettingsController extends Controller
         if (! $brand) {
             return redirect()->route('brands.create');
         }
+
+        $this->authorize('update', $brand);
 
         $validated = $request->validate([
             'account_id' => 'required|string',

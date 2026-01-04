@@ -218,7 +218,7 @@ const handleAskQuestion = async () => {
                 <!-- Suggestion Display -->
                 <div v-else-if="suggestion" class="space-y-3">
                     <div class="bg-white border border-gray-200 rounded-lg p-3 max-h-64 overflow-y-auto">
-                        <div class="prose prose-sm max-w-none" v-html="suggestion.replace(/\n/g, '<br>')"></div>
+                        <pre class="prose prose-sm max-w-none whitespace-pre-wrap font-sans text-gray-900">{{ suggestion }}</pre>
                     </div>
                     <div class="space-y-2">
                         <button

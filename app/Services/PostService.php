@@ -8,10 +8,24 @@ use App\Jobs\ProcessNewsletterSend;
 use App\Models\Brand;
 use App\Models\Post;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Mews\Purifier\Facades\Purifier;
 
 class PostService
 {
+    /**
+     * Sanitize HTML content to prevent XSS attacks.
+     */
+    protected function sanitizeHtml(?string $html): ?string
+    {
+        if ($html === null || $html === '') {
+            return $html;
+        }
+
+        return Purifier::clean($html, 'blog');
+    }
+
     /**
      * Create a new post from validated data.
      *
@@ -24,7 +38,7 @@ class PostService
             'title' => $validated['title'],
             'slug' => Str::slug($validated['title']),
             'content' => $validated['content'],
-            'content_html' => $validated['content_html'] ?? null,
+            'content_html' => $this->sanitizeHtml($validated['content_html'] ?? null),
             'excerpt' => $validated['excerpt'] ?? null,
             'featured_image' => $validated['featured_image'] ?? null,
             'seo_title' => $validated['seo_title'] ?? null,
@@ -47,7 +61,7 @@ class PostService
         $post->update([
             'title' => $validated['title'],
             'content' => $validated['content'],
-            'content_html' => $validated['content_html'] ?? null,
+            'content_html' => $this->sanitizeHtml($validated['content_html'] ?? null),
             'excerpt' => $validated['excerpt'] ?? null,
             'featured_image' => $validated['featured_image'] ?? null,
             'seo_title' => $validated['seo_title'] ?? null,
@@ -68,16 +82,18 @@ class PostService
      */
     public function publish(Post $post, array $options): void
     {
-        $post->update([
-            'status' => PostStatus::Published,
-            'published_at' => now(),
-            'publish_to_blog' => $options['publish_to_blog'] ?? true,
-            'send_as_newsletter' => $options['send_as_newsletter'] ?? false,
-        ]);
+        DB::transaction(function () use ($post, $options) {
+            $post->update([
+                'status' => PostStatus::Published,
+                'published_at' => now(),
+                'publish_to_blog' => $options['publish_to_blog'] ?? true,
+                'send_as_newsletter' => $options['send_as_newsletter'] ?? false,
+            ]);
 
-        if ($options['send_as_newsletter'] ?? false) {
-            $this->createAndDispatchNewsletter($post, $options, now());
-        }
+            if ($options['send_as_newsletter'] ?? false) {
+                $this->createAndDispatchNewsletter($post, $options, now());
+            }
+        });
     }
 
     /**
@@ -87,18 +103,20 @@ class PostService
      */
     public function schedule(Post $post, array $options): void
     {
-        $scheduledAt = Carbon::parse($options['scheduled_at']);
+        DB::transaction(function () use ($post, $options) {
+            $scheduledAt = Carbon::parse($options['scheduled_at']);
 
-        $post->update([
-            'status' => PostStatus::Scheduled,
-            'scheduled_at' => $scheduledAt,
-            'publish_to_blog' => $options['publish_to_blog'] ?? true,
-            'send_as_newsletter' => $options['send_as_newsletter'] ?? false,
-        ]);
+            $post->update([
+                'status' => PostStatus::Scheduled,
+                'scheduled_at' => $scheduledAt,
+                'publish_to_blog' => $options['publish_to_blog'] ?? true,
+                'send_as_newsletter' => $options['send_as_newsletter'] ?? false,
+            ]);
 
-        if ($options['send_as_newsletter'] ?? false) {
-            $this->createNewsletterSend($post, $options, $scheduledAt);
-        }
+            if ($options['send_as_newsletter'] ?? false) {
+                $this->createNewsletterSend($post, $options, $scheduledAt);
+            }
+        });
     }
 
     /**

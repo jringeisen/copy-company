@@ -8,6 +8,8 @@ use App\Http\Requests\Subscriber\ImportSubscribersRequest;
 use App\Http\Resources\SubscriberResource;
 use App\Models\Subscriber;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -28,12 +30,20 @@ class SubscriberController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(25);
 
+        // Optimized: single query for all stats instead of 3 separate queries
+        $stats = $brand->subscribers()
+            ->toBase()
+            ->selectRaw('COUNT(*) as total')
+            ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as confirmed', [SubscriberStatus::Confirmed->value])
+            ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as unsubscribed', [SubscriberStatus::Unsubscribed->value])
+            ->first();
+
         return Inertia::render('Subscribers/Index', [
             'subscribers' => SubscriberResource::collection($subscribers),
             'stats' => [
-                'total' => $brand->subscribers()->count(),
-                'confirmed' => $brand->subscribers()->where('status', SubscriberStatus::Confirmed)->count(),
-                'unsubscribed' => $brand->subscribers()->where('status', SubscriberStatus::Unsubscribed)->count(),
+                'total' => (int) $stats->total,
+                'confirmed' => (int) $stats->confirmed,
+                'unsubscribed' => (int) $stats->unsubscribed,
             ],
             'brand' => $brand,
         ]);
@@ -56,26 +66,31 @@ class SubscriberController extends Controller
             return back()->with('error', 'No brand found.');
         }
 
-        $subscribers = $brand->subscribers()
-            ->where('status', SubscriberStatus::Confirmed)
-            ->get(['email', 'name', 'created_at']);
+        $this->authorize('update', $brand);
 
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="subscribers.csv"',
         ];
 
-        $callback = function () use ($subscribers) {
+        // Use cursor() to stream results without loading all into memory
+        $callback = function () use ($brand) {
             $file = fopen('php://output', 'w');
             fputcsv($file, ['Email', 'Name', 'Subscribed At']);
 
-            foreach ($subscribers as $subscriber) {
-                fputcsv($file, [
-                    $subscriber->email,
-                    $subscriber->name,
-                    $subscriber->created_at->toDateTimeString(),
-                ]);
-            }
+            $brand->subscribers()
+                ->where('status', SubscriberStatus::Confirmed)
+                ->select(['email', 'name', 'created_at'])
+                ->cursor()
+                ->each(function ($subscriber) use ($file) {
+                    // Sanitize values to prevent CSV formula injection
+                    $safeName = $subscriber->name ? preg_replace('/^[\=\+\-\@\t\r]/', "'", $subscriber->name) : '';
+                    fputcsv($file, [
+                        $subscriber->email,
+                        $safeName,
+                        $subscriber->created_at->toDateTimeString(),
+                    ]);
+                });
 
             fclose($file);
         };
@@ -88,46 +103,76 @@ class SubscriberController extends Controller
         $brand = $this->currentBrand();
 
         $file = $request->file('file');
-        $handle = fopen($file->getPathname(), 'r');
-
-        // Skip header row
-        $header = fgetcsv($handle);
 
         $imported = 0;
         $skipped = 0;
 
-        while (($row = fgetcsv($handle)) !== false) {
-            $email = $row[0] ?? null;
-            $name = $row[1] ?? null;
+        DB::transaction(function () use ($brand, $file, &$imported, &$skipped) {
+            // Pre-load existing emails for this brand to avoid N+1 queries
+            $existingEmails = $brand->subscribers()
+                ->pluck('email')
+                ->map(fn ($email) => strtolower($email))
+                ->flip()
+                ->all();
 
-            if (! $email || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $skipped++;
+            $handle = fopen($file->getPathname(), 'r');
 
-                continue;
+            // Skip header row
+            fgetcsv($handle);
+
+            $batch = [];
+            $batchSize = 500;
+            $now = now();
+
+            while (($row = fgetcsv($handle)) !== false) {
+                $email = strtolower(trim($row[0] ?? ''));
+                $name = $row[1] ?? null;
+
+                // Sanitize name to prevent CSV formula injection on future exports
+                if ($name) {
+                    $name = preg_replace('/^[\=\+\-\@\t\r]/', "'", $name);
+                }
+
+                if (! $email || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $skipped++;
+
+                    continue;
+                }
+
+                if (isset($existingEmails[$email])) {
+                    $skipped++;
+
+                    continue;
+                }
+
+                $batch[] = [
+                    'brand_id' => $brand->id,
+                    'email' => $email,
+                    'name' => $name,
+                    'status' => SubscriberStatus::Confirmed->value,
+                    'confirmed_at' => $now,
+                    'unsubscribe_token' => Str::random(64),
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+
+                // Mark as existing to prevent duplicates within the same import
+                $existingEmails[$email] = true;
+                $imported++;
+
+                if (count($batch) >= $batchSize) {
+                    Subscriber::insert($batch);
+                    $batch = [];
+                }
             }
 
-            $existing = Subscriber::where('brand_id', $brand->id)
-                ->where('email', $email)
-                ->first();
-
-            if ($existing) {
-                $skipped++;
-
-                continue;
+            // Insert remaining records
+            if (! empty($batch)) {
+                Subscriber::insert($batch);
             }
 
-            Subscriber::create([
-                'brand_id' => $brand->id,
-                'email' => $email,
-                'name' => $name,
-                'status' => SubscriberStatus::Confirmed,
-                'confirmed_at' => now(),
-            ]);
-
-            $imported++;
-        }
-
-        fclose($handle);
+            fclose($handle);
+        });
 
         return back()->with('success', "Imported {$imported} subscribers. Skipped {$skipped} duplicates or invalid entries.");
     }

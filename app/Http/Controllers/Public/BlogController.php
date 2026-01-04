@@ -16,8 +16,8 @@ class BlogController extends Controller
             ->published()
             ->where('publish_to_blog', true)
             ->orderByDesc('published_at')
-            ->get()
-            ->map(fn (Post $post): array => [
+            ->paginate(12)
+            ->through(fn (Post $post): array => [
                 'id' => $post->id,
                 'title' => $post->title,
                 'slug' => $post->slug,
