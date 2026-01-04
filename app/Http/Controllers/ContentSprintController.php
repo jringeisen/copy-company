@@ -32,7 +32,7 @@ class ContentSprintController extends Controller
         $sprints = $brand->contentSprints()
             ->orderByDesc('created_at')
             ->get()
-            ->map(fn ($sprint) => [
+            ->map(fn (ContentSprint $sprint): array => [
                 'id' => $sprint->id,
                 'title' => $sprint->title,
                 'status' => $sprint->status->value,

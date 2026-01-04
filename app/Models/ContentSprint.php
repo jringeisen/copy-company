@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ContentSprintStatus;
 use App\Models\Concerns\HasStatusScopes;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -41,22 +42,38 @@ class ContentSprint extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function scopePending($query)
+    /**
+     * @param  Builder<ContentSprint>  $query
+     * @return Builder<ContentSprint>
+     */
+    public function scopePending(Builder $query): Builder
     {
         return $this->scopeWithStatus($query, ContentSprintStatus::Pending);
     }
 
-    public function scopeGenerating($query)
+    /**
+     * @param  Builder<ContentSprint>  $query
+     * @return Builder<ContentSprint>
+     */
+    public function scopeGenerating(Builder $query): Builder
     {
         return $this->scopeWithStatus($query, ContentSprintStatus::Generating);
     }
 
-    public function scopeCompleted($query)
+    /**
+     * @param  Builder<ContentSprint>  $query
+     * @return Builder<ContentSprint>
+     */
+    public function scopeCompleted(Builder $query): Builder
     {
         return $this->scopeWithStatus($query, ContentSprintStatus::Completed);
     }
 
-    public function scopeFailed($query)
+    /**
+     * @param  Builder<ContentSprint>  $query
+     * @return Builder<ContentSprint>
+     */
+    public function scopeFailed(Builder $query): Builder
     {
         return $this->scopeWithStatus($query, ContentSprintStatus::Failed);
     }

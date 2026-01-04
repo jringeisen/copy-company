@@ -5,11 +5,13 @@ namespace App\Jobs;
 use App\Enums\NewsletterSendStatus;
 use App\Enums\SubscriberStatus;
 use App\Models\NewsletterSend;
+use App\Models\Subscriber;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;
 
@@ -66,7 +68,8 @@ class ProcessNewsletterSend implements ShouldQueue
 
         $brand->subscribers()
             ->where('status', SubscriberStatus::Confirmed)
-            ->chunkById(100, function ($subscribers) use (&$jobs, $newsletterSend) {
+            ->chunkById(100, function (Collection $subscribers) use (&$jobs, $newsletterSend): void {
+                /** @var Subscriber $subscriber */
                 foreach ($subscribers as $subscriber) {
                     $jobs[] = new SendNewsletterToSubscriber($newsletterSend, $subscriber);
                 }

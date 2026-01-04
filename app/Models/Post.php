@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\PostStatus;
 use App\Models\Concerns\HasStatusScopes;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -50,11 +51,11 @@ class Post extends Model
         'generate_social' => 'boolean',
     ];
 
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
 
-        static::creating(function ($post) {
+        static::creating(function (Post $post): void {
             if (empty($post->slug)) {
                 $post->slug = static::generateUniqueSlug($post->title, $post->brand_id);
             }
@@ -95,17 +96,29 @@ class Post extends Model
         return $this->hasMany(SocialPost::class);
     }
 
-    public function scopePublished($query)
+    /**
+     * @param  Builder<Post>  $query
+     * @return Builder<Post>
+     */
+    public function scopePublished(Builder $query): Builder
     {
         return $this->scopeWithStatus($query, PostStatus::Published);
     }
 
-    public function scopeDraft($query)
+    /**
+     * @param  Builder<Post>  $query
+     * @return Builder<Post>
+     */
+    public function scopeDraft(Builder $query): Builder
     {
         return $this->scopeWithStatus($query, PostStatus::Draft);
     }
 
-    public function scopeScheduled($query)
+    /**
+     * @param  Builder<Post>  $query
+     * @return Builder<Post>
+     */
+    public function scopeScheduled(Builder $query): Builder
     {
         return $this->scopeWithStatus($query, PostStatus::Scheduled);
     }

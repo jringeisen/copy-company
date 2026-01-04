@@ -8,6 +8,7 @@ use App\Enums\SocialPostStatus;
 use App\Models\Concerns\HasStatusScopes;
 use App\Services\SocialPlatforms\PlatformFactory;
 use App\Services\SocialPlatforms\PlatformInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -58,32 +59,56 @@ class SocialPost extends Model
         return $this->belongsTo(Post::class);
     }
 
-    public function scopeDraft($query)
+    /**
+     * @param  Builder<SocialPost>  $query
+     * @return Builder<SocialPost>
+     */
+    public function scopeDraft(Builder $query): Builder
     {
         return $this->scopeWithStatus($query, SocialPostStatus::Draft);
     }
 
-    public function scopeQueued($query)
+    /**
+     * @param  Builder<SocialPost>  $query
+     * @return Builder<SocialPost>
+     */
+    public function scopeQueued(Builder $query): Builder
     {
         return $this->scopeWithStatus($query, SocialPostStatus::Queued);
     }
 
-    public function scopeScheduled($query)
+    /**
+     * @param  Builder<SocialPost>  $query
+     * @return Builder<SocialPost>
+     */
+    public function scopeScheduled(Builder $query): Builder
     {
         return $this->scopeWithStatus($query, SocialPostStatus::Scheduled);
     }
 
-    public function scopePublished($query)
+    /**
+     * @param  Builder<SocialPost>  $query
+     * @return Builder<SocialPost>
+     */
+    public function scopePublished(Builder $query): Builder
     {
         return $this->scopeWithStatus($query, SocialPostStatus::Published);
     }
 
-    public function scopeFailed($query)
+    /**
+     * @param  Builder<SocialPost>  $query
+     * @return Builder<SocialPost>
+     */
+    public function scopeFailed(Builder $query): Builder
     {
         return $this->scopeWithStatus($query, SocialPostStatus::Failed);
     }
 
-    public function scopeForPlatform($query, SocialPlatform $platform)
+    /**
+     * @param  Builder<SocialPost>  $query
+     * @return Builder<SocialPost>
+     */
+    public function scopeForPlatform(Builder $query, SocialPlatform $platform): Builder
     {
         return $query->where('platform', $platform);
     }

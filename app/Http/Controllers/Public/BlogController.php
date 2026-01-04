@@ -17,7 +17,7 @@ class BlogController extends Controller
             ->where('publish_to_blog', true)
             ->orderByDesc('published_at')
             ->get()
-            ->map(fn ($post) => [
+            ->map(fn (Post $post): array => [
                 'id' => $post->id,
                 'title' => $post->title,
                 'slug' => $post->slug,

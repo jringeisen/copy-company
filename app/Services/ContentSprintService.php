@@ -72,7 +72,7 @@ class ContentSprintService
             ];
         }
 
-        $listItems = array_map(fn ($point) => [
+        $listItems = array_map(fn (string $point): array => [
             'type' => 'listItem',
             'content' => [
                 [

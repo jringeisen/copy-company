@@ -7,6 +7,8 @@ use App\Models\NewsletterSend;
 use App\Models\Post;
 use App\Models\SocialPost;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -33,7 +35,7 @@ class CalendarController extends Controller
 
         // Fetch all content for the month
         $posts = Post::where('brand_id', $brand->id)
-            ->where(function ($q) use ($startOfMonth, $endOfMonth) {
+            ->where(function (Builder $q) use ($startOfMonth, $endOfMonth): void {
                 $q->whereBetween('scheduled_at', [$startOfMonth, $endOfMonth])
                     ->orWhereBetween('published_at', [$startOfMonth, $endOfMonth]);
             })
@@ -41,7 +43,7 @@ class CalendarController extends Controller
             ->get();
 
         $socialPosts = SocialPost::where('brand_id', $brand->id)
-            ->where(function ($q) use ($startOfMonth, $endOfMonth) {
+            ->where(function (Builder $q) use ($startOfMonth, $endOfMonth): void {
                 $q->whereBetween('scheduled_at', [$startOfMonth, $endOfMonth])
                     ->orWhereBetween('published_at', [$startOfMonth, $endOfMonth]);
             })
@@ -50,7 +52,7 @@ class CalendarController extends Controller
             ->get();
 
         $newsletterSends = NewsletterSend::where('brand_id', $brand->id)
-            ->where(function ($q) use ($startOfMonth, $endOfMonth) {
+            ->where(function (Builder $q) use ($startOfMonth, $endOfMonth): void {
                 $q->whereBetween('scheduled_at', [$startOfMonth, $endOfMonth])
                     ->orWhereBetween('sent_at', [$startOfMonth, $endOfMonth]);
             })
@@ -68,7 +70,13 @@ class CalendarController extends Controller
         ]);
     }
 
-    private function transformToEvents($posts, $socialPosts, $newsletterSends): array
+    /**
+     * @param  Collection<int, Post>  $posts
+     * @param  Collection<int, SocialPost>  $socialPosts
+     * @param  Collection<int, NewsletterSend>  $newsletterSends
+     * @return array<int, array<string, mixed>>
+     */
+    private function transformToEvents(Collection $posts, Collection $socialPosts, Collection $newsletterSends): array
     {
         $events = [];
 

@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
+use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialSettingsController extends Controller
@@ -44,7 +45,7 @@ class SocialSettingsController extends Controller
             return $brand;
         }
 
-        $platforms = collect(SocialPlatform::cases())->map(function ($platform) use ($brand) {
+        $platforms = collect(SocialPlatform::cases())->map(function (SocialPlatform $platform) use ($brand): array {
             $identifier = $platform->value;
             $isSupported = PublisherFactory::isSupported($identifier);
             $connectionInfo = $this->tokenManager->getConnectionInfo($brand, $identifier);
@@ -154,7 +155,7 @@ class SocialSettingsController extends Controller
      *
      * @return array<string, mixed>
      */
-    protected function buildCredentials(string $platform, $socialUser): array
+    protected function buildCredentials(string $platform, SocialiteUser $socialUser): array
     {
         $credentials = [
             'access_token' => $socialUser->token,

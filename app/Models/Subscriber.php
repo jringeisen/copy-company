@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\SubscriberStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -48,7 +49,11 @@ class Subscriber extends Model
         return $this->belongsTo(Brand::class);
     }
 
-    public function scopeActive($query)
+    /**
+     * @param  Builder<Subscriber>  $query
+     * @return Builder<Subscriber>
+     */
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', 'active');
     }

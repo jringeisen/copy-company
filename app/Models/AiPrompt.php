@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class AiPrompt extends Model
@@ -19,19 +20,31 @@ class AiPrompt extends Model
         'active' => 'boolean',
     ];
 
-    public function scopeActive($query)
+    /**
+     * @param  Builder<AiPrompt>  $query
+     * @return Builder<AiPrompt>
+     */
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('active', true);
     }
 
-    public function scopeForType($query, string $type)
+    /**
+     * @param  Builder<AiPrompt>  $query
+     * @return Builder<AiPrompt>
+     */
+    public function scopeForType(Builder $query, string $type): Builder
     {
         return $query->where('type', $type);
     }
 
-    public function scopeForIndustry($query, ?string $industry)
+    /**
+     * @param  Builder<AiPrompt>  $query
+     * @return Builder<AiPrompt>
+     */
+    public function scopeForIndustry(Builder $query, ?string $industry): Builder
     {
-        return $query->where(function ($q) use ($industry) {
+        return $query->where(function (Builder $q) use ($industry): void {
             $q->where('industry', $industry)
                 ->orWhereNull('industry');
         });
