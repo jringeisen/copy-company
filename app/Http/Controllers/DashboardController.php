@@ -37,6 +37,7 @@ class DashboardController extends Controller
                 'subscribersCount' => $brand?->confirmed_subscribers_count ?? 0,
                 'draftsCount' => $brand?->drafts_count ?? 0,
             ],
+            'onboarding' => $brand?->getOnboardingProgress(),
         ]);
     }
 }

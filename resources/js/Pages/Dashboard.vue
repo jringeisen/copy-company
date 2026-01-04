@@ -1,11 +1,25 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import AppNavigation from '@/Components/AppNavigation.vue';
+import OnboardingChecklist from '@/Components/OnboardingChecklist.vue';
 
 const props = defineProps({
     user: Object,
     brand: Object,
     stats: Object,
+    onboarding: Object,
+});
+
+const showOnboarding = computed(() => {
+    return props.brand && props.onboarding && !props.onboarding.dismissed && !props.onboarding.isComplete;
+});
+
+const showEmptyStateGuidance = computed(() => {
+    return props.brand &&
+           props.stats.postsCount === 0 &&
+           props.stats.subscribersCount === 0 &&
+           (!props.onboarding || props.onboarding.dismissed || props.onboarding.isComplete);
 });
 </script>
 
@@ -18,8 +32,8 @@ const props = defineProps({
         <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
             <!-- Brand setup prompt if no brand exists -->
             <div v-if="!brand" class="bg-white rounded-lg shadow p-6 mb-6">
-                <h2 class="text-xl font-semibold text-gray-900 mb-2">Welcome to Content Platform!</h2>
-                <p class="text-gray-600 mb-4">Let's set up your brand to get started.</p>
+                <h2 class="text-xl font-semibold text-gray-900 mb-2">Welcome to Wordsmith!</h2>
+                <p class="text-gray-600 mb-4">Let's set up your brand to get started creating content.</p>
                 <Link
                     href="/brands/create"
                     class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"
@@ -28,8 +42,36 @@ const props = defineProps({
                 </Link>
             </div>
 
-            <!-- Stats Grid -->
-            <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <template v-else>
+                <!-- Onboarding Checklist -->
+                <div v-if="showOnboarding" class="mb-6">
+                    <OnboardingChecklist :onboarding="onboarding" />
+                </div>
+
+                <!-- Empty state guidance (when onboarding dismissed/complete but no content) -->
+                <div v-else-if="showEmptyStateGuidance" class="mb-6 bg-gradient-to-r from-primary-500 to-indigo-600 rounded-xl p-6 text-white">
+                    <h2 class="text-xl font-semibold mb-2">Ready to Create?</h2>
+                    <p class="text-primary-100 mb-4">
+                        Your brand is set up! Start creating content to grow your audience.
+                    </p>
+                    <div class="flex flex-wrap gap-3">
+                        <Link
+                            href="/posts/create"
+                            class="px-4 py-2 bg-white text-primary-600 font-medium rounded-lg hover:bg-primary-50 transition"
+                        >
+                            Write Your First Post
+                        </Link>
+                        <Link
+                            href="/content-sprints/create"
+                            class="px-4 py-2 bg-white/20 text-white font-medium rounded-lg hover:bg-white/30 transition"
+                        >
+                            Generate Content Ideas
+                        </Link>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div class="bg-white rounded-lg shadow p-6">
                     <div class="text-sm font-medium text-gray-500">Published Posts</div>
                     <div class="mt-1 text-3xl font-semibold text-gray-900">{{ stats.postsCount }}</div>
@@ -149,6 +191,7 @@ const props = defineProps({
                     </Link>
                 </div>
             </div>
+            </template>
         </main>
     </div>
 </template>

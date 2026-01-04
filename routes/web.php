@@ -5,6 +5,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ContentSprintController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\Public\BlogController;
 use App\Http\Controllers\Public\SubscribeController;
@@ -31,6 +32,10 @@ Route::get('/@{brand:slug}/unsubscribe/{token}', [SubscribeController::class, 'u
 // Authenticated routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Onboarding routes
+    Route::post('/onboarding/step/{step}', [OnboardingController::class, 'markStepComplete'])->name('onboarding.step');
+    Route::post('/onboarding/dismiss', [OnboardingController::class, 'dismiss'])->name('onboarding.dismiss');
 
     // Calendar route
     Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');

@@ -30,6 +30,13 @@ class CalendarController extends Controller
             return $brand;
         }
 
+        // Mark calendar as viewed for onboarding
+        if (! ($brand->onboarding_status['calendar_viewed'] ?? false)) {
+            $status = $brand->onboarding_status ?? [];
+            $status['calendar_viewed'] = true;
+            $brand->update(['onboarding_status' => $status]);
+        }
+
         $month = $request->get('month', now()->format('Y-m'));
 
         // Parse month into date range

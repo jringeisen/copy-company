@@ -29,6 +29,8 @@ class Brand extends Model
         'newsletter_provider',
         'newsletter_credentials',
         'social_connections',
+        'onboarding_status',
+        'onboarding_dismissed',
     ];
 
     protected $casts = [
@@ -37,6 +39,8 @@ class Brand extends Model
         'newsletter_provider' => NewsletterProvider::class,
         'newsletter_credentials' => 'encrypted:array',
         'social_connections' => 'encrypted:array',
+        'onboarding_status' => 'array',
+        'onboarding_dismissed' => 'boolean',
     ];
 
     public function user(): BelongsTo
@@ -81,5 +85,36 @@ class Brand extends Model
     public function getActiveSubscribersCountAttribute(): int
     {
         return $this->subscribers()->confirmed()->count();
+    }
+
+    /**
+     * Get the onboarding progress data.
+     *
+     * @return array<string, mixed>
+     */
+    public function getOnboardingProgress(): array
+    {
+        $status = $this->onboarding_status ?? [];
+
+        // Compute current state from existing data
+        $steps = [
+            'brand_created' => true,
+            'voice_configured' => ! empty($this->voice_settings['tone']) && ! empty($this->voice_settings['style']),
+            'social_connected' => ! empty($this->social_connections),
+            'first_post_created' => $this->posts()->exists(),
+            'calendar_viewed' => $status['calendar_viewed'] ?? false,
+        ];
+
+        $completedCount = count(array_filter($steps));
+        $totalSteps = count($steps);
+
+        return [
+            'steps' => $steps,
+            'completed' => $completedCount,
+            'total' => $totalSteps,
+            'percentage' => $totalSteps > 0 ? round(($completedCount / $totalSteps) * 100) : 0,
+            'isComplete' => $completedCount === $totalSteps,
+            'dismissed' => $this->onboarding_dismissed,
+        ];
     }
 }

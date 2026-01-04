@@ -5,6 +5,7 @@ import axios from 'axios';
 import AppNavigation from '@/Components/AppNavigation.vue';
 import SocialPostCard from '@/Components/Social/SocialPostCard.vue';
 import SocialPostEditor from '@/Components/Social/SocialPostEditor.vue';
+import FeatureEducationBanner from '@/Components/FeatureEducationBanner.vue';
 
 const props = defineProps({
     socialPosts: Object,
@@ -148,6 +149,14 @@ const availablePlatformsForGenerate = [
     { value: 'pinterest', label: 'Pinterest', icon: 'pinterest' },
     { value: 'tiktok', label: 'TikTok', icon: 'tiktok' },
 ];
+
+const showConnectPlatformsBanner = computed(() => {
+    return props.socialPosts.data.length === 0 && props.connectedPlatforms.length === 0;
+});
+
+const showGenerateContentBanner = computed(() => {
+    return props.socialPosts.data.length === 0 && props.connectedPlatforms.length > 0;
+});
 </script>
 
 <template>
@@ -203,6 +212,58 @@ const availablePlatformsForGenerate = [
                     </select>
                 </div>
             </div>
+
+            <!-- Educational Banner: Connect Platforms -->
+            <FeatureEducationBanner
+                v-if="showConnectPlatformsBanner"
+                title="Amplify Your Content"
+                description="Connect your social media platforms to automatically publish AI-generated posts tailored for each network. Turn one blog post into content for Instagram, X, LinkedIn, and more."
+                gradient="from-pink-500 to-purple-600"
+                cta-text="Connect Platforms"
+                cta-href="/settings/social"
+            >
+                <template #extra>
+                    <div class="mt-3 flex flex-wrap items-center gap-4 text-sm text-white/80">
+                        <span class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                            </svg>
+                            AI-optimized for each platform
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                            </svg>
+                            Schedule posts in advance
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                            </svg>
+                            One click publishing
+                        </span>
+                    </div>
+                </template>
+            </FeatureEducationBanner>
+
+            <!-- Educational Banner: Generate Content (platforms connected but no posts) -->
+            <FeatureEducationBanner
+                v-else-if="showGenerateContentBanner"
+                title="Ready to Share"
+                description="You've connected your social platforms! Now generate AI-optimized posts from your blog content to share with your audience."
+                gradient="from-green-500 to-teal-600"
+            >
+                <template #cta>
+                    <button
+                        @click="showGenerateModal = true"
+                        class="shrink-0 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg font-medium transition"
+                    >
+                        Generate Posts
+                    </button>
+                </template>
+            </FeatureEducationBanner>
 
             <!-- Social Posts Grid -->
             <div v-if="socialPosts.data.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

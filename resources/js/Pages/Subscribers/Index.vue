@@ -1,20 +1,41 @@
 <script setup>
 import { Head, Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import AppNavigation from '@/Components/AppNavigation.vue';
+import FeatureEducationBanner from '@/Components/FeatureEducationBanner.vue';
+import ConfirmModal from '@/Components/ConfirmModal.vue';
 
-defineProps({
+const props = defineProps({
     subscribers: Object,
     stats: Object,
+    brand: Object,
 });
 
 const importFile = ref(null);
 const isImporting = ref(false);
+const showDeleteModal = ref(false);
+const subscriberToDelete = ref(null);
+const isDeleting = ref(false);
+
+const showEducationalBanner = computed(() => {
+    return props.stats.total === 0;
+});
 
 const deleteSubscriber = (subscriber) => {
-    if (confirm(`Remove ${subscriber.email} from your list?`)) {
-        router.delete(`/subscribers/${subscriber.id}`);
-    }
+    subscriberToDelete.value = subscriber;
+    showDeleteModal.value = true;
+};
+
+const confirmDelete = () => {
+    if (!subscriberToDelete.value) return;
+    isDeleting.value = true;
+    router.delete(`/subscribers/${subscriberToDelete.value.id}`, {
+        onFinish: () => {
+            isDeleting.value = false;
+            showDeleteModal.value = false;
+            subscriberToDelete.value = null;
+        },
+    });
 };
 
 const handleImport = () => {
@@ -59,6 +80,38 @@ const onFileChange = (e) => {
                     </a>
                 </div>
             </div>
+
+            <!-- Educational Banner -->
+            <FeatureEducationBanner
+                v-if="showEducationalBanner"
+                title="Build Your Audience"
+                description="Subscribers receive your newsletter when you publish. Share your public blog to grow your list, or import existing subscribers from another platform."
+                gradient="from-blue-500 to-cyan-600"
+            >
+                <template #extra>
+                    <div class="mt-3 flex flex-wrap items-center gap-4 text-sm text-white/80">
+                        <span class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                            </svg>
+                            Automatic newsletter delivery
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            Import from CSV
+                        </span>
+                        <span v-if="brand" class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd"/>
+                            </svg>
+                            Public blog at /@{{ brand.slug }}
+                        </span>
+                    </div>
+                </template>
+            </FeatureEducationBanner>
 
             <!-- Stats -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -185,5 +238,15 @@ const onFileChange = (e) => {
                 </div>
             </div>
         </main>
+
+        <ConfirmModal
+            :show="showDeleteModal"
+            title="Remove Subscriber"
+            :message="`Remove ${subscriberToDelete?.email || ''} from your list? They won't receive future newsletters.`"
+            confirm-text="Remove"
+            :processing="isDeleting"
+            @confirm="confirmDelete"
+            @cancel="showDeleteModal = false"
+        />
     </div>
 </template>

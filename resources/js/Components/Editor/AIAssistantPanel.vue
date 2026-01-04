@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useAI } from '@/Composables/useAI';
+import ConfirmModal from '@/Components/ConfirmModal.vue';
 
 const props = defineProps({
     content: {
@@ -46,15 +47,21 @@ const toneOptions = [
 
 const hasContent = computed(() => props.content && props.content.trim().length > 0);
 const hasTitle = computed(() => props.title && props.title.trim().length > 0);
+const showReplaceConfirm = ref(false);
 
 const clearSuggestion = () => {
     suggestion.value = null;
+};
+
+const confirmReplace = () => {
+    showReplaceConfirm.value = true;
 };
 
 const applySuggestion = () => {
     if (suggestion.value) {
         emit('apply-suggestion', suggestion.value);
         suggestion.value = null;
+        showReplaceConfirm.value = false;
     }
 };
 
@@ -213,22 +220,24 @@ const handleAskQuestion = async () => {
                     <div class="bg-white border border-gray-200 rounded-lg p-3 max-h-64 overflow-y-auto">
                         <div class="prose prose-sm max-w-none" v-html="suggestion.replace(/\n/g, '<br>')"></div>
                     </div>
-                    <div class="flex gap-2">
+                    <div class="space-y-2">
                         <button
-                            @click="applySuggestion"
-                            class="flex-1 px-3 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700"
+                            @click="confirmReplace"
+                            class="w-full px-3 py-2.5 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 flex items-center justify-between"
                         >
-                            Replace
+                            <span class="font-medium">Replace All</span>
+                            <span class="text-xs opacity-75">Overwrites content</span>
                         </button>
                         <button
                             @click="insertSuggestion"
-                            class="flex-1 px-3 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50"
+                            class="w-full px-3 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm rounded-lg hover:bg-gray-50 flex items-center justify-between"
                         >
-                            Insert
+                            <span class="font-medium">Insert at Cursor</span>
+                            <span class="text-xs text-gray-500">Adds at position</span>
                         </button>
                         <button
                             @click="clearSuggestion"
-                            class="px-3 py-2 text-gray-500 text-sm hover:text-gray-700"
+                            class="w-full px-3 py-2 text-gray-500 text-sm hover:text-gray-700 hover:bg-gray-100 rounded-lg"
                         >
                             Dismiss
                         </button>
@@ -333,7 +342,17 @@ const handleAskQuestion = async () => {
                     <div class="space-y-4">
                         <!-- Generate Draft -->
                         <div class="space-y-2">
-                            <label class="block text-xs text-gray-500">Generate draft from title</label>
+                            <label class="flex items-center gap-1.5 text-xs text-gray-500">
+                                Generate draft from title
+                                <span class="group relative">
+                                    <svg class="h-3.5 w-3.5 text-gray-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                    </svg>
+                                    <span class="invisible group-hover:visible absolute left-0 top-5 z-10 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg">
+                                        Creates a complete, conversational blog post with paragraphs, examples, and insights.
+                                    </span>
+                                </span>
+                            </label>
                             <textarea
                                 v-model="draftBullets"
                                 placeholder="Key points to cover (optional)..."
@@ -352,7 +371,17 @@ const handleAskQuestion = async () => {
 
                         <!-- Generate Outline -->
                         <div class="pt-4 border-t border-gray-200 space-y-2">
-                            <label class="block text-xs text-gray-500">Generate outline from title</label>
+                            <label class="flex items-center gap-1.5 text-xs text-gray-500">
+                                Generate outline from title
+                                <span class="group relative">
+                                    <svg class="h-3.5 w-3.5 text-gray-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                    </svg>
+                                    <span class="invisible group-hover:visible absolute left-0 top-5 z-10 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg">
+                                        Creates a structured framework with main sections, subsections, and brief descriptions to guide your writing.
+                                    </span>
+                                </span>
+                            </label>
                             <textarea
                                 v-model="outlineNotes"
                                 placeholder="Additional notes or ideas (optional)..."
@@ -381,5 +410,15 @@ const handleAskQuestion = async () => {
                 </svg>
             </div>
         </template>
+
+        <ConfirmModal
+            :show="showReplaceConfirm"
+            title="Replace All Content?"
+            message="This will replace all existing content in the editor with the AI suggestion. This cannot be undone."
+            confirm-text="Replace All"
+            variant="warning"
+            @confirm="applySuggestion"
+            @cancel="showReplaceConfirm = false"
+        />
     </div>
 </template>

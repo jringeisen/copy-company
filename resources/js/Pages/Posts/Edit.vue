@@ -59,6 +59,17 @@ watch(
 );
 
 const editorRef = ref(null);
+const savedSelection = ref(null);
+
+// Save cursor position when user interacts with AI panel
+const saveEditorSelection = () => {
+    if (editorRef.value?.editor) {
+        savedSelection.value = {
+            from: editorRef.value.editor.state.selection.from,
+            to: editorRef.value.editor.state.selection.to,
+        };
+    }
+};
 
 const handleApplySuggestion = (suggestion) => {
     // Convert markdown to HTML and set in editor
@@ -71,12 +82,29 @@ const handleApplySuggestion = (suggestion) => {
 };
 
 const handleInsertContent = (content) => {
-    // Convert markdown to HTML and append to editor
+    // Convert markdown to HTML and insert at saved cursor position
     const html = marked.parse(content);
     if (editorRef.value?.editor) {
-        editorRef.value.editor.commands.insertContent(html);
-        form.content = editorRef.value.editor.getJSON();
-        form.content_html = editorRef.value.editor.getHTML();
+        const editor = editorRef.value.editor;
+
+        if (savedSelection.value) {
+            // Restore cursor position and insert content there
+            editor.chain()
+                .focus()
+                .setTextSelection(savedSelection.value.from)
+                .insertContent(html)
+                .run();
+        } else {
+            // Insert at end if no saved position
+            editor.chain()
+                .focus('end')
+                .insertContent(html)
+                .run();
+        }
+
+        form.content = editor.getJSON();
+        form.content_html = editor.getHTML();
+        savedSelection.value = null;
     }
 };
 
@@ -297,12 +325,14 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
             </main>
 
             <!-- AI Assistant Panel -->
-            <AIAssistantPanel
-                :content="form.content_html"
-                :title="form.title"
-                @apply-suggestion="handleApplySuggestion"
-                @insert-content="handleInsertContent"
-            />
+            <div @mousedown="saveEditorSelection" class="flex">
+                <AIAssistantPanel
+                    :content="form.content_html"
+                    :title="form.title"
+                    @apply-suggestion="handleApplySuggestion"
+                    @insert-content="handleInsertContent"
+                />
+            </div>
         </div>
 
         <!-- Publish Modal -->

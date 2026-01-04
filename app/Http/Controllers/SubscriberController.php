@@ -35,6 +35,7 @@ class SubscriberController extends Controller
                 'confirmed' => $brand->subscribers()->where('status', SubscriberStatus::Confirmed)->count(),
                 'unsubscribed' => $brand->subscribers()->where('status', SubscriberStatus::Unsubscribed)->count(),
             ],
+            'brand' => $brand,
         ]);
     }
 
