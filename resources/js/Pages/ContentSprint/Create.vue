@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import AppNavigation from '@/Components/AppNavigation.vue';
 
 const props = defineProps({
     brand: Object,
@@ -41,22 +42,7 @@ const submit = () => {
     <Head title="Start Content Sprint" />
 
     <div class="min-h-screen bg-gray-50">
-        <!-- Navigation -->
-        <nav class="bg-white border-b border-gray-200 sticky top-0 z-10">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex items-center space-x-4">
-                        <Link href="/content-sprints" class="text-gray-500 hover:text-gray-700">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                        </Link>
-                        <span class="text-gray-400">|</span>
-                        <h1 class="text-lg font-semibold text-gray-900">Start Content Sprint</h1>
-                    </div>
-                </div>
-            </div>
-        </nav>
+        <AppNavigation current-page="sprints" />
 
         <main class="max-w-2xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">

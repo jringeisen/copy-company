@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\ContentSprintStatus;
 use App\Models\Brand;
 use App\Models\ContentSprint;
 use App\Models\User;

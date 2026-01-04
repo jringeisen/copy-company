@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import AppNavigation from '@/Components/AppNavigation.vue';
 
 const props = defineProps({
     sprint: Object,
@@ -96,10 +97,12 @@ const retry = () => {
     <Head :title="sprint.title" />
 
     <div class="min-h-screen bg-gray-50">
-        <!-- Navigation -->
-        <nav class="bg-white border-b border-gray-200 sticky top-0 z-10">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
+        <AppNavigation current-page="sprints" />
+
+        <!-- Page Header -->
+        <div class="bg-white border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-4">
                         <Link href="/content-sprints" class="text-gray-500 hover:text-gray-700">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -109,7 +112,7 @@ const retry = () => {
                         <span class="text-gray-400">|</span>
                         <h1 class="text-lg font-semibold text-gray-900">{{ sprint.title }}</h1>
                     </div>
-                    <div v-if="isCompleted && selectedIdeas.length > 0" class="flex items-center">
+                    <div v-if="isCompleted && selectedIdeas.length > 0">
                         <button
                             @click="createPosts"
                             :disabled="acceptForm.processing"
@@ -120,7 +123,7 @@ const retry = () => {
                     </div>
                 </div>
             </div>
-        </nav>
+        </div>
 
         <main class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
             <!-- Generating State -->

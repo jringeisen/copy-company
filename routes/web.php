@@ -9,6 +9,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\Public\BlogController;
 use App\Http\Controllers\Public\SubscribeController;
 use App\Http\Controllers\SocialPostController;
+use App\Http\Controllers\SocialSettingsController;
 use App\Http\Controllers\SubscriberController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -45,6 +46,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/settings/brand', [BrandController::class, 'edit'])->name('settings.brand');
     Route::put('/settings/brand/{brand}', [BrandController::class, 'update'])->name('settings.brand.update');
 
+    // Social Settings routes (OAuth)
+    Route::get('/settings/social', [SocialSettingsController::class, 'index'])->name('settings.social');
+    Route::get('/settings/social/{platform}/redirect', [SocialSettingsController::class, 'redirect'])->name('settings.social.redirect');
+    Route::get('/settings/social/{platform}/callback', [SocialSettingsController::class, 'callback'])->name('settings.social.callback');
+    Route::delete('/settings/social/{platform}', [SocialSettingsController::class, 'disconnect'])->name('settings.social.disconnect');
+
     // Post routes
     Route::delete('/posts/bulk-delete', [PostController::class, 'bulkDestroy'])->name('posts.bulk-destroy');
     Route::resource('posts', PostController::class);
@@ -64,6 +71,9 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/social-posts/{socialPost}', [SocialPostController::class, 'destroy'])->name('social-posts.destroy');
     Route::post('/social-posts/{socialPost}/queue', [SocialPostController::class, 'queuePost'])->name('social-posts.queue-post');
     Route::post('/social-posts/{socialPost}/schedule', [SocialPostController::class, 'schedule'])->name('social-posts.schedule');
+    Route::post('/social-posts/{socialPost}/publish', [SocialPostController::class, 'publish'])->name('social-posts.publish');
+    Route::post('/social-posts/{socialPost}/publish-now', [SocialPostController::class, 'publishNow'])->name('social-posts.publish-now');
+    Route::post('/social-posts/{socialPost}/retry', [SocialPostController::class, 'retry'])->name('social-posts.retry');
     Route::post('/social-posts/bulk-schedule', [SocialPostController::class, 'bulkSchedule'])->name('social-posts.bulk-schedule');
 
     // AI Assistant routes

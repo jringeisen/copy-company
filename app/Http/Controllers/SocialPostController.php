@@ -10,7 +10,10 @@ use App\Http\Requests\SocialPost\StoreSocialPostRequest;
 use App\Http\Requests\SocialPost\UpdateSocialPostRequest;
 use App\Http\Resources\BrandResource;
 use App\Http\Resources\SocialPostResource;
+use App\Jobs\PublishSocialPost;
 use App\Models\SocialPost;
+use App\Services\SocialPublishing\SocialPublishingService;
+use App\Services\SocialPublishing\TokenManager;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -18,6 +21,11 @@ use Inertia\Response;
 class SocialPostController extends Controller
 {
     use HasBrandAuthorization;
+
+    public function __construct(
+        protected TokenManager $tokenManager,
+        protected SocialPublishingService $publishingService
+    ) {}
 
     public function index(): Response|RedirectResponse
     {
@@ -191,5 +199,79 @@ class SocialPostController extends Controller
         }
 
         return back()->with('success', count($socialPosts).' posts scheduled!');
+    }
+
+    public function publish(SocialPost $socialPost): RedirectResponse
+    {
+        $this->authorize('update', $socialPost);
+
+        if (! $socialPost->canPublish()) {
+            return back()->with('error', 'This post cannot be published.');
+        }
+
+        $brand = $socialPost->brand;
+        $platform = $socialPost->platform->value;
+
+        // Check if platform is connected
+        if (! $this->tokenManager->isConnected($brand, $platform)) {
+            return back()->with('error', 'Please connect your '.$socialPost->platform->displayName().' account first.');
+        }
+
+        // Dispatch the publishing job
+        PublishSocialPost::dispatch($socialPost);
+
+        return back()->with('success', 'Publishing to '.$socialPost->platform->displayName().'...');
+    }
+
+    public function publishNow(SocialPost $socialPost): RedirectResponse
+    {
+        $this->authorize('update', $socialPost);
+
+        if (! $socialPost->canPublish()) {
+            return back()->with('error', 'This post cannot be published.');
+        }
+
+        $brand = $socialPost->brand;
+        $platform = $socialPost->platform->value;
+
+        // Check if platform is connected
+        if (! $this->tokenManager->isConnected($brand, $platform)) {
+            return back()->with('error', 'Please connect your '.$socialPost->platform->displayName().' account first.');
+        }
+
+        // Publish synchronously
+        $success = $this->publishingService->publishAndUpdateStatus($socialPost);
+
+        if ($success) {
+            return back()->with('success', 'Published to '.$socialPost->platform->displayName().'!');
+        }
+
+        return back()->with('error', 'Failed to publish: '.$socialPost->failure_reason);
+    }
+
+    public function retry(SocialPost $socialPost): RedirectResponse
+    {
+        $this->authorize('update', $socialPost);
+
+        if ($socialPost->status !== SocialPostStatus::Failed) {
+            return back()->with('error', 'Only failed posts can be retried.');
+        }
+
+        $brand = $socialPost->brand;
+        $platform = $socialPost->platform->value;
+
+        if (! $this->tokenManager->isConnected($brand, $platform)) {
+            return back()->with('error', 'Please connect your '.$socialPost->platform->displayName().' account first.');
+        }
+
+        // Reset status and dispatch
+        $socialPost->update([
+            'status' => SocialPostStatus::Queued,
+            'failure_reason' => null,
+        ]);
+
+        PublishSocialPost::dispatch($socialPost);
+
+        return back()->with('success', 'Retrying publication to '.$socialPost->platform->displayName().'...');
     }
 }

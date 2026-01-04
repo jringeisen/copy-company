@@ -35,4 +35,52 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Social Media Platforms (OAuth + Publishing)
+    |--------------------------------------------------------------------------
+    */
+
+    'twitter' => [
+        'client_id' => env('TWITTER_CLIENT_ID'),
+        'client_secret' => env('TWITTER_CLIENT_SECRET'),
+        'redirect' => '/settings/social/twitter/callback',
+        'scopes' => env('TWITTER_SCOPES', 'tweet.read,tweet.write,users.read,offline.access'),
+    ],
+
+    'facebook' => [
+        'client_id' => env('FACEBOOK_CLIENT_ID'),
+        'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
+        'redirect' => '/settings/social/facebook/callback',
+        'scopes' => env('FACEBOOK_SCOPES', 'pages_manage_posts,pages_read_engagement,pages_show_list'),
+    ],
+
+    'instagram' => [
+        'client_id' => env('INSTAGRAM_CLIENT_ID'),
+        'client_secret' => env('INSTAGRAM_CLIENT_SECRET'),
+        'redirect' => '/settings/social/instagram/callback',
+        'scopes' => env('INSTAGRAM_SCOPES', 'instagram_basic,instagram_content_publish,pages_show_list'),
+    ],
+
+    'linkedin' => [
+        'client_id' => env('LINKEDIN_CLIENT_ID'),
+        'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
+        'redirect' => '/settings/social/linkedin/callback',
+        'scopes' => env('LINKEDIN_SCOPES', 'openid,profile,w_member_social'),
+    ],
+
+    'pinterest' => [
+        'client_id' => env('PINTEREST_CLIENT_ID'),
+        'client_secret' => env('PINTEREST_CLIENT_SECRET'),
+        'redirect' => '/settings/social/pinterest/callback',
+        'scopes' => env('PINTEREST_SCOPES', 'boards:read,pins:read,pins:write'),
+    ],
+
+    'tiktok' => [
+        'client_id' => env('TIKTOK_CLIENT_KEY'),
+        'client_secret' => env('TIKTOK_CLIENT_SECRET'),
+        'redirect' => '/settings/social/tiktok/callback',
+        'scopes' => env('TIKTOK_SCOPES', 'user.info.basic,video.upload,video.publish'),
+    ],
+
 ];

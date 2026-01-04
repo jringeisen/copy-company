@@ -1,7 +1,6 @@
 <?php
 
 use App\Enums\NewsletterSendStatus;
-use App\Enums\SubscriberStatus;
 use App\Jobs\ProcessNewsletterSend;
 use App\Jobs\SendNewsletterToSubscriber;
 use App\Models\Brand;

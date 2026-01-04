@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import AppNavigation from '@/Components/AppNavigation.vue';
 
 const props = defineProps({
     brand: Object,
@@ -74,23 +75,27 @@ const submit = () => {
     <Head title="Brand Settings" />
 
     <div class="min-h-screen bg-gray-50">
-        <!-- Navigation -->
-        <nav class="bg-white border-b border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex items-center space-x-8">
-                        <Link href="/dashboard" class="text-xl font-semibold text-gray-900">
-                            Content Platform
-                        </Link>
-                        <div class="flex space-x-4">
-                            <Link href="/posts" class="text-gray-600 hover:text-gray-900">Posts</Link>
-                            <Link href="/subscribers" class="text-gray-600 hover:text-gray-900">Subscribers</Link>
-                            <Link href="/settings/brand" class="text-primary-600 font-medium">Settings</Link>
-                        </div>
-                    </div>
-                </div>
+        <AppNavigation current-page="settings" />
+
+        <!-- Settings Sub-navigation -->
+        <div class="bg-white border-b border-gray-200">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <nav class="flex space-x-8">
+                    <Link
+                        href="/settings/brand"
+                        class="border-b-2 border-primary-500 py-4 px-1 text-sm font-medium text-primary-600"
+                    >
+                        Brand
+                    </Link>
+                    <Link
+                        href="/settings/social"
+                        class="border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    >
+                        Social Connections
+                    </Link>
+                </nav>
             </div>
-        </nav>
+        </div>
 
         <main class="max-w-3xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
             <div class="mb-8">
