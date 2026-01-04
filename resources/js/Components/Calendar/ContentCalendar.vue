@@ -97,9 +97,28 @@ const getEventClasses = (event) => {
     } else if (event.type === 'newsletter') {
         return 'bg-purple-100 text-purple-800 hover:bg-purple-200';
     } else if (event.type === 'social') {
+        // Color based on status for social posts
+        if (event.status === 'published') {
+            return 'bg-green-100 text-green-800 hover:bg-green-200';
+        } else if (event.status === 'failed') {
+            return 'bg-red-100 text-red-800 hover:bg-red-200';
+        }
         return 'bg-pink-100 text-pink-800 hover:bg-pink-200';
     }
     return 'bg-gray-100 text-gray-800';
+};
+
+const getStatusIcon = (event) => {
+    if (event.type !== 'social') return null;
+
+    if (event.status === 'published') {
+        return 'check';
+    } else if (event.status === 'failed') {
+        return 'x';
+    } else if (event.status === 'scheduled') {
+        return 'clock';
+    }
+    return null;
 };
 
 const goToToday = () => {
@@ -181,9 +200,19 @@ const goToToday = () => {
                         :key="event.id"
                         @click="emit('selectEvent', event)"
                         :class="getEventClasses(event)"
-                        class="text-xs px-2 py-1 rounded truncate cursor-pointer transition"
+                        class="text-xs px-2 py-1 rounded truncate cursor-pointer transition flex items-center gap-1"
                     >
-                        {{ event.title }}
+                        <!-- Status icon for social posts -->
+                        <svg v-if="getStatusIcon(event) === 'check'" class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <svg v-else-if="getStatusIcon(event) === 'x'" class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        <svg v-else-if="getStatusIcon(event) === 'clock'" class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="truncate">{{ event.title }}</span>
                     </div>
                     <div
                         v-if="getEventsForDay(day.date).length > 3"

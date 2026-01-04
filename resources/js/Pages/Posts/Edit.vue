@@ -301,7 +301,7 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
         <!-- Publish Modal -->
         <div v-if="showPublishModal" class="fixed inset-0 z-50 overflow-y-auto">
             <div class="flex min-h-screen items-center justify-center p-4">
-                <div class="fixed inset-0 bg-black bg-opacity-30" @click="showPublishModal = false"></div>
+                <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showPublishModal = false"></div>
 
                 <div class="relative bg-white rounded-xl shadow-xl max-w-lg w-full p-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-4">

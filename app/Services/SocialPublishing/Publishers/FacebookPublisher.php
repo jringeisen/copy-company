@@ -5,10 +5,22 @@ namespace App\Services\SocialPublishing\Publishers;
 use App\Models\SocialPost;
 use App\Services\SocialPublishing\Contracts\TokenRefreshableInterface;
 use Carbon\Carbon;
-use Facebook\Facebook;
+use Illuminate\Support\Facades\Http;
 
 class FacebookPublisher extends AbstractPublisher implements TokenRefreshableInterface
 {
+    protected function getHttpClient(): \Illuminate\Http\Client\PendingRequest
+    {
+        $client = Http::baseUrl('https://graph.facebook.com/v18.0');
+
+        // Disable SSL verification in local development only
+        if (app()->environment('local')) {
+            $client = $client->withOptions(['verify' => false]);
+        }
+
+        return $client;
+    }
+
     public function getPlatform(): string
     {
         return 'facebook';
@@ -37,26 +49,30 @@ class FacebookPublisher extends AbstractPublisher implements TokenRefreshableInt
     public function publish(SocialPost $socialPost, array $credentials): array
     {
         try {
-            $fb = new Facebook([
-                'app_id' => config('services.facebook.client_id'),
-                'app_secret' => config('services.facebook.client_secret'),
-                'default_graph_version' => 'v18.0',
-            ]);
-
             $pageId = $credentials['page_id'];
             $pageToken = $credentials['page_access_token'] ?? $credentials['access_token'];
 
-            $data = ['message' => $socialPost->content];
+            $data = [
+                'message' => $socialPost->content,
+                'access_token' => $pageToken,
+            ];
 
             // Add link if present
             if ($socialPost->link) {
                 $data['link'] = $socialPost->link;
             }
 
-            $response = $fb->post("/{$pageId}/feed", $data, $pageToken);
-            $graphNode = $response->getGraphNode();
+            $response = $this->getHttpClient()->post("/{$pageId}/feed", $data);
 
-            return $this->successResponse($graphNode['id']);
+            if (! $response->successful()) {
+                $error = $response->json('error.message', 'Unknown Facebook API error');
+
+                return $this->errorResponse($error);
+            }
+
+            $postId = $response->json('id');
+
+            return $this->successResponse($postId);
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage());
         }
@@ -82,19 +98,23 @@ class FacebookPublisher extends AbstractPublisher implements TokenRefreshableInt
      */
     public function refreshToken(array $credentials): array
     {
-        $fb = new Facebook([
-            'app_id' => config('services.facebook.client_id'),
-            'app_secret' => config('services.facebook.client_secret'),
-            'default_graph_version' => 'v18.0',
+        $response = $this->getHttpClient()->get('/oauth/access_token', [
+            'grant_type' => 'fb_exchange_token',
+            'client_id' => config('services.facebook.client_id'),
+            'client_secret' => config('services.facebook.client_secret'),
+            'fb_exchange_token' => $credentials['access_token'],
         ]);
 
-        $oAuth2Client = $fb->getOAuth2Client();
-        $longLivedToken = $oAuth2Client->getLongLivedAccessToken($credentials['access_token']);
+        if (! $response->successful()) {
+            throw new \RuntimeException('Failed to refresh Facebook token: '.$response->json('error.message', 'Unknown error'));
+        }
+
+        $expiresIn = $response->json('expires_in');
 
         return [
-            'access_token' => $longLivedToken->getValue(),
+            'access_token' => $response->json('access_token'),
             'refresh_token' => null,
-            'expires_at' => $longLivedToken->getExpiresAt()?->format('Y-m-d H:i:s'),
+            'expires_at' => $expiresIn ? now()->addSeconds($expiresIn)->format('Y-m-d H:i:s') : null,
         ];
     }
 }

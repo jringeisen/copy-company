@@ -254,7 +254,7 @@ const availablePlatformsForGenerate = [
         <!-- Generate Modal -->
         <div v-if="showGenerateModal" class="fixed inset-0 z-50 overflow-y-auto">
             <div class="flex min-h-screen items-center justify-center p-4">
-                <div class="fixed inset-0 bg-black bg-opacity-30" @click="showGenerateModal = false"></div>
+                <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showGenerateModal = false"></div>
 
                 <div class="relative bg-white rounded-xl shadow-xl max-w-lg w-full p-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-4">Generate Social Posts</h2>
@@ -321,7 +321,7 @@ const availablePlatformsForGenerate = [
         <!-- Schedule Modal -->
         <div v-if="showScheduleModal" class="fixed inset-0 z-50 overflow-y-auto">
             <div class="flex min-h-screen items-center justify-center p-4">
-                <div class="fixed inset-0 bg-black bg-opacity-30" @click="showScheduleModal = false"></div>
+                <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showScheduleModal = false"></div>
 
                 <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-4">Schedule Post</h2>

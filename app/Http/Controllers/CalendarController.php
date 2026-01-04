@@ -50,7 +50,7 @@ class CalendarController extends Controller
                 $q->whereBetween('scheduled_at', [$startOfMonth, $endOfMonth])
                     ->orWhereBetween('published_at', [$startOfMonth, $endOfMonth]);
             })
-            ->whereIn('status', [SocialPostStatus::Scheduled, SocialPostStatus::Published])
+            ->whereIn('status', [SocialPostStatus::Scheduled, SocialPostStatus::Published, SocialPostStatus::Failed])
             ->with('post:id,title')
             ->get();
 

@@ -197,7 +197,7 @@ const submitBulkSchedule = () => {
         <!-- Bulk Schedule Modal -->
         <div v-if="showBulkScheduleModal" class="fixed inset-0 z-50 overflow-y-auto">
             <div class="flex min-h-screen items-center justify-center p-4">
-                <div class="fixed inset-0 bg-black bg-opacity-30" @click="showBulkScheduleModal = false"></div>
+                <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showBulkScheduleModal = false"></div>
 
                 <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-4">
@@ -205,12 +205,20 @@ const submitBulkSchedule = () => {
                     </h2>
 
                     <div class="space-y-4">
+                        <!-- Validation Errors -->
+                        <div v-if="Object.keys(bulkScheduleForm.errors).length > 0" class="bg-red-50 border border-red-200 rounded-lg p-3">
+                            <ul class="text-sm text-red-600 list-disc list-inside">
+                                <li v-for="(error, key) in bulkScheduleForm.errors" :key="key">{{ error }}</li>
+                            </ul>
+                        </div>
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Start date and time</label>
                             <input
                                 v-model="bulkScheduleForm.scheduled_at"
                                 type="datetime-local"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-primary-500 focus:border-primary-500"
+                                :class="{ 'border-red-500': bulkScheduleForm.errors.scheduled_at }"
                             />
                         </div>
 

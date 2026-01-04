@@ -2,7 +2,7 @@
 
 namespace App\Services\SocialPublishing;
 
-use Facebook\Facebook;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class FacebookPagesService
@@ -15,25 +15,39 @@ class FacebookPagesService
     public function fetchUserPages(string $userAccessToken): array
     {
         try {
-            $fb = new Facebook([
-                'app_id' => config('services.facebook.client_id'),
-                'app_secret' => config('services.facebook.client_secret'),
-                'default_graph_version' => 'v18.0',
-            ]);
+            $client = Http::baseUrl('https://graph.facebook.com/v18.0');
 
-            $response = $fb->get('/me/accounts', $userAccessToken);
-            $pages = $response->getGraphEdge();
-
-            $result = [];
-            foreach ($pages as $page) {
-                $result[] = [
-                    'id' => $page['id'],
-                    'name' => $page['name'],
-                    'access_token' => $page['access_token'],
-                ];
+            // Disable SSL verification in local development only
+            if (app()->environment('local')) {
+                $client = $client->withOptions(['verify' => false]);
             }
 
-            return $result;
+            $response = $client->get('/me/accounts', [
+                'access_token' => $userAccessToken,
+                'fields' => 'id,name,access_token',
+            ]);
+
+            Log::info('Facebook pages API response', [
+                'status' => $response->status(),
+                'body' => $response->json(),
+            ]);
+
+            if (! $response->successful()) {
+                Log::error('Facebook API error', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+
+                return [];
+            }
+
+            $data = $response->json('data', []);
+
+            return array_map(fn (array $page): array => [
+                'id' => $page['id'],
+                'name' => $page['name'],
+                'access_token' => $page['access_token'],
+            ], $data);
         } catch (\Exception $e) {
             Log::error('Failed to fetch Facebook pages', [
                 'error' => $e->getMessage(),

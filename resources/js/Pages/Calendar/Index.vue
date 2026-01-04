@@ -58,7 +58,15 @@ const handleSelectEvent = (event) => {
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="w-3 h-3 rounded-full bg-pink-500"></span>
-                    <span class="text-sm text-gray-600">Social Post</span>
+                    <span class="text-sm text-gray-600">Social (Scheduled)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                    <span class="text-sm text-gray-600">Social (Published)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                    <span class="text-sm text-gray-600">Social (Failed)</span>
                 </div>
             </div>
 
