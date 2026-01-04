@@ -2,6 +2,7 @@
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AppNavigation from '@/Components/AppNavigation.vue';
+import ConfirmModal from '@/Components/ConfirmModal.vue';
 
 const props = defineProps({
     posts: Array,
@@ -10,6 +11,7 @@ const props = defineProps({
 
 const selectedIds = ref([]);
 const isDeleting = ref(false);
+const showDeleteModal = ref(false);
 
 const allSelected = computed(() => {
     return props.posts.length > 0 && selectedIds.value.length === props.posts.length;
@@ -37,10 +39,6 @@ const togglePost = (postId) => {
 };
 
 const deleteSelected = () => {
-    if (!confirm(`Are you sure you want to delete ${selectedIds.value.length} post(s)? This action cannot be undone.`)) {
-        return;
-    }
-
     isDeleting.value = true;
     router.delete('/posts/bulk-delete', {
         data: { ids: selectedIds.value },
@@ -49,9 +47,15 @@ const deleteSelected = () => {
         },
         onFinish: () => {
             isDeleting.value = false;
+            showDeleteModal.value = false;
         },
     });
 };
+
+const deleteMessage = computed(() => {
+    const count = selectedIds.value.length;
+    return `Are you sure you want to delete ${count} post${count !== 1 ? 's' : ''}? This action cannot be undone.`;
+});
 
 const getStatusColor = (status) => {
     const colors = {
@@ -80,11 +84,10 @@ const getStatusColor = (status) => {
                 <div class="flex items-center gap-3">
                     <button
                         v-if="selectedIds.length > 0"
-                        @click="deleteSelected"
-                        :disabled="isDeleting"
-                        class="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition disabled:opacity-50"
+                        @click="showDeleteModal = true"
+                        class="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition"
                     >
-                        {{ isDeleting ? 'Deleting...' : `Delete (${selectedIds.length})` }}
+                        Delete ({{ selectedIds.length }})
                     </button>
                     <Link
                         href="/posts/create"
@@ -180,5 +183,15 @@ const getStatusColor = (status) => {
                 </Link>
             </div>
         </main>
+
+        <ConfirmModal
+            :show="showDeleteModal"
+            title="Delete Posts"
+            :message="deleteMessage"
+            confirm-text="Delete"
+            :processing="isDeleting"
+            @confirm="deleteSelected"
+            @cancel="showDeleteModal = false"
+        />
     </div>
 </template>

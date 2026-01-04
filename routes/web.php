@@ -36,7 +36,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
 
     // Content Sprint routes
-    Route::resource('content-sprints', ContentSprintController::class)->only(['index', 'create', 'store', 'show']);
+    Route::resource('content-sprints', ContentSprintController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
     Route::post('/content-sprints/{contentSprint}/accept', [ContentSprintController::class, 'accept'])->name('content-sprints.accept');
     Route::post('/content-sprints/{contentSprint}/retry', [ContentSprintController::class, 'retry'])->name('content-sprints.retry');
 

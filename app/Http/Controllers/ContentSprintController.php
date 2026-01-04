@@ -143,4 +143,14 @@ class ContentSprintController extends Controller
         return redirect()->route('content-sprints.show', $contentSprint)
             ->with('success', 'Sprint generation restarted.');
     }
+
+    public function destroy(ContentSprint $contentSprint): RedirectResponse
+    {
+        $this->authorize('delete', $contentSprint);
+
+        $contentSprint->delete();
+
+        return redirect()->route('content-sprints.index')
+            ->with('success', 'Content sprint deleted.');
+    }
 }

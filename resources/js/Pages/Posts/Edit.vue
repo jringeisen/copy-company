@@ -2,6 +2,7 @@
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import PostEditor from '@/Components/Editor/PostEditor.vue';
 import AIAssistantPanel from '@/Components/Editor/AIAssistantPanel.vue';
+import ConfirmModal from '@/Components/ConfirmModal.vue';
 import { useAutosave } from '@/Composables/useAutosave';
 import { ref, computed, watch } from 'vue';
 import { marked } from 'marked';
@@ -96,6 +97,8 @@ const minDateTime = computed(() => {
 });
 
 const showPublishModal = ref(false);
+const showDeleteModal = ref(false);
+const isDeleting = ref(false);
 
 const updateContent = (json) => {
     form.content = json;
@@ -145,9 +148,13 @@ const publish = () => {
 };
 
 const deletePost = () => {
-    if (confirm('Are you sure you want to delete this post?')) {
-        router.delete(`/posts/${props.post.id}`);
-    }
+    isDeleting.value = true;
+    router.delete(`/posts/${props.post.id}`, {
+        onFinish: () => {
+            isDeleting.value = false;
+            showDeleteModal.value = false;
+        },
+    });
 };
 
 const isPublished = computed(() => props.post.status === 'published');
@@ -279,7 +286,7 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
                         <!-- Delete -->
                         <div class="border-t border-gray-200 pt-6 mt-6">
                             <button
-                                @click="deletePost"
+                                @click="showDeleteModal = true"
                                 class="text-sm text-red-600 hover:text-red-800"
                             >
                                 Delete this post
@@ -411,5 +418,15 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
                 </div>
             </div>
         </div>
+
+        <ConfirmModal
+            :show="showDeleteModal"
+            title="Delete Post"
+            message="Are you sure you want to delete this post? This action cannot be undone."
+            confirm-text="Delete"
+            :processing="isDeleting"
+            @confirm="deletePost"
+            @cancel="showDeleteModal = false"
+        />
     </div>
 </template>

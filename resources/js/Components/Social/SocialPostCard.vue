@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { router, Link } from '@inertiajs/vue3';
+import ConfirmModal from '@/Components/ConfirmModal.vue';
 
 const props = defineProps({
     socialPost: {
@@ -16,6 +17,8 @@ const props = defineProps({
 const emit = defineEmits(['edit', 'delete', 'queue', 'schedule']);
 
 const isPublishing = ref(false);
+const showDeleteModal = ref(false);
+const isDeleting = ref(false);
 
 const isPlatformConnected = computed(() => {
     return props.connectedPlatforms.includes(props.socialPost.platform);
@@ -55,9 +58,13 @@ const truncatedContent = computed(() => {
 });
 
 const handleDelete = () => {
-    if (confirm('Are you sure you want to delete this social post?')) {
-        router.delete(`/social-posts/${props.socialPost.id}`);
-    }
+    isDeleting.value = true;
+    router.delete(`/social-posts/${props.socialPost.id}`, {
+        onFinish: () => {
+            isDeleting.value = false;
+            showDeleteModal.value = false;
+        },
+    });
 };
 
 const handleQueue = () => {
@@ -256,7 +263,7 @@ const handleRetry = () => {
             </div>
 
             <button
-                @click="handleDelete"
+                @click="showDeleteModal = true"
                 class="text-sm text-red-600 hover:text-red-700"
                 :disabled="isPublishing"
             >
@@ -265,5 +272,15 @@ const handleRetry = () => {
                 </svg>
             </button>
         </div>
+
+        <ConfirmModal
+            :show="showDeleteModal"
+            title="Delete Social Post"
+            message="Are you sure you want to delete this social post? This action cannot be undone."
+            confirm-text="Delete"
+            :processing="isDeleting"
+            @confirm="handleDelete"
+            @cancel="showDeleteModal = false"
+        />
     </div>
 </template>
