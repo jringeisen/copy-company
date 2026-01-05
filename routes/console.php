@@ -17,3 +17,6 @@ Schedule::command('newsletters:process-scheduled')->everyMinute();
 
 // Process scheduled social posts every minute
 Schedule::job(new ProcessScheduledSocialPosts)->everyMinute();
+
+// Check SES reputation hourly
+Schedule::command('ses:check-reputation')->hourly();

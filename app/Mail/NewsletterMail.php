@@ -6,6 +6,7 @@ use App\Models\NewsletterSend;
 use App\Models\Subscriber;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -21,7 +22,13 @@ class NewsletterMail extends Mailable
 
     public function envelope(): Envelope
     {
+        $brand = $this->newsletterSend->brand;
+
         return new Envelope(
+            from: new Address(
+                $brand->getEmailFromAddress(),
+                $brand->getEmailFromName()
+            ),
             subject: $this->newsletterSend->subject_line,
         );
     }

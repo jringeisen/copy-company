@@ -93,6 +93,12 @@ const submit = () => {
                     >
                         Social Connections
                     </Link>
+                    <Link
+                        href="/settings/email-domain"
+                        class="border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    >
+                        Email Domain
+                    </Link>
                 </nav>
             </div>
         </div>

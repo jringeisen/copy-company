@@ -11,11 +11,18 @@ use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\Public\BlogController;
 use App\Http\Controllers\Public\SubscribeController;
+use App\Http\Controllers\Settings\EmailDomainController;
 use App\Http\Controllers\SocialPostController;
 use App\Http\Controllers\SocialSettingsController;
 use App\Http\Controllers\SubscriberController;
+use App\Http\Controllers\Webhooks\SesWebhookController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+// Webhook routes (no CSRF)
+Route::post('/webhooks/ses', [SesWebhookController::class, 'handle'])
+    ->name('webhooks.ses')
+    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 
 // Public landing page
 Route::get('/', function () {
@@ -66,6 +73,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/settings/social/{platform}/select', [SocialSettingsController::class, 'showAccountSelection'])->name('settings.social.select');
     Route::post('/settings/social/{platform}/select', [SocialSettingsController::class, 'storeAccountSelection'])->name('settings.social.select.store');
     Route::delete('/settings/social/{platform}', [SocialSettingsController::class, 'disconnect'])->name('settings.social.disconnect');
+
+    // Email Domain Settings routes
+    Route::get('/settings/email-domain', [EmailDomainController::class, 'index'])->name('settings.email-domain');
+    Route::post('/settings/email-domain', [EmailDomainController::class, 'initiate'])->name('settings.email-domain.initiate');
+    Route::post('/settings/email-domain/check', [EmailDomainController::class, 'checkStatus'])->name('settings.email-domain.check');
+    Route::put('/settings/email-domain/from', [EmailDomainController::class, 'updateFrom'])->name('settings.email-domain.update-from');
+    Route::delete('/settings/email-domain', [EmailDomainController::class, 'remove'])->name('settings.email-domain.remove');
 
     // Post routes
     Route::delete('/posts/bulk-delete', [PostController::class, 'bulkDestroy'])->name('posts.bulk-destroy');

@@ -20,6 +20,9 @@ class Subscriber extends Model
         'first_name',
         'last_name',
         'status',
+        'bounce_type',
+        'soft_bounce_count',
+        'last_bounce_at',
         'source',
         'confirmation_token',
         'unsubscribe_token',
@@ -30,6 +33,8 @@ class Subscriber extends Model
 
     protected $casts = [
         'status' => SubscriberStatus::class,
+        'soft_bounce_count' => 'integer',
+        'last_bounce_at' => 'datetime',
         'confirmed_at' => 'datetime',
         'subscribed_at' => 'datetime',
         'unsubscribed_at' => 'datetime',

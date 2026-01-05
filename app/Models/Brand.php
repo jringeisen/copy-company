@@ -22,6 +22,11 @@ class Brand extends Model
         'favicon_path',
         'custom_domain',
         'domain_verified',
+        'custom_email_domain',
+        'custom_email_from',
+        'email_domain_verification_status',
+        'email_domain_dns_records',
+        'email_domain_verified_at',
         'primary_color',
         'secondary_color',
         'industry',
@@ -41,6 +46,8 @@ class Brand extends Model
         'social_connections' => 'encrypted:array',
         'onboarding_status' => 'array',
         'onboarding_dismissed' => 'boolean',
+        'email_domain_dns_records' => 'array',
+        'email_domain_verified_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
@@ -95,6 +102,37 @@ class Brand extends Model
     public function getActiveSubscribersCountAttribute(): int
     {
         return $this->subscribers()->confirmed()->count();
+    }
+
+    /**
+     * Check if the brand has a verified email sending domain.
+     */
+    public function hasVerifiedEmailDomain(): bool
+    {
+        return $this->email_domain_verification_status === 'verified'
+            && $this->custom_email_domain !== null;
+    }
+
+    /**
+     * Get the email address to send newsletters from.
+     */
+    public function getEmailFromAddress(): string
+    {
+        if ($this->hasVerifiedEmailDomain()) {
+            $from = $this->custom_email_from ?: 'hello';
+
+            return "{$from}@{$this->custom_email_domain}";
+        }
+
+        return config('mail.from.address');
+    }
+
+    /**
+     * Get the email sender name.
+     */
+    public function getEmailFromName(): string
+    {
+        return $this->name;
     }
 
     /**

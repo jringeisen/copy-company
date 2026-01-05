@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use App\Services\Newsletter\BuiltInNewsletterService;
 use App\Services\Newsletter\NewsletterServiceInterface;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use SocialiteProviders\Instagram\InstagramExtendSocialite;
 use SocialiteProviders\Manager\SocialiteWasCalled;
@@ -33,5 +35,10 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(SocialiteWasCalled::class, InstagramExtendSocialite::class.'@handle');
         Event::listen(SocialiteWasCalled::class, PinterestExtendSocialite::class.'@handle');
         Event::listen(SocialiteWasCalled::class, TikTokExtendSocialite::class.'@handle');
+
+        // Rate limiter for SES email sending (10 emails per second)
+        RateLimiter::for('ses-sending', function (object $job) {
+            return Limit::perSecond(10);
+        });
     }
 }

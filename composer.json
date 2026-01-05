@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.2",
         "abraham/twitteroauth": "^8.1",
+        "aws/aws-sdk-php": "^3.369",
         "facebook/graph-sdk": "^5.1",
         "inertiajs/inertia-laravel": "^2.0",
         "intervention/image-laravel": "^1.5",
