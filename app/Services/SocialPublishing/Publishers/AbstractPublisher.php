@@ -2,9 +2,11 @@
 
 namespace App\Services\SocialPublishing\Publishers;
 
+use App\Models\Media;
 use App\Services\SocialPublishing\Contracts\PublisherInterface;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 abstract class AbstractPublisher implements PublisherInterface
 {
@@ -89,5 +91,25 @@ abstract class AbstractPublisher implements PublisherInterface
             'external_id' => null,
             'error' => $error,
         ];
+    }
+
+    /**
+     * Get a publicly accessible URL for a media item by ID.
+     *
+     * Uses a longer expiration (4 hours) to give external platforms time to fetch the image.
+     */
+    protected function getMediaUrl(int $mediaId): ?string
+    {
+        $media = Media::find($mediaId);
+
+        if (! $media) {
+            return null;
+        }
+
+        // Generate a signed URL with longer expiration for external platform access
+        return Storage::disk($media->disk)->temporaryUrl(
+            $media->path,
+            now()->addHours(4)
+        );
     }
 }

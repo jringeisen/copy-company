@@ -34,10 +34,10 @@ class PostController extends Controller
         $posts = $brand->posts()
             ->with('brand') // Eager load brand to avoid N+1 in PostResource url accessor
             ->orderByDesc('updated_at')
-            ->paginate(20);
+            ->get();
 
         return Inertia::render('Posts/Index', [
-            'posts' => PostResource::collection($posts),
+            'posts' => PostResource::collection($posts)->resolve(),
             'brand' => (new BrandResource($brand))->resolve(),
         ]);
     }

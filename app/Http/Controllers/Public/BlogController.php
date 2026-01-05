@@ -16,15 +16,16 @@ class BlogController extends Controller
             ->published()
             ->where('publish_to_blog', true)
             ->orderByDesc('published_at')
-            ->paginate(12)
-            ->through(fn (Post $post): array => [
+            ->get()
+            ->map(fn (Post $post): array => [
                 'id' => $post->id,
                 'title' => $post->title,
                 'slug' => $post->slug,
                 'excerpt' => $post->excerpt,
                 'featured_image' => $post->featured_image,
                 'published_at' => $post->published_at->format('M d, Y'),
-            ]);
+            ])
+            ->toArray();
 
         return Inertia::render('Public/Blog/Index', [
             'brand' => [

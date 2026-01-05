@@ -4,7 +4,8 @@ import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
-import { watch, onBeforeUnmount } from 'vue';
+import { ref, watch, onBeforeUnmount } from 'vue';
+import MediaPickerModal from '@/Components/Media/MediaPickerModal.vue';
 
 const props = defineProps({
     modelValue: {
@@ -71,11 +72,19 @@ const setLink = () => {
     }
 };
 
+const showMediaPicker = ref(false);
+
 const addImage = () => {
-    const url = window.prompt('Enter image URL');
-    if (url) {
-        editor.value.chain().focus().setImage({ src: url }).run();
-    }
+    showMediaPicker.value = true;
+};
+
+const handleImageSelect = (media) => {
+    // Use permanent URL instead of signed URL - it redirects to a fresh signed URL on access
+    editor.value.chain().focus().setImage({
+        src: media.permanent_url,
+        alt: media.alt_text || ''
+    }).run();
+    showMediaPicker.value = false;
 };
 
 defineExpose({ editor });
@@ -267,6 +276,13 @@ defineExpose({ editor });
         <div class="p-6">
             <EditorContent :editor="editor" />
         </div>
+
+        <!-- Media Picker Modal -->
+        <MediaPickerModal
+            :show="showMediaPicker"
+            @close="showMediaPicker = false"
+            @select="handleImageSelect"
+        />
     </div>
 </template>
 

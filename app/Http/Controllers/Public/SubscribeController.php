@@ -5,15 +5,16 @@ namespace App\Http\Controllers\Public;
 use App\Enums\SubscriberStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Public\SubscribeRequest;
+use App\Mail\SubscriptionConfirmation;
 use App\Models\Brand;
 use App\Models\Subscriber;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class SubscribeController extends Controller
 {
-    public function store(SubscribeRequest $request, Brand $brand): JsonResponse
+    public function store(SubscribeRequest $request, Brand $brand): RedirectResponse
     {
         $validated = $request->validated();
 
@@ -29,19 +30,15 @@ class SubscribeController extends Controller
                     'unsubscribed_at' => null,
                 ]);
 
-                // TODO: Send confirmation email
+                Mail::to($existing->email)->send(new SubscriptionConfirmation($existing, $brand));
 
-                return response()->json([
-                    'message' => 'Please check your email to confirm your subscription.',
-                ]);
+                return back()->with('success', 'Please check your email to confirm your subscription.');
             }
 
-            return response()->json([
-                'message' => 'You are already subscribed.',
-            ]);
+            return back()->with('info', 'You are already subscribed.');
         }
 
-        Subscriber::create([
+        $subscriber = Subscriber::create([
             'brand_id' => $brand->id,
             'email' => $validated['email'],
             'name' => $validated['name'] ?? null,
@@ -49,11 +46,9 @@ class SubscribeController extends Controller
             'confirmation_token' => Str::random(64),
         ]);
 
-        // TODO: Send confirmation email
+        Mail::to($subscriber->email)->send(new SubscriptionConfirmation($subscriber, $brand));
 
-        return response()->json([
-            'message' => 'Please check your email to confirm your subscription.',
-        ]);
+        return back()->with('success', 'Please check your email to confirm your subscription.');
     }
 
     public function confirm(Brand $brand, string $token): RedirectResponse

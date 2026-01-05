@@ -116,11 +116,17 @@ class SocialPostController extends Controller
     {
         $validated = $request->validated();
 
+        // Extract just the media IDs for storage
+        $mediaIds = isset($validated['media'])
+            ? collect($validated['media'])->pluck('id')->toArray()
+            : [];
+
         $socialPost->update([
             'content' => $validated['content'],
             'hashtags' => $validated['hashtags'] ?? [],
             'link' => $validated['link'] ?? null,
             'format' => $validated['format'] ?? $socialPost->format,
+            'media' => $mediaIds,
             'user_edited' => true,
         ]);
 

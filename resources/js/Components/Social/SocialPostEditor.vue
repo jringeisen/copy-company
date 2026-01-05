@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
 import { useForm } from '@inertiajs/vue3';
+import MediaPickerModal from '@/Components/Media/MediaPickerModal.vue';
 
 const props = defineProps({
     socialPost: {
@@ -16,7 +17,10 @@ const form = useForm({
     hashtags: props.socialPost.hashtags || [],
     link: props.socialPost.link || '',
     format: props.socialPost.format,
+    media: props.socialPost.media || [],
 });
+
+const showMediaPicker = ref(false);
 
 const hashtagInput = ref('');
 
@@ -49,6 +53,41 @@ const formatOptions = {
     linkedin: ['feed'],
     pinterest: ['pin'],
     tiktok: ['feed', 'story'],
+};
+
+// Media limits per platform and format
+const mediaLimits = {
+    instagram: { feed: 10, story: 1, reel: 0, carousel: 10 },
+    facebook: { feed: 10, story: 1, reel: 0 },
+    twitter: { feed: 4, thread: 4 },
+    linkedin: { feed: 9 },
+    pinterest: { pin: 5 },
+    tiktok: { feed: 0, story: 0 },
+};
+
+const mediaLimit = computed(() => {
+    const platformLimits = mediaLimits[props.socialPost.platform];
+    return platformLimits?.[form.format] ?? 0;
+});
+
+const allowsMedia = computed(() => mediaLimit.value > 0);
+const canAddMoreMedia = computed(() => form.media.length < mediaLimit.value);
+
+const handleMediaSelect = (selectedMedia) => {
+    // selectedMedia can be a single item or array (if multiple mode)
+    const items = Array.isArray(selectedMedia) ? selectedMedia : [selectedMedia];
+
+    for (const item of items) {
+        if (form.media.length >= mediaLimit.value) break;
+        if (!form.media.find(m => m.id === item.id)) {
+            form.media.push(item);
+        }
+    }
+    showMediaPicker.value = false;
+};
+
+const removeMedia = (index) => {
+    form.media.splice(index, 1);
 };
 
 const addHashtag = () => {
@@ -110,6 +149,57 @@ const save = () => {
                                 {{ formatOption.charAt(0).toUpperCase() + formatOption.slice(1) }}
                             </option>
                         </select>
+                    </div>
+
+                    <!-- Media -->
+                    <div v-if="allowsMedia">
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-sm font-medium text-gray-700">Media</label>
+                            <span class="text-sm text-gray-500">
+                                {{ form.media.length }} / {{ mediaLimit }}
+                            </span>
+                        </div>
+
+                        <!-- Media Grid -->
+                        <div v-if="form.media.length > 0" class="grid grid-cols-4 gap-2 mb-3">
+                            <div
+                                v-for="(item, index) in form.media"
+                                :key="item.id"
+                                class="relative aspect-square bg-gray-100 rounded-lg overflow-hidden group"
+                            >
+                                <img
+                                    :src="item.thumbnail_url || item.url"
+                                    :alt="item.alt_text || item.filename"
+                                    class="w-full h-full object-cover"
+                                />
+                                <button
+                                    @click="removeMedia(index)"
+                                    class="absolute top-1 right-1 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Add Media Button -->
+                        <button
+                            v-if="canAddMoreMedia"
+                            type="button"
+                            @click="showMediaPicker = true"
+                            class="flex items-center gap-2 px-3 py-2 border border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-700 transition"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            Add Media
+                        </button>
+                    </div>
+                    <div v-else class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                        <p class="text-sm text-yellow-800">
+                            This format does not support images (video only or not applicable).
+                        </p>
                     </div>
 
                     <!-- Content -->
@@ -207,5 +297,14 @@ const save = () => {
                 </div>
             </div>
         </div>
+
+        <!-- Media Picker Modal -->
+        <MediaPickerModal
+            :show="showMediaPicker"
+            :multiple="mediaLimit > 1"
+            :max-items="mediaLimit - form.media.length"
+            @close="showMediaPicker = false"
+            @select="handleMediaSelect"
+        />
     </div>
 </template>

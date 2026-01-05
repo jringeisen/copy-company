@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Media;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,7 +21,7 @@ class SocialPostResource extends JsonResource
             'platform_display' => $this->platform_display_name,
             'format' => $this->format?->value,
             'content' => $this->content,
-            'media' => $this->media,
+            'media' => $this->getHydratedMedia(),
             'hashtags' => $this->hashtags,
             'link' => $this->link,
             'status' => $this->status?->value,
@@ -42,5 +43,30 @@ class SocialPostResource extends JsonResource
             ]),
             'brand' => new BrandResource($this->whenLoaded('brand')),
         ];
+    }
+
+    /**
+     * Hydrate media IDs into full media objects with fresh signed URLs.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    protected function getHydratedMedia(): array
+    {
+        $mediaIds = $this->media ?? [];
+
+        if (empty($mediaIds)) {
+            return [];
+        }
+
+        // If media is already an array of objects (legacy data), return as-is
+        if (isset($mediaIds[0]) && is_array($mediaIds[0])) {
+            return $mediaIds;
+        }
+
+        // Fetch media records and transform with fresh URLs
+        return Media::whereIn('id', $mediaIds)
+            ->get()
+            ->map(fn (Media $media) => (new MediaResource($media))->resolve())
+            ->toArray();
     }
 }

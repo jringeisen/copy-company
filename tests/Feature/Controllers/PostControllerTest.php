@@ -203,7 +203,7 @@ test('users can bulk delete their posts', function () {
     }
 });
 
-test('bulk delete only deletes posts from users brand', function () {
+test('bulk delete rejects request containing posts from other brands', function () {
     $user = User::factory()->create();
     $brand = Brand::factory()->forUser($user)->create();
     $userPosts = Post::factory()->forBrand($brand)->count(2)->create();
@@ -218,10 +218,12 @@ test('bulk delete only deletes posts from users brand', function () {
         'ids' => $allIds,
     ]);
 
-    $response->assertRedirect(route('posts.index'));
+    // Authorization fails if any post IDs don't belong to the user's brand
+    $response->assertForbidden();
 
+    // No posts should be deleted
     foreach ($userPosts as $post) {
-        $this->assertDatabaseMissing('posts', ['id' => $post->id]);
+        $this->assertDatabaseHas('posts', ['id' => $post->id]);
     }
 
     foreach ($otherPosts as $post) {
@@ -240,7 +242,7 @@ test('bulk delete requires at least one post id', function () {
     $response->assertSessionHasErrors('ids');
 });
 
-test('bulk delete requires valid post ids', function () {
+test('bulk delete rejects non-existent post ids', function () {
     $user = User::factory()->create();
     Brand::factory()->forUser($user)->create();
 
@@ -248,5 +250,6 @@ test('bulk delete requires valid post ids', function () {
         'ids' => [99999],
     ]);
 
-    $response->assertSessionHasErrors('ids.0');
+    // Authorization fails because none of the IDs belong to the user's brand
+    $response->assertForbidden();
 });

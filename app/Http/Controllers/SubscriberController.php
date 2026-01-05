@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\SubscriberStatus;
 use App\Http\Controllers\Concerns\HasBrandAuthorization;
 use App\Http\Requests\Subscriber\ImportSubscribersRequest;
+use App\Http\Requests\Subscriber\UpdateSubscriberRequest;
 use App\Http\Resources\SubscriberResource;
 use App\Models\Subscriber;
 use Illuminate\Http\RedirectResponse;
@@ -49,6 +50,13 @@ class SubscriberController extends Controller
         ]);
     }
 
+    public function update(UpdateSubscriberRequest $request, Subscriber $subscriber): RedirectResponse
+    {
+        $subscriber->update($request->validated());
+
+        return back()->with('success', 'Subscriber updated successfully.');
+    }
+
     public function destroy(Subscriber $subscriber): RedirectResponse
     {
         $this->authorize('delete', $subscriber);
@@ -82,7 +90,7 @@ class SubscriberController extends Controller
                 ->where('status', SubscriberStatus::Confirmed)
                 ->select(['email', 'name', 'created_at'])
                 ->cursor()
-                ->each(function ($subscriber) use ($file) {
+                ->each(function (Subscriber $subscriber) use ($file): void {
                     // Sanitize values to prevent CSV formula injection
                     $safeName = $subscriber->name ? preg_replace('/^[\=\+\-\@\t\r]/', "'", $subscriber->name) : '';
                     fputcsv($file, [
@@ -111,7 +119,7 @@ class SubscriberController extends Controller
             // Pre-load existing emails for this brand to avoid N+1 queries
             $existingEmails = $brand->subscribers()
                 ->pluck('email')
-                ->map(fn ($email) => strtolower($email))
+                ->map(fn (string $email): string => strtolower($email))
                 ->flip()
                 ->all();
 

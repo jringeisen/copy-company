@@ -133,7 +133,19 @@ const submit = () => {
                                 required
                             />
                         </div>
-                        <p class="mt-1 text-sm text-gray-500">Your public blog URL: /@{{ form.slug }}</p>
+                        <p class="mt-1 text-sm text-gray-500">
+                            Your public blog URL:
+                            <a
+                                :href="`/@${form.slug}`"
+                                target="_blank"
+                                class="text-primary-600 hover:text-primary-700 hover:underline"
+                            >
+                                /@{{ form.slug }}
+                                <svg class="inline-block w-3 h-3 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                            </a>
+                        </p>
                         <p v-if="form.errors.slug" class="mt-1 text-sm text-red-600">{{ form.errors.slug }}</p>
                     </div>
 

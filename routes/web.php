@@ -5,6 +5,8 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ContentSprintController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MediaController;
+use App\Http\Controllers\MediaFolderController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\Public\BlogController;
@@ -30,6 +32,10 @@ Route::post('/@{brand:slug}/subscribe', [SubscribeController::class, 'store'])
     ->name('public.subscribe');
 Route::get('/@{brand:slug}/confirm/{token}', [SubscribeController::class, 'confirm'])->name('public.subscribe.confirm');
 Route::get('/@{brand:slug}/unsubscribe/{token}', [SubscribeController::class, 'unsubscribe'])->name('public.subscribe.unsubscribe');
+
+// Public media routes (permanent URLs that redirect to signed S3 URLs)
+Route::get('/m/{media}', [MediaController::class, 'view'])->name('media.view');
+Route::get('/m/{media}/thumb', [MediaController::class, 'thumbnail'])->name('media.thumbnail');
 
 // Authenticated routes
 Route::middleware(['auth'])->group(function () {
@@ -66,8 +72,24 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('posts', PostController::class);
     Route::post('/posts/{post}/publish', [PostController::class, 'publish'])->name('posts.publish');
 
+    // Media Library routes
+    Route::get('/media', [MediaController::class, 'index'])->name('media.index');
+    Route::get('/media/list', [MediaController::class, 'list'])->name('media.list');
+    Route::post('/media', [MediaController::class, 'store'])->name('media.store');
+    Route::patch('/media/{media}', [MediaController::class, 'update'])->name('media.update');
+    Route::delete('/media/{media}', [MediaController::class, 'destroy'])->name('media.destroy');
+    Route::post('/media/bulk-delete', [MediaController::class, 'bulkDestroy'])->name('media.bulk-destroy');
+    Route::post('/media/move', [MediaController::class, 'move'])->name('media.move');
+
+    // Media Folder routes
+    Route::get('/media/folders', [MediaFolderController::class, 'index'])->name('media.folders.index');
+    Route::post('/media/folders', [MediaFolderController::class, 'store'])->name('media.folders.store');
+    Route::patch('/media/folders/{folder}', [MediaFolderController::class, 'update'])->name('media.folders.update');
+    Route::delete('/media/folders/{folder}', [MediaFolderController::class, 'destroy'])->name('media.folders.destroy');
+
     // Subscriber routes
     Route::get('/subscribers', [SubscriberController::class, 'index'])->name('subscribers.index');
+    Route::patch('/subscribers/{subscriber}', [SubscriberController::class, 'update'])->name('subscribers.update');
     Route::delete('/subscribers/{subscriber}', [SubscriberController::class, 'destroy'])->name('subscribers.destroy');
     Route::get('/subscribers/export', [SubscriberController::class, 'export'])->name('subscribers.export');
     Route::post('/subscribers/import', [SubscriberController::class, 'import'])->name('subscribers.import');

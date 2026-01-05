@@ -44,7 +44,12 @@ class PinterestPublisher extends AbstractPublisher implements TokenRefreshableIn
                 return $this->errorResponse('Pinterest requires at least one image to create a pin.');
             }
 
-            $imageUrl = $this->getPublicMediaUrl($socialPost->media[0]);
+            // Get media URL from the first media ID
+            $imageUrl = $this->getMediaUrl($socialPost->media[0]);
+
+            if (! $imageUrl) {
+                return $this->errorResponse('Could not find the media file to publish.');
+            }
 
             $payload = [
                 'board_id' => $credentials['board_id'],
@@ -113,10 +118,5 @@ class PinterestPublisher extends AbstractPublisher implements TokenRefreshableIn
             'refresh_token' => $data['refresh_token'] ?? $credentials['refresh_token'],
             'expires_at' => now()->addSeconds($data['expires_in'])->toDateTimeString(),
         ];
-    }
-
-    protected function getPublicMediaUrl(string $path): string
-    {
-        return config('app.url').'/storage/'.$path;
     }
 }

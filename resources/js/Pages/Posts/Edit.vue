@@ -3,6 +3,7 @@ import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import PostEditor from '@/Components/Editor/PostEditor.vue';
 import AIAssistantPanel from '@/Components/Editor/AIAssistantPanel.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
+import MediaPickerModal from '@/Components/Media/MediaPickerModal.vue';
 import { useAutosave } from '@/Composables/useAutosave';
 import { ref, computed, watch } from 'vue';
 import { marked } from 'marked';
@@ -17,10 +18,22 @@ const form = useForm({
     content: props.post.content || { type: 'doc', content: [] },
     content_html: props.post.content_html || '',
     excerpt: props.post.excerpt || '',
+    featured_image: props.post.featured_image || '',
     publish_to_blog: props.post.publish_to_blog,
     send_as_newsletter: props.post.send_as_newsletter,
     generate_social: props.post.generate_social,
 });
+
+const showFeaturedImagePicker = ref(false);
+
+const handleFeaturedImageSelect = (media) => {
+    form.featured_image = media.url;
+    showFeaturedImagePicker.value = false;
+};
+
+const removeFeaturedImage = () => {
+    form.featured_image = '';
+};
 
 // Autosave setup
 const {
@@ -37,6 +50,7 @@ const {
         content: form.content,
         content_html: form.content_html,
         excerpt: form.excerpt,
+        featured_image: form.featured_image,
     }),
     onSave: async () => {
         return new Promise((resolve, reject) => {
@@ -51,7 +65,7 @@ const {
 
 // Watch for form changes to trigger autosave
 watch(
-    () => [form.title, form.content, form.content_html, form.excerpt],
+    () => [form.title, form.content, form.content_html, form.excerpt, form.featured_image],
     () => {
         markChanged();
     },
@@ -280,6 +294,54 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
                             <p v-if="form.errors.content" class="mt-1 text-sm text-red-600">{{ form.errors.content }}</p>
                         </div>
 
+                        <!-- Featured Image -->
+                        <div class="border-t border-gray-200 pt-6 mt-6">
+                            <h3 class="text-sm font-medium text-gray-900 mb-4">Featured Image</h3>
+                            <div v-if="form.featured_image" class="relative inline-block">
+                                <img
+                                    :src="form.featured_image"
+                                    alt="Featured image"
+                                    class="w-48 h-32 object-cover rounded-lg border border-gray-200"
+                                />
+                                <div class="absolute top-2 right-2 flex gap-1">
+                                    <button
+                                        type="button"
+                                        @click="showFeaturedImagePicker = true"
+                                        class="p-1.5 bg-white/90 text-gray-600 rounded-lg hover:bg-white transition shadow-sm"
+                                        title="Change image"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                        </svg>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        @click="removeFeaturedImage"
+                                        class="p-1.5 bg-white/90 text-red-600 rounded-lg hover:bg-white transition shadow-sm"
+                                        title="Remove image"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <button
+                                v-else
+                                type="button"
+                                @click="showFeaturedImagePicker = true"
+                                class="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-700 transition"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                Add Featured Image
+                            </button>
+                            <p class="mt-2 text-xs text-gray-500">
+                                This image will appear at the top of your post and in social shares.
+                            </p>
+                        </div>
+
                         <!-- Distribution Options -->
                         <div class="border-t border-gray-200 pt-6 mt-6">
                             <h3 class="text-sm font-medium text-gray-900 mb-4">Distribution Options</h3>
@@ -457,6 +519,13 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
             :processing="isDeleting"
             @confirm="deletePost"
             @cancel="showDeleteModal = false"
+        />
+
+        <!-- Featured Image Picker Modal -->
+        <MediaPickerModal
+            :show="showFeaturedImagePicker"
+            @close="showFeaturedImagePicker = false"
+            @select="handleFeaturedImageSelect"
         />
     </div>
 </template>

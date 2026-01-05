@@ -73,6 +73,16 @@ class Brand extends Model
         return $this->hasMany(ContentSprint::class);
     }
 
+    public function media(): HasMany
+    {
+        return $this->hasMany(Media::class);
+    }
+
+    public function mediaFolders(): HasMany
+    {
+        return $this->hasMany(MediaFolder::class);
+    }
+
     public function getUrlAttribute(): string
     {
         if ($this->custom_domain && $this->domain_verified) {

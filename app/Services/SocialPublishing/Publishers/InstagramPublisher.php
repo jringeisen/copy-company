@@ -43,9 +43,14 @@ class InstagramPublisher extends AbstractPublisher
                 return $this->errorResponse('Instagram requires at least one image to publish.');
             }
 
-            // Step 1: Create a media container
-            $mediaUrl = $this->getPublicMediaUrl($socialPost->media[0]);
+            // Get media URL from the first media ID
+            $mediaUrl = $this->getMediaUrl($socialPost->media[0]);
 
+            if (! $mediaUrl) {
+                return $this->errorResponse('Could not find the media file to publish.');
+            }
+
+            // Step 1: Create a media container
             $containerResponse = Http::post("https://graph.facebook.com/v18.0/{$accountId}/media", [
                 'image_url' => $mediaUrl,
                 'caption' => $socialPost->content,
@@ -72,14 +77,5 @@ class InstagramPublisher extends AbstractPublisher
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage());
         }
-    }
-
-    /**
-     * Get public URL for a media file.
-     */
-    protected function getPublicMediaUrl(string $path): string
-    {
-        // Instagram requires a publicly accessible URL
-        return config('app.url').'/storage/'.$path;
     }
 }

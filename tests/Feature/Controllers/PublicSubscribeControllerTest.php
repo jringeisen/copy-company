@@ -10,13 +10,13 @@ uses(RefreshDatabase::class);
 test('visitors can subscribe to a brand newsletter', function () {
     $brand = Brand::factory()->create(['slug' => 'test-brand']);
 
-    $response = $this->postJson("/@{$brand->slug}/subscribe", [
+    $response = $this->post("/@{$brand->slug}/subscribe", [
         'email' => 'subscriber@example.com',
         'name' => 'John Doe',
     ]);
 
-    $response->assertStatus(200);
-    $response->assertJson(['message' => 'Please check your email to confirm your subscription.']);
+    $response->assertRedirect();
+    $response->assertSessionHas('success', 'Please check your email to confirm your subscription.');
     $this->assertDatabaseHas('subscribers', [
         'brand_id' => $brand->id,
         'email' => 'subscriber@example.com',
@@ -49,12 +49,12 @@ test('duplicate email shows already subscribed message', function () {
     $brand = Brand::factory()->create(['slug' => 'test-brand']);
     Subscriber::factory()->forBrand($brand)->confirmed()->create(['email' => 'existing@example.com']);
 
-    $response = $this->postJson("/@{$brand->slug}/subscribe", [
+    $response = $this->post("/@{$brand->slug}/subscribe", [
         'email' => 'existing@example.com',
     ]);
 
-    $response->assertStatus(200);
-    $response->assertJson(['message' => 'You are already subscribed.']);
+    $response->assertRedirect();
+    $response->assertSessionHas('info', 'You are already subscribed.');
     expect(Subscriber::where('brand_id', $brand->id)->where('email', 'existing@example.com')->count())->toBe(1);
 });
 

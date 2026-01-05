@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AppNavigation from '@/Components/AppNavigation.vue';
 import FeatureEducationBanner from '@/Components/FeatureEducationBanner.vue';
@@ -17,9 +17,40 @@ const showDeleteModal = ref(false);
 const subscriberToDelete = ref(null);
 const isDeleting = ref(false);
 
+// Edit subscriber state
+const showEditModal = ref(false);
+const subscriberToEdit = ref(null);
+const editForm = useForm({
+    name: '',
+});
+
 const showEducationalBanner = computed(() => {
     return props.stats.total === 0;
 });
+
+const editSubscriber = (subscriber) => {
+    subscriberToEdit.value = subscriber;
+    editForm.name = subscriber.name || '';
+    showEditModal.value = true;
+};
+
+const saveSubscriber = () => {
+    if (!subscriberToEdit.value) return;
+    editForm.patch(`/subscribers/${subscriberToEdit.value.id}`, {
+        preserveScroll: true,
+        onSuccess: () => {
+            showEditModal.value = false;
+            subscriberToEdit.value = null;
+            editForm.reset();
+        },
+    });
+};
+
+const cancelEdit = () => {
+    showEditModal.value = false;
+    subscriberToEdit.value = null;
+    editForm.reset();
+};
 
 const deleteSubscriber = (subscriber) => {
     subscriberToDelete.value = subscriber;
@@ -195,7 +226,13 @@ const onFileChange = (e) => {
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ new Date(subscriber.created_at).toLocaleDateString() }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-3">
+                                <button
+                                    @click="editSubscriber(subscriber)"
+                                    class="text-primary-600 hover:text-primary-800"
+                                >
+                                    Edit
+                                </button>
                                 <button
                                     @click="deleteSubscriber(subscriber)"
                                     class="text-red-600 hover:text-red-800"
@@ -248,5 +285,63 @@ const onFileChange = (e) => {
             @confirm="confirmDelete"
             @cancel="showDeleteModal = false"
         />
+
+        <!-- Edit Subscriber Modal -->
+        <Teleport to="body">
+            <Transition
+                enter-active-class="duration-200 ease-out"
+                enter-from-class="opacity-0"
+                enter-to-class="opacity-100"
+                leave-active-class="duration-150 ease-in"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0"
+            >
+                <div v-if="showEditModal" class="fixed inset-0 z-50 overflow-y-auto">
+                    <div class="flex min-h-screen items-center justify-center p-4">
+                        <div class="fixed inset-0 bg-black/50" @click="cancelEdit"></div>
+
+                        <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Edit Subscriber</h3>
+
+                            <form @submit.prevent="saveSubscriber">
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                    <p class="text-sm text-gray-600">{{ subscriberToEdit?.email }}</p>
+                                </div>
+
+                                <div class="mb-6">
+                                    <label for="edit-name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                    <input
+                                        id="edit-name"
+                                        v-model="editForm.name"
+                                        type="text"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                        placeholder="Enter subscriber name"
+                                    />
+                                    <p v-if="editForm.errors.name" class="mt-1 text-sm text-red-600">{{ editForm.errors.name }}</p>
+                                </div>
+
+                                <div class="flex justify-end gap-3">
+                                    <button
+                                        type="button"
+                                        @click="cancelEdit"
+                                        class="px-4 py-2 text-gray-700 font-medium bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        :disabled="editForm.processing"
+                                        class="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
+                                    >
+                                        {{ editForm.processing ? 'Saving...' : 'Save' }}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </Transition>
+        </Teleport>
     </div>
 </template>

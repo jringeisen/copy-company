@@ -80,7 +80,7 @@ class PublishScheduledPosts implements ShouldQueue
         // Use chunkById to avoid loading all subscribers into memory
         $brand->subscribers()
             ->confirmed()
-            ->chunkById(100, function ($subscribers) use ($newsletterSend) {
+            ->chunkById(100, function (\Illuminate\Database\Eloquent\Collection $subscribers) use ($newsletterSend): void {
                 foreach ($subscribers as $subscriber) {
                     SendNewsletterToSubscriber::dispatch($newsletterSend, $subscriber);
                 }

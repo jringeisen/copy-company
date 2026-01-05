@@ -1,25 +1,30 @@
 <script setup>
-import { Head, Link, useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
 
 const props = defineProps({
     brand: Object,
     posts: Array,
 });
 
+const page = usePage();
+const flash = computed(() => page.props.flash || {});
+
 const subscribeForm = useForm({
     email: '',
 });
 
 const subscribeSuccess = ref(false);
+const subscribeMessage = ref('');
 const subscribeError = ref('');
 
 const subscribe = () => {
     subscribeError.value = '';
     subscribeForm.post(`/@${props.brand.slug}/subscribe`, {
         preserveScroll: true,
-        onSuccess: () => {
+        onSuccess: (page) => {
             subscribeSuccess.value = true;
+            subscribeMessage.value = page.props.flash?.success || page.props.flash?.info || 'Thanks for subscribing!';
             subscribeForm.reset();
         },
         onError: (errors) => {
@@ -53,8 +58,7 @@ const subscribe = () => {
                     <!-- Subscribe Form in Header -->
                     <div class="mt-8 max-w-md mx-auto">
                         <div v-if="subscribeSuccess" class="bg-green-50 border border-green-200 rounded-lg p-4">
-                            <p class="text-green-800 font-medium">Thanks for subscribing!</p>
-                            <p class="text-green-600 text-sm mt-1">Check your email to confirm your subscription.</p>
+                            <p class="text-green-800 font-medium">{{ subscribeMessage }}</p>
                         </div>
                         <form v-else @submit.prevent="subscribe" class="flex gap-2">
                             <input

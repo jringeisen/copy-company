@@ -22,6 +22,7 @@ const logout = () => {
 
 const navLinks = [
     { name: 'Posts', href: '/posts', key: 'posts' },
+    { name: 'Media', href: '/media', key: 'media' },
     { name: 'Social', href: '/social-posts', key: 'social' },
     { name: 'Subscribers', href: '/subscribers', key: 'subscribers' },
     { name: 'Calendar', href: '/calendar', key: 'calendar' },
