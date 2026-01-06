@@ -89,14 +89,15 @@ Configuration Sets enable open/click tracking and event notifications.
 3. Name: `wordsmith-tracking`
 4. Click **Create set**
 
-### 3.2 Enable Open & Click Tracking
+### 3.2 About Open & Click Tracking
 
-1. Click on your new configuration set
-2. Go to the **Tracking options** tab
-3. Click **Edit**
-4. Enable **Open tracking**
-5. Enable **Click tracking**
-6. Click **Save changes**
+Open and click tracking are automatically enabled when you add event destinations for "Opens" and "Clicks" events (covered in Step 5).
+
+**How it works:**
+- **Open tracking**: SES inserts a tiny 1x1 transparent image in your emails. When opened, it pings AWS servers.
+- **Click tracking**: SES rewrites links to go through `r.REGION.awstrack.me` before redirecting to your original URL.
+
+> **Note**: Many ad blockers block the default AWS tracking domain. For production, consider [setting up a custom tracking domain](https://docs.aws.amazon.com/ses/latest/dg/configure-custom-open-click-domains.html) using your own subdomain (e.g., `track.yourdomain.com`).
 
 ---
 

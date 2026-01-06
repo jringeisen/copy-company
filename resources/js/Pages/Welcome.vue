@@ -1,16 +1,27 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
+import { ref } from 'vue';
+
+const billingPeriod = ref('monthly');
+
+const pricing = {
+    starter: { monthly: 8, annual: 6 },
+    creator: { monthly: 19, annual: 14 },
+    pro: { monthly: 29, annual: 22 },
+};
 </script>
 
 <template>
-    <Head title="Welcome" />
+    <Head title="Wordsmith - Write Once, Publish Everywhere" />
 
     <div class="min-h-screen bg-gradient-to-br from-primary-50 to-white">
         <!-- Navigation -->
         <nav class="p-6">
             <div class="max-w-7xl mx-auto flex justify-between items-center">
-                <span class="text-2xl font-bold text-gray-900">Content Platform</span>
-                <div class="space-x-4">
+                <span class="text-2xl font-bold text-gray-900">Wordsmith</span>
+                <div class="flex items-center gap-6">
+                    <a href="#features" class="text-gray-600 hover:text-gray-900">Features</a>
+                    <a href="#pricing" class="text-gray-600 hover:text-gray-900">Pricing</a>
                     <Link href="/login" class="text-gray-600 hover:text-gray-900">Log in</Link>
                     <Link
                         href="/register"
@@ -419,6 +430,216 @@ import { Head, Link } from '@inertiajs/vue3';
                 </div>
             </div>
 
+            <!-- Pricing Section -->
+            <div id="pricing" class="py-16 border-t border-gray-100">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-4">Simple, Transparent Pricing</h2>
+                    <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                        Choose the plan that fits your needs. No hidden fees, no surprise charges.
+                    </p>
+                </div>
+
+                <!-- Billing Toggle -->
+                <div class="flex justify-center items-center gap-4 mb-12">
+                    <span :class="billingPeriod === 'monthly' ? 'text-gray-900 font-medium' : 'text-gray-500'">Monthly</span>
+                    <button
+                        @click="billingPeriod = billingPeriod === 'monthly' ? 'annual' : 'monthly'"
+                        class="relative w-14 h-7 bg-gray-200 rounded-full transition-colors"
+                        :class="billingPeriod === 'annual' ? 'bg-primary-600' : 'bg-gray-200'"
+                    >
+                        <span
+                            class="absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform"
+                            :class="billingPeriod === 'annual' ? 'translate-x-7' : 'translate-x-0'"
+                        ></span>
+                    </button>
+                    <span :class="billingPeriod === 'annual' ? 'text-gray-900 font-medium' : 'text-gray-500'">
+                        Annual
+                        <span class="ml-1 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Save 25%</span>
+                    </span>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    <!-- Starter Tier -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+                        <div class="text-center">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Starter</h3>
+                            <div class="mb-4">
+                                <span class="text-4xl font-bold text-gray-900">${{ pricing.starter[billingPeriod] }}</span>
+                                <span class="text-gray-500">/month</span>
+                            </div>
+                            <p v-if="billingPeriod === 'annual'" class="text-xs text-green-600 mb-2">Billed annually (${{ pricing.starter.annual * 12 }}/year)</p>
+                            <p class="text-sm text-gray-600 mb-6">Perfect for getting started</p>
+                        </div>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="text-gray-600">Up to <strong>500</strong> subscribers</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="text-gray-600">5 posts per month</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="text-gray-600">2 social accounts</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="text-gray-600">1 AI Content Sprint/month</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="text-gray-600">Public blog page</span>
+                            </li>
+                        </ul>
+                        <Link
+                            href="/register"
+                            class="block w-full py-3 px-4 text-center border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition"
+                        >
+                            Start Free Trial
+                        </Link>
+                    </div>
+
+                    <!-- Creator Tier -->
+                    <div class="bg-white rounded-2xl shadow-lg border-2 border-primary-500 p-8 relative">
+                        <div class="absolute -top-4 left-1/2 -translate-x-1/2">
+                            <span class="bg-primary-500 text-white text-sm font-semibold px-4 py-1 rounded-full">Most Popular</span>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Creator</h3>
+                            <div class="mb-4">
+                                <span class="text-4xl font-bold text-gray-900">${{ pricing.creator[billingPeriod] }}</span>
+                                <span class="text-gray-500">/month</span>
+                            </div>
+                            <p v-if="billingPeriod === 'annual'" class="text-xs text-green-600 mb-2">Billed annually (${{ pricing.creator.annual * 12 }}/year)</p>
+                            <p class="text-sm text-gray-600 mb-6">For growing creators</p>
+                        </div>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="text-gray-600">Up to <strong>5,000</strong> subscribers</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="text-gray-600"><strong>Unlimited</strong> posts</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="text-gray-600">5 social accounts</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="text-gray-600">10 AI Content Sprints/month</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="text-gray-600">Custom blog domain</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="text-gray-600">Newsletter analytics</span>
+                            </li>
+                        </ul>
+                        <Link
+                            href="/register"
+                            class="block w-full py-3 px-4 text-center bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition"
+                        >
+                            Start Free Trial
+                        </Link>
+                    </div>
+
+                    <!-- Pro Tier -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+                        <div class="text-center">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Pro</h3>
+                            <div class="mb-2">
+                                <span class="text-4xl font-bold text-gray-900">${{ pricing.pro[billingPeriod] }}</span>
+                                <span class="text-gray-500">/month</span>
+                            </div>
+                            <p v-if="billingPeriod === 'annual'" class="text-xs text-green-600 mb-1">Billed annually (${{ pricing.pro.annual * 12 }}/year)</p>
+                            <p class="text-xs text-gray-500 mb-4">+$10/mo per additional 10k subscribers</p>
+                            <p class="text-sm text-gray-600 mb-6">For professional creators</p>
+                        </div>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="text-gray-600"><strong>25,000+</strong> subscribers</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="text-gray-600"><strong>Unlimited</strong> posts</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="text-gray-600">15 social accounts</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="text-gray-600"><strong>Unlimited</strong> AI Content Sprints</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="text-gray-600">Custom blog + email domain</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="text-gray-600">Remove Wordsmith branding</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="text-gray-600">Priority support</span>
+                            </li>
+                        </ul>
+                        <Link
+                            href="/register"
+                            class="block w-full py-3 px-4 text-center border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition"
+                        >
+                            Start Free Trial
+                        </Link>
+                    </div>
+                </div>
+
+                <p class="text-center text-sm text-gray-500 mt-8">
+                    All plans include a 14-day free trial. No credit card required. Cancel anytime.
+                </p>
+            </div>
+
             <!-- CTA Section -->
             <div class="py-20 text-center">
                 <h2 class="text-3xl font-bold text-gray-900 mb-4">Ready to Simplify Your Content Workflow?</h2>
@@ -437,7 +658,7 @@ import { Head, Link } from '@inertiajs/vue3';
         <!-- Footer -->
         <footer class="border-t border-gray-200 py-8">
             <div class="max-w-7xl mx-auto px-6 text-center text-gray-500 text-sm">
-                &copy; {{ new Date().getFullYear() }} Content Platform. All rights reserved.
+                &copy; {{ new Date().getFullYear() }} Wordsmith. All rights reserved.
             </div>
         </footer>
     </div>
