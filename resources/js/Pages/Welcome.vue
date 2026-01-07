@@ -1,6 +1,6 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 const billingPeriod = ref('monthly');
 
@@ -8,6 +8,31 @@ const pricing = {
     starter: { monthly: 8, annual: 6 },
     creator: { monthly: 19, annual: 14 },
     pro: { monthly: 29, annual: 22 },
+};
+
+// Cost calculator
+const subscriberCount = ref(5000);
+const emailsPerMonth = ref(4);
+
+const calculatedCosts = computed(() => {
+    const totalEmails = subscriberCount.value * emailsPerMonth.value;
+    const emailCost = (totalEmails / 1000) * 0.40;
+
+    return {
+        totalEmails,
+        emailCost,
+        starter: pricing.starter[billingPeriod.value] + emailCost,
+        creator: pricing.creator[billingPeriod.value] + emailCost,
+        pro: pricing.pro[billingPeriod.value] + emailCost,
+    };
+});
+
+const formatNumber = (num) => {
+    return new Intl.NumberFormat().format(num);
+};
+
+const formatCurrency = (num) => {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
 };
 </script>
 
@@ -475,7 +500,7 @@ const pricing = {
                                 <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                 </svg>
-                                <span class="text-gray-600">Up to <strong>500</strong> subscribers</span>
+                                <span class="text-gray-600"><strong>Unlimited</strong> subscribers</span>
                             </li>
                             <li class="flex items-start gap-3">
                                 <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -529,7 +554,7 @@ const pricing = {
                                 <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                 </svg>
-                                <span class="text-gray-600">Up to <strong>5,000</strong> subscribers</span>
+                                <span class="text-gray-600"><strong>Unlimited</strong> subscribers</span>
                             </li>
                             <li class="flex items-start gap-3">
                                 <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -574,12 +599,11 @@ const pricing = {
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
                         <div class="text-center">
                             <h3 class="text-lg font-semibold text-gray-900 mb-2">Pro</h3>
-                            <div class="mb-2">
+                            <div class="mb-4">
                                 <span class="text-4xl font-bold text-gray-900">${{ pricing.pro[billingPeriod] }}</span>
                                 <span class="text-gray-500">/month</span>
                             </div>
-                            <p v-if="billingPeriod === 'annual'" class="text-xs text-green-600 mb-1">Billed annually (${{ pricing.pro.annual * 12 }}/year)</p>
-                            <p class="text-xs text-gray-500 mb-4">+$10/mo per additional 10k subscribers</p>
+                            <p v-if="billingPeriod === 'annual'" class="text-xs text-green-600 mb-2">Billed annually (${{ pricing.pro.annual * 12 }}/year)</p>
                             <p class="text-sm text-gray-600 mb-6">For professional creators</p>
                         </div>
                         <ul class="space-y-3 mb-8">
@@ -587,7 +611,7 @@ const pricing = {
                                 <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                 </svg>
-                                <span class="text-gray-600"><strong>25,000+</strong> subscribers</span>
+                                <span class="text-gray-600"><strong>Unlimited</strong> subscribers</span>
                             </li>
                             <li class="flex items-start gap-3">
                                 <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -635,7 +659,96 @@ const pricing = {
                     </div>
                 </div>
 
-                <p class="text-center text-sm text-gray-500 mt-8">
+                <!-- Cost Calculator -->
+                <div class="mt-12 max-w-3xl mx-auto">
+                    <div class="bg-gray-50 rounded-2xl p-8">
+                        <div class="text-center mb-6">
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Calculate Your Monthly Cost</h3>
+                            <p class="text-sm text-gray-600">Adjust the sliders to estimate your total monthly cost</p>
+                        </div>
+
+                        <!-- Sliders -->
+                        <div class="space-y-6 mb-8">
+                            <!-- Subscriber Slider -->
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <label class="text-sm font-medium text-gray-700">Subscribers</label>
+                                    <span class="text-sm font-bold text-primary-600">{{ formatNumber(subscriberCount) }}</span>
+                                </div>
+                                <input
+                                    type="range"
+                                    v-model.number="subscriberCount"
+                                    min="500"
+                                    max="100000"
+                                    step="500"
+                                    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
+                                />
+                                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                                    <span>500</span>
+                                    <span>25k</span>
+                                    <span>50k</span>
+                                    <span>75k</span>
+                                    <span>100k</span>
+                                </div>
+                            </div>
+
+                            <!-- Emails per Month Slider -->
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <label class="text-sm font-medium text-gray-700">Emails per subscriber/month</label>
+                                    <span class="text-sm font-bold text-primary-600">{{ emailsPerMonth }}</span>
+                                </div>
+                                <input
+                                    type="range"
+                                    v-model.number="emailsPerMonth"
+                                    min="1"
+                                    max="12"
+                                    step="1"
+                                    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
+                                />
+                                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                                    <span>1</span>
+                                    <span>4</span>
+                                    <span>8</span>
+                                    <span>12</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Calculation Summary -->
+                        <div class="bg-white rounded-xl p-4 mb-6">
+                            <div class="flex justify-between items-center text-sm text-gray-600 mb-2">
+                                <span>Total emails per month</span>
+                                <span class="font-medium">{{ formatNumber(calculatedCosts.totalEmails) }}</span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm text-gray-600">
+                                <span>Email cost ($0.40 per 1,000)</span>
+                                <span class="font-medium">{{ formatCurrency(calculatedCosts.emailCost) }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Plan Costs -->
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="bg-white rounded-xl p-4 text-center">
+                                <div class="text-sm text-gray-500 mb-1">Starter</div>
+                                <div class="text-xl font-bold text-gray-900">{{ formatCurrency(calculatedCosts.starter) }}</div>
+                                <div class="text-xs text-gray-400">/month</div>
+                            </div>
+                            <div class="bg-white rounded-xl p-4 text-center ring-2 ring-primary-500">
+                                <div class="text-sm text-primary-600 font-medium mb-1">Creator</div>
+                                <div class="text-xl font-bold text-gray-900">{{ formatCurrency(calculatedCosts.creator) }}</div>
+                                <div class="text-xs text-gray-400">/month</div>
+                            </div>
+                            <div class="bg-white rounded-xl p-4 text-center">
+                                <div class="text-sm text-gray-500 mb-1">Pro</div>
+                                <div class="text-xl font-bold text-gray-900">{{ formatCurrency(calculatedCosts.pro) }}</div>
+                                <div class="text-xs text-gray-400">/month</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-center text-sm text-gray-500 mt-6">
                     All plans include a 14-day free trial. No credit card required. Cancel anytime.
                 </p>
             </div>
