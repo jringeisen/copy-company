@@ -1,4 +1,4 @@
-# Wordsmith
+# Copy Company
 
 A content platform for creators to manage blogs, newsletters, and social media posts from a single dashboard.
 
@@ -32,7 +32,7 @@ A content platform for creators to manage blogs, newsletters, and social media p
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd wordsmith-two
+cd copy-company
 
 # Install dependencies
 composer install

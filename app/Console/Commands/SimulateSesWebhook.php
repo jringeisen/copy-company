@@ -71,7 +71,7 @@ class SimulateSesWebhook extends Command
             'mail' => [
                 'messageId' => $messageId,
                 'destination' => [$email],
-                'source' => 'noreply@wordsmith.com',
+                'source' => 'noreply@copy-company.com',
                 'timestamp' => now()->toISOString(),
             ],
         ];

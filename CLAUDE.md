@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Wordsmith is a content platform for creators to manage blogs, newsletters, and social media posts. Users create a **Brand** which serves as the central entity - all content (posts, subscribers, social posts) belongs to a brand.
+Copy Company is a content platform for creators to manage blogs, newsletters, and social media posts. Users create a **Brand** which serves as the central entity - all content (posts, subscribers, social posts) belongs to a brand.
 
 ## Common Commands
 

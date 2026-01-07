@@ -1,6 +1,6 @@
 # Amazon SES Setup Guide
 
-This guide walks you through setting up Amazon SES for high-volume email sending with Wordsmith.
+This guide walks you through setting up Amazon SES for high-volume email sending with Copy Company.
 
 ## Prerequisites
 
@@ -28,9 +28,9 @@ This guide walks you through setting up Amazon SES for high-volume email sending
 1. In the SES console, click **Verified identities** in the left sidebar
 2. Click **Create identity**
 3. Select **Domain**
-4. Enter your domain (e.g., `wordsmith.com`)
+4. Enter your domain (e.g., `copy-company.com`)
 5. Check **Use a custom MAIL FROM domain** (optional but recommended)
-   - Enter subdomain: `mail` (creates `mail.wordsmith.com`)
+   - Enter subdomain: `mail` (creates `mail.copy-company.com`)
 6. Click **Create identity**
 
 ### 2.2 Add DNS Records
@@ -86,7 +86,7 @@ Configuration Sets enable open/click tracking and event notifications.
 
 1. In SES console, click **Configuration sets** in the left sidebar
 2. Click **Create set**
-3. Name: `wordsmith-tracking`
+3. Name: `copy-company-tracking`
 4. Click **Create set**
 
 ### 3.2 About Open & Click Tracking
@@ -111,7 +111,7 @@ SNS (Simple Notification Service) will send email events to your application.
 2. Click **Topics** in the left sidebar
 3. Click **Create topic**
 4. Type: **Standard**
-5. Name: `wordsmith-ses-events`
+5. Name: `copy-company-ses-events`
 6. Click **Create topic**
 
 ### 4.2 Create HTTPS Subscription
@@ -131,7 +131,7 @@ The subscription will show as "Pending confirmation". Your application will auto
 ### 5.1 Add Event Destinations
 
 1. Go back to SES console → **Configuration sets**
-2. Click on `wordsmith-tracking`
+2. Click on `copy-company-tracking`
 3. Go to **Event destinations** tab
 4. Click **Add destination**
 
@@ -139,7 +139,7 @@ The subscription will show as "Pending confirmation". Your application will auto
 1. Event types: Select **Bounces** and **Complaints**
 2. Click **Next**
 3. Destination type: **Amazon SNS**
-4. SNS topic: Select `wordsmith-ses-events`
+4. SNS topic: Select `copy-company-ses-events`
 5. Click **Next** → **Add destination**
 
 #### For Delivery Events:
@@ -186,7 +186,7 @@ New SES accounts are in "sandbox mode" with these limits:
 
 1. Open [IAM Console](https://console.aws.amazon.com/iam/)
 2. Click **Users** → **Create user**
-3. User name: `wordsmith-ses`
+3. User name: `copy-company-ses`
 4. Click **Next**
 
 ### 7.2 Attach Policies
@@ -224,7 +224,7 @@ AWS_SECRET_ACCESS_KEY=your-secret-access-key
 AWS_DEFAULT_REGION=us-east-1
 
 # SES Configuration Set (for tracking)
-SES_CONFIGURATION_SET=wordsmith-tracking
+SES_CONFIGURATION_SET=copy-company-tracking
 ```
 
 ### 8.2 Update Mail Configuration (Optional)

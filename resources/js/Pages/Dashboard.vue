@@ -32,7 +32,7 @@ const showEmptyStateGuidance = computed(() => {
         <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
             <!-- Brand setup prompt if no brand exists -->
             <div v-if="!brand" class="bg-white rounded-lg shadow p-6 mb-6">
-                <h2 class="text-xl font-semibold text-gray-900 mb-2">Welcome to Wordsmith!</h2>
+                <h2 class="text-xl font-semibold text-gray-900 mb-2">Welcome to Copy Company!</h2>
                 <p class="text-gray-600 mb-4">Let's set up your brand to get started creating content.</p>
                 <Link
                     href="/brands/create"

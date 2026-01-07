@@ -37,13 +37,13 @@ const formatCurrency = (num) => {
 </script>
 
 <template>
-    <Head title="Wordsmith - Write Once, Publish Everywhere" />
+    <Head title="Copy Company - Write Once, Publish Everywhere" />
 
     <div class="min-h-screen bg-gradient-to-br from-primary-50 to-white">
         <!-- Navigation -->
         <nav class="p-6">
             <div class="max-w-7xl mx-auto flex justify-between items-center">
-                <span class="text-2xl font-bold text-gray-900">Wordsmith</span>
+                <span class="text-2xl font-bold text-gray-900">Copy Company</span>
                 <div class="flex items-center gap-6">
                     <a href="#features" class="text-gray-600 hover:text-gray-900">Features</a>
                     <a href="#pricing" class="text-gray-600 hover:text-gray-900">Pricing</a>
@@ -641,7 +641,7 @@ const formatCurrency = (num) => {
                                 <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                 </svg>
-                                <span class="text-gray-600">Remove Wordsmith branding</span>
+                                <span class="text-gray-600">Remove Copy Company branding</span>
                             </li>
                             <li class="flex items-start gap-3">
                                 <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -771,7 +771,7 @@ const formatCurrency = (num) => {
         <!-- Footer -->
         <footer class="border-t border-gray-200 py-8">
             <div class="max-w-7xl mx-auto px-6 text-center text-gray-500 text-sm">
-                &copy; {{ new Date().getFullYear() }} Wordsmith. All rights reserved.
+                &copy; {{ new Date().getFullYear() }} Copy Company. All rights reserved.
             </div>
         </footer>
     </div>
