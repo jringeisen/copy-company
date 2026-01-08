@@ -24,10 +24,15 @@ Route::post('/webhooks/ses', [SesWebhookController::class, 'handle'])
     ->name('webhooks.ses')
     ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 
+// Coming soon page (production only)
+Route::get('/coming-soon', function () {
+    return Inertia::render('ComingSoon');
+})->name('coming-soon');
+
 // Public landing page
 Route::get('/', function () {
     return Inertia::render('Welcome');
-});
+})->name('home');
 
 // Public blog routes (/@username format)
 Route::get('/@{brand:slug}', [BlogController::class, 'index'])->name('public.blog.index');
