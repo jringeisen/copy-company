@@ -6,6 +6,9 @@ import AppNavigation from '@/Components/AppNavigation.vue';
 import SocialPostCard from '@/Components/Social/SocialPostCard.vue';
 import SocialPostEditor from '@/Components/Social/SocialPostEditor.vue';
 import FeatureEducationBanner from '@/Components/FeatureEducationBanner.vue';
+import { usePermissions } from '@/Composables/usePermissions';
+
+const { canManageSocial } = usePermissions();
 
 const props = defineProps({
     socialPosts: Object,
@@ -180,6 +183,7 @@ const showGenerateContentBanner = computed(() => {
                         View Queue
                     </Link>
                     <button
+                        v-if="canManageSocial"
                         @click="showGenerateModal = true"
                         class="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition"
                     >
@@ -255,7 +259,7 @@ const showGenerateContentBanner = computed(() => {
                 description="You've connected your social platforms! Now generate AI-optimized posts from your blog content to share with your audience."
                 gradient="from-green-500 to-teal-600"
             >
-                <template #cta>
+                <template v-if="canManageSocial" #cta>
                     <button
                         @click="showGenerateModal = true"
                         class="shrink-0 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg font-medium transition"
@@ -284,9 +288,10 @@ const showGenerateContentBanner = computed(() => {
                 </svg>
                 <h3 class="mt-4 text-lg font-medium text-gray-900">No social posts yet</h3>
                 <p class="mt-2 text-sm text-gray-500">
-                    Generate social posts from your blog content to share across platforms.
+                    {{ canManageSocial ? 'Generate social posts from your blog content to share across platforms.' : 'No social posts have been created yet.' }}
                 </p>
                 <button
+                    v-if="canManageSocial"
                     @click="showGenerateModal = true"
                     class="mt-4 px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition"
                 >

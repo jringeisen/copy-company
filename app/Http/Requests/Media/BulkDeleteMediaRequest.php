@@ -9,7 +9,7 @@ class BulkDeleteMediaRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->currentBrand() !== null;
+        return $this->user()->currentBrand() !== null && $this->user()->can('media.delete');
     }
 
     public function rules(): array

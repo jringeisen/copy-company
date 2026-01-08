@@ -33,9 +33,15 @@ class BrandController extends Controller
 
     public function store(StoreBrandRequest $request): RedirectResponse
     {
+        $account = $request->user()->currentAccount();
+
+        if (! $account) {
+            return redirect()->route('dashboard')->with('error', 'No account found.');
+        }
+
         $validated = $request->validated();
 
-        $request->user()->brands()->create([
+        $account->brands()->create([
             'name' => $validated['name'],
             'slug' => Str::slug($validated['slug']),
             'tagline' => $validated['tagline'] ?? null,

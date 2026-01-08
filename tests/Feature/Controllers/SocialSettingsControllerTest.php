@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Controllers;
 
+use App\Models\Account;
 use App\Models\Brand;
 use App\Models\User;
 use App\Services\SocialPublishing\FacebookPagesService;
@@ -10,6 +11,8 @@ use App\Services\SocialPublishing\TokenManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
 use Mockery;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class SocialSettingsControllerTest extends TestCase
@@ -20,13 +23,25 @@ class SocialSettingsControllerTest extends TestCase
 
     protected Brand $brand;
 
+    protected Account $account;
+
     protected function setUp(): void
     {
         parent::setUp();
 
+        // Create permissions and roles needed for brand operations
+        Permission::findOrCreate('brands.update', 'web');
+        $adminRole = Role::findOrCreate('admin', 'web');
+        $adminRole->givePermissionTo(['brands.update']);
+
         $this->user = User::factory()->create();
-        $this->brand = Brand::factory()->create(['user_id' => $this->user->id]);
-        $this->user->update(['current_brand_id' => $this->brand->id]);
+        $this->account = Account::factory()->create();
+        $this->account->users()->attach($this->user->id, ['role' => 'admin']);
+        $this->brand = Brand::factory()->forAccount($this->account)->create();
+
+        // Set up permissions team context and assign role
+        setPermissionsTeamId($this->account->id);
+        $this->user->assignRole('admin');
     }
 
     public function test_guests_cannot_access_social_settings(): void
@@ -38,7 +53,9 @@ class SocialSettingsControllerTest extends TestCase
 
     public function test_users_with_brand_can_view_social_settings(): void
     {
-        $response = $this->actingAs($this->user)->get('/settings/social');
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social');
 
         $response->assertOk();
         $response->assertInertia(fn (AssertableInertia $page) => $page
@@ -50,7 +67,9 @@ class SocialSettingsControllerTest extends TestCase
 
     public function test_social_settings_shows_all_platforms(): void
     {
-        $response = $this->actingAs($this->user)->get('/settings/social');
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social');
 
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->has('platforms', 6)
@@ -67,7 +86,9 @@ class SocialSettingsControllerTest extends TestCase
             'account_name' => '@testuser',
         ]);
 
-        $response = $this->actingAs($this->user)->get('/settings/social');
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social');
 
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->has('platforms', fn ($platforms) => $platforms
@@ -81,7 +102,9 @@ class SocialSettingsControllerTest extends TestCase
 
     public function test_redirect_returns_error_for_invalid_platform(): void
     {
-        $response = $this->actingAs($this->user)->get('/settings/social/invalid/redirect');
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social/invalid/redirect');
 
         $response->assertRedirect();
         $response->assertSessionHas('error');
@@ -96,7 +119,9 @@ class SocialSettingsControllerTest extends TestCase
 
         $this->assertTrue($tokenManager->isConnected($this->brand, 'twitter'));
 
-        $response = $this->actingAs($this->user)->delete('/settings/social/twitter');
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->delete('/settings/social/twitter');
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -107,7 +132,9 @@ class SocialSettingsControllerTest extends TestCase
 
     public function test_disconnect_returns_error_for_invalid_platform(): void
     {
-        $response = $this->actingAs($this->user)->delete('/settings/social/invalid');
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->delete('/settings/social/invalid');
 
         $response->assertRedirect();
         $response->assertSessionHas('error');
@@ -116,15 +143,21 @@ class SocialSettingsControllerTest extends TestCase
     public function test_users_without_brand_are_redirected_to_brand_create(): void
     {
         $userWithoutBrand = User::factory()->create();
+        $accountWithoutBrand = Account::factory()->create();
+        $accountWithoutBrand->users()->attach($userWithoutBrand->id, ['role' => 'admin']);
 
-        $response = $this->actingAs($userWithoutBrand)->get('/settings/social');
+        $response = $this->actingAs($userWithoutBrand)
+            ->withSession(['current_account_id' => $accountWithoutBrand->id])
+            ->get('/settings/social');
 
         $response->assertRedirect(route('brands.create'));
     }
 
     public function test_account_selection_redirects_for_non_supported_platform(): void
     {
-        $response = $this->actingAs($this->user)->get('/settings/social/twitter/select');
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social/twitter/select');
 
         $response->assertRedirect(route('settings.social'));
         $response->assertSessionHas('error');
@@ -132,7 +165,9 @@ class SocialSettingsControllerTest extends TestCase
 
     public function test_account_selection_requires_connected_platform(): void
     {
-        $response = $this->actingAs($this->user)->get('/settings/social/facebook/select');
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social/facebook/select');
 
         $response->assertRedirect(route('settings.social'));
         $response->assertSessionHas('error', 'Please connect your facebook account first.');
@@ -156,7 +191,9 @@ class SocialSettingsControllerTest extends TestCase
             ]);
         $this->app->instance(FacebookPagesService::class, $mockPagesService);
 
-        $response = $this->actingAs($this->user)->get('/settings/social/facebook/select');
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social/facebook/select');
 
         $response->assertOk();
         $response->assertInertia(fn (AssertableInertia $page) => $page
@@ -184,7 +221,9 @@ class SocialSettingsControllerTest extends TestCase
             ->andReturn([]);
         $this->app->instance(FacebookPagesService::class, $mockPagesService);
 
-        $response = $this->actingAs($this->user)->get('/settings/social/facebook/select');
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social/facebook/select');
 
         $response->assertRedirect(route('settings.social'));
         $response->assertSessionHas('error');
@@ -208,7 +247,9 @@ class SocialSettingsControllerTest extends TestCase
             ]);
         $this->app->instance(PinterestBoardsService::class, $mockBoardsService);
 
-        $response = $this->actingAs($this->user)->get('/settings/social/pinterest/select');
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social/pinterest/select');
 
         $response->assertOk();
         $response->assertInertia(fn (AssertableInertia $page) => $page
@@ -228,11 +269,13 @@ class SocialSettingsControllerTest extends TestCase
             'account_name' => 'Test User',
         ]);
 
-        $response = $this->actingAs($this->user)->post('/settings/social/facebook/select', [
-            'account_id' => '123',
-            'account_name' => 'My Page',
-            'access_token' => 'page_token_123',
-        ]);
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->post('/settings/social/facebook/select', [
+                'account_id' => '123',
+                'account_name' => 'My Page',
+                'access_token' => 'page_token_123',
+            ]);
 
         $response->assertRedirect(route('settings.social'));
         $response->assertSessionHas('success');
@@ -251,10 +294,12 @@ class SocialSettingsControllerTest extends TestCase
             'account_name' => 'Test User',
         ]);
 
-        $response = $this->actingAs($this->user)->post('/settings/social/pinterest/select', [
-            'account_id' => 'board_123',
-            'account_name' => 'My Board',
-        ]);
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->post('/settings/social/pinterest/select', [
+                'account_id' => 'board_123',
+                'account_name' => 'My Board',
+            ]);
 
         $response->assertRedirect(route('settings.social'));
         $response->assertSessionHas('success');
@@ -272,7 +317,9 @@ class SocialSettingsControllerTest extends TestCase
             'account_name' => 'Test User',
         ]);
 
-        $response = $this->actingAs($this->user)->get('/settings/social');
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social');
 
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->has('platforms', fn ($platforms) => $platforms
@@ -294,7 +341,9 @@ class SocialSettingsControllerTest extends TestCase
             'page_name' => 'My Business Page',
         ]);
 
-        $response = $this->actingAs($this->user)->get('/settings/social');
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social');
 
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->has('platforms', fn ($platforms) => $platforms

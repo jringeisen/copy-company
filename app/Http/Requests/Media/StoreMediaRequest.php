@@ -10,7 +10,7 @@ class StoreMediaRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->currentBrand() !== null;
+        return $this->user()->can('create', \App\Models\Media::class);
     }
 
     public function rules(): array

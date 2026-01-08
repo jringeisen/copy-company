@@ -45,7 +45,16 @@ class MediaFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'brand_id' => $brand->id,
-            'user_id' => $brand->user_id,
+        ]);
+    }
+
+    /**
+     * Associate the media with a specific user.
+     */
+    public function forUser(User $user): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'user_id' => $user->id,
         ]);
     }
 

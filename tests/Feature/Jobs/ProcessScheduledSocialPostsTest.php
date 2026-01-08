@@ -6,6 +6,7 @@ use App\Enums\SocialPlatform;
 use App\Enums\SocialPostStatus;
 use App\Jobs\ProcessScheduledSocialPosts;
 use App\Jobs\PublishSocialPost;
+use App\Models\Account;
 use App\Models\Brand;
 use App\Models\SocialPost;
 use App\Models\User;
@@ -19,12 +20,16 @@ class ProcessScheduledSocialPostsTest extends TestCase
 
     protected Brand $brand;
 
+    protected Account $account;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $user = User::factory()->create();
-        $this->brand = Brand::factory()->create(['user_id' => $user->id]);
+        $this->account = Account::factory()->create();
+        $this->account->users()->attach($user->id, ['role' => 'admin']);
+        $this->brand = Brand::factory()->forAccount($this->account)->create();
     }
 
     public function test_dispatches_publish_job_for_due_scheduled_posts(): void
@@ -126,8 +131,8 @@ class ProcessScheduledSocialPostsTest extends TestCase
     {
         Queue::fake();
 
-        $otherUser = User::factory()->create();
-        $otherBrand = Brand::factory()->create(['user_id' => $otherUser->id]);
+        $otherAccount = Account::factory()->create();
+        $otherBrand = Brand::factory()->forAccount($otherAccount)->create();
 
         SocialPost::factory()->create([
             'brand_id' => $this->brand->id,

@@ -5,8 +5,33 @@ use App\Models\ContentSprint;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    // Create all permissions needed for content sprint operations
+    Permission::findOrCreate('sprints.create', 'web');
+    Permission::findOrCreate('sprints.manage', 'web');
+    Permission::findOrCreate('posts.create', 'web');
+
+    $adminRole = Role::findOrCreate('admin', 'web');
+    $adminRole->givePermissionTo([
+        'sprints.create',
+        'sprints.manage',
+        'posts.create',
+    ]);
+});
+
+function setupUserWithSprintPermissions(User $user): void
+{
+    $account = $user->accounts()->first();
+    if ($account) {
+        setPermissionsTeamId($account->id);
+        $user->assignRole('admin');
+    }
+}
 
 test('users can view completed sprint with converted indices', function () {
     $user = User::factory()->create();
@@ -16,6 +41,8 @@ test('users can view completed sprint with converted indices', function () {
         ->completed()
         ->withConvertedIdeas([0])
         ->create();
+
+    setupUserWithSprintPermissions($user);
 
     $response = $this->actingAs($user)->get(route('content-sprints.show', $sprint));
 
@@ -36,6 +63,8 @@ test('accepting ideas records converted indices', function () {
         ->completed()
         ->create();
 
+    setupUserWithSprintPermissions($user);
+
     $response = $this->actingAs($user)->post(route('content-sprints.accept', $sprint), [
         'idea_indices' => [0, 1],
     ]);
@@ -55,6 +84,8 @@ test('accepting more ideas merges with existing converted indices', function () 
         ->completed()
         ->withConvertedIdeas([0])
         ->create();
+
+    setupUserWithSprintPermissions($user);
 
     $response = $this->actingAs($user)->post(route('content-sprints.accept', $sprint), [
         'idea_indices' => [1, 2],
@@ -97,6 +128,8 @@ test('sprint with no converted ideas has all ideas available', function () {
         ->forBrand($brand)
         ->completed()
         ->create();
+
+    setupUserWithSprintPermissions($user);
 
     $response = $this->actingAs($user)->get(route('content-sprints.show', $sprint));
 

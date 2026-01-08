@@ -9,6 +9,9 @@ import FolderTree from '@/Components/Media/FolderTree.vue';
 import CreateFolderModal from '@/Components/Media/CreateFolderModal.vue';
 import EditAltTextModal from '@/Components/Media/EditAltTextModal.vue';
 import MoveFolderModal from '@/Components/Media/MoveFolderModal.vue';
+import { usePermissions } from '@/Composables/usePermissions';
+
+const { canUploadMedia, canDeleteMedia } = usePermissions();
 
 const props = defineProps({
     media: Object,
@@ -103,26 +106,28 @@ const deleteMessage = computed(() => {
                 </div>
                 <div class="flex items-center gap-3">
                     <button
-                        v-if="selectedIds.length > 0"
+                        v-if="canUploadMedia && selectedIds.length > 0"
                         @click="openMoveModal"
                         class="px-4 py-2 bg-gray-600 text-white font-medium rounded-lg hover:bg-gray-700 transition"
                     >
                         Move ({{ selectedIds.length }})
                     </button>
                     <button
-                        v-if="selectedIds.length > 0"
+                        v-if="canDeleteMedia && selectedIds.length > 0"
                         @click="showDeleteModal = true"
                         class="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition"
                     >
                         Delete ({{ selectedIds.length }})
                     </button>
                     <button
+                        v-if="canUploadMedia"
                         @click="showCreateFolderModal = true"
                         class="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition"
                     >
                         New Folder
                     </button>
                     <button
+                        v-if="canUploadMedia"
                         @click="showUploader = true"
                         class="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition"
                     >
@@ -155,7 +160,7 @@ const deleteMessage = computed(() => {
 
                     <!-- Selection header -->
                     <div v-if="media.data?.length > 0" class="mb-4 flex items-center gap-4">
-                        <label class="flex items-center gap-2 text-sm text-gray-600">
+                        <label v-if="canDeleteMedia" class="flex items-center gap-2 text-sm text-gray-600">
                             <input
                                 type="checkbox"
                                 :checked="allSelected"
@@ -186,9 +191,10 @@ const deleteMessage = computed(() => {
                         </svg>
                         <h3 class="mt-4 text-lg font-medium text-gray-900">No images yet</h3>
                         <p class="mt-2 text-gray-500">
-                            {{ currentFolder ? 'This folder is empty.' : 'Upload your first image to get started.' }}
+                            {{ currentFolder ? 'This folder is empty.' : (canUploadMedia ? 'Upload your first image to get started.' : 'No images have been uploaded yet.') }}
                         </p>
                         <button
+                            v-if="canUploadMedia"
                             @click="showUploader = true"
                             class="mt-4 inline-flex items-center px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition"
                         >

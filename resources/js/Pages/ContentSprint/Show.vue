@@ -3,6 +3,9 @@ import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import AppNavigation from '@/Components/AppNavigation.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
+import { usePermissions } from '@/Composables/usePermissions';
+
+const { canManageSprints } = usePermissions();
 
 const props = defineProps({
     sprint: Object,
@@ -127,7 +130,7 @@ const deleteSprint = () => {
                     </div>
                     <div class="flex items-center gap-3">
                         <button
-                            v-if="isCompleted && selectedIdeas.length > 0"
+                            v-if="canManageSprints && isCompleted && selectedIdeas.length > 0"
                             @click="createPosts"
                             :disabled="acceptForm.processing"
                             class="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
@@ -135,6 +138,7 @@ const deleteSprint = () => {
                             Create {{ selectedIdeas.length }} Posts
                         </button>
                         <button
+                            v-if="canManageSprints"
                             @click="showDeleteModal = true"
                             class="p-2 text-gray-400 hover:text-red-600 transition"
                             title="Delete sprint"
@@ -187,6 +191,7 @@ const deleteSprint = () => {
                     Something went wrong while generating your content ideas. Please try again.
                 </p>
                 <button
+                    v-if="canManageSprints"
                     @click="retry"
                     class="px-6 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition"
                 >
@@ -215,7 +220,7 @@ const deleteSprint = () => {
                         </p>
                     </div>
                     <button
-                        v-if="unconvertedIndices.length > 0"
+                        v-if="canManageSprints && unconvertedIndices.length > 0"
                         @click="selectAll"
                         class="text-sm text-primary-600 hover:text-primary-700 font-medium"
                     >
@@ -302,7 +307,7 @@ const deleteSprint = () => {
                 </div>
 
                 <!-- Fixed Bottom Bar -->
-                <div v-if="selectedIdeas.length > 0" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
+                <div v-if="canManageSprints && selectedIdeas.length > 0" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
                     <div class="max-w-4xl mx-auto flex items-center justify-between">
                         <span class="text-gray-600">
                             {{ selectedIdeas.length }} of {{ unconvertedIndices.length }} available ideas selected

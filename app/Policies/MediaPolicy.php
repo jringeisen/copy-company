@@ -21,20 +21,20 @@ class MediaPolicy
 
     public function create(User $user): bool
     {
-        return $user->currentBrand() !== null;
+        return $user->currentBrand() !== null && $user->can('media.upload');
     }
 
     public function update(User $user, Media $media): bool
     {
         $brand = $user->currentBrand();
 
-        return $brand && $media->brand_id === $brand->id;
+        return $brand && $media->brand_id === $brand->id && $user->can('media.upload');
     }
 
     public function delete(User $user, Media $media): bool
     {
         $brand = $user->currentBrand();
 
-        return $brand && $media->brand_id === $brand->id;
+        return $brand && $media->brand_id === $brand->id && $user->can('media.delete');
     }
 }

@@ -15,6 +15,11 @@ class BulkDeletePostsRequest extends FormRequest
             return false;
         }
 
+        // Check if user has delete permission
+        if (! $this->user()->can('posts.delete')) {
+            return false;
+        }
+
         // Verify all posts belong to the user's brand
         $ids = $this->input('ids', []);
 

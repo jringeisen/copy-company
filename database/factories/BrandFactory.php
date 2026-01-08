@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\NewsletterProvider;
-use App\Models\User;
+use App\Models\Account;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -22,7 +22,7 @@ class BrandFactory extends Factory
         $name = fake()->company();
 
         return [
-            'user_id' => User::factory(),
+            'account_id' => Account::factory(),
             'name' => $name,
             'slug' => Str::slug($name),
             'tagline' => fake()->catchPhrase(),
@@ -43,10 +43,31 @@ class BrandFactory extends Factory
         ]);
     }
 
-    public function forUser(User $user): static
+    public function forAccount(Account $account): static
     {
         return $this->state(fn (array $attributes) => [
-            'user_id' => $user->id,
+            'account_id' => $account->id,
         ]);
+    }
+
+    /**
+     * Associate the brand with a user by creating an account for them.
+     * This is a convenience method for tests during migration from user-based to account-based ownership.
+     */
+    public function forUser(\App\Models\User $user): static
+    {
+        // Get or create an account for the user
+        $account = $user->accounts()->first();
+        if (! $account) {
+            $account = Account::factory()->create();
+            $account->users()->attach($user->id, ['role' => 'admin']);
+        }
+
+        return $this->state(fn (array $attributes) => [
+            'account_id' => $account->id,
+        ])->afterCreating(function (\App\Models\Brand $brand) use ($account) {
+            // Set the user's current account session
+            session(['current_account_id' => $account->id]);
+        });
     }
 }

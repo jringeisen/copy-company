@@ -6,8 +6,35 @@ use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    // Create all permissions needed for post operations
+    Permission::findOrCreate('posts.create', 'web');
+    Permission::findOrCreate('posts.update', 'web');
+    Permission::findOrCreate('posts.delete', 'web');
+    Permission::findOrCreate('posts.publish', 'web');
+
+    $adminRole = Role::findOrCreate('admin', 'web');
+    $adminRole->givePermissionTo([
+        'posts.create',
+        'posts.update',
+        'posts.delete',
+        'posts.publish',
+    ]);
+});
+
+function setupUserWithPermissions(User $user): void
+{
+    $account = $user->accounts()->first();
+    if ($account) {
+        setPermissionsTeamId($account->id);
+        $user->assignRole('admin');
+    }
+}
 
 test('guests cannot access posts index', function () {
     $response = $this->get(route('posts.index'));
@@ -28,6 +55,8 @@ test('users with brand can view posts index', function () {
     $brand = Brand::factory()->forUser($user)->create();
     Post::factory()->forBrand($brand)->count(3)->create();
 
+    setupUserWithPermissions($user);
+
     $response = $this->actingAs($user)->get(route('posts.index'));
 
     $response->assertStatus(200);
@@ -42,6 +71,8 @@ test('users can view post create page', function () {
     $user = User::factory()->create();
     Brand::factory()->forUser($user)->create();
 
+    setupUserWithPermissions($user);
+
     $response = $this->actingAs($user)->get(route('posts.create'));
 
     $response->assertStatus(200);
@@ -51,6 +82,8 @@ test('users can view post create page', function () {
 test('users can create a post', function () {
     $user = User::factory()->create();
     $brand = Brand::factory()->forUser($user)->create();
+
+    setupUserWithPermissions($user);
 
     $response = $this->actingAs($user)->post(route('posts.store'), [
         'title' => 'My First Post',
@@ -72,6 +105,8 @@ test('post title is required', function () {
     $user = User::factory()->create();
     Brand::factory()->forUser($user)->create();
 
+    setupUserWithPermissions($user);
+
     $response = $this->actingAs($user)->post(route('posts.store'), [
         'content' => [['type' => 'paragraph', 'content' => 'Content']],
     ]);
@@ -83,6 +118,8 @@ test('users can view post edit page', function () {
     $user = User::factory()->create();
     $brand = Brand::factory()->forUser($user)->create();
     $post = Post::factory()->forBrand($brand)->create();
+
+    setupUserWithPermissions($user);
 
     $response = $this->actingAs($user)->get(route('posts.edit', $post));
 
@@ -98,6 +135,8 @@ test('users cannot edit posts from other brands', function () {
     $user = User::factory()->create();
     Brand::factory()->forUser($user)->create();
 
+    setupUserWithPermissions($user);
+
     $otherUser = User::factory()->create();
     $otherBrand = Brand::factory()->forUser($otherUser)->create();
     $post = Post::factory()->forBrand($otherBrand)->create();
@@ -111,6 +150,8 @@ test('users can update their posts', function () {
     $user = User::factory()->create();
     $brand = Brand::factory()->forUser($user)->create();
     $post = Post::factory()->forBrand($brand)->create();
+
+    setupUserWithPermissions($user);
 
     $response = $this->actingAs($user)->put(route('posts.update', $post), [
         'title' => 'Updated Title',
@@ -129,6 +170,8 @@ test('users can delete their posts', function () {
     $brand = Brand::factory()->forUser($user)->create();
     $post = Post::factory()->forBrand($brand)->create();
 
+    setupUserWithPermissions($user);
+
     $response = $this->actingAs($user)->delete(route('posts.destroy', $post));
 
     $response->assertRedirect(route('posts.index'));
@@ -138,6 +181,8 @@ test('users can delete their posts', function () {
 test('users cannot delete posts from other brands', function () {
     $user = User::factory()->create();
     Brand::factory()->forUser($user)->create();
+
+    setupUserWithPermissions($user);
 
     $otherUser = User::factory()->create();
     $otherBrand = Brand::factory()->forUser($otherUser)->create();
@@ -153,6 +198,8 @@ test('users can publish a post immediately', function () {
     $user = User::factory()->create();
     $brand = Brand::factory()->forUser($user)->create();
     $post = Post::factory()->forBrand($brand)->draft()->create();
+
+    setupUserWithPermissions($user);
 
     $response = $this->actingAs($user)->post(route('posts.publish', $post), [
         'schedule_mode' => 'now',
@@ -171,6 +218,8 @@ test('users can schedule a post for later', function () {
     $user = User::factory()->create();
     $brand = Brand::factory()->forUser($user)->create();
     $post = Post::factory()->forBrand($brand)->draft()->create();
+
+    setupUserWithPermissions($user);
 
     $scheduledAt = now()->addDays(3)->format('Y-m-d H:i:s');
 
@@ -193,6 +242,8 @@ test('users can bulk delete their posts', function () {
     $brand = Brand::factory()->forUser($user)->create();
     $posts = Post::factory()->forBrand($brand)->count(3)->create();
 
+    setupUserWithPermissions($user);
+
     $response = $this->actingAs($user)->delete(route('posts.bulk-destroy'), [
         'ids' => $posts->pluck('id')->toArray(),
     ]);
@@ -207,6 +258,8 @@ test('bulk delete rejects request containing posts from other brands', function 
     $user = User::factory()->create();
     $brand = Brand::factory()->forUser($user)->create();
     $userPosts = Post::factory()->forBrand($brand)->count(2)->create();
+
+    setupUserWithPermissions($user);
 
     $otherUser = User::factory()->create();
     $otherBrand = Brand::factory()->forUser($otherUser)->create();
@@ -235,6 +288,8 @@ test('bulk delete requires at least one post id', function () {
     $user = User::factory()->create();
     Brand::factory()->forUser($user)->create();
 
+    setupUserWithPermissions($user);
+
     $response = $this->actingAs($user)->delete(route('posts.bulk-destroy'), [
         'ids' => [],
     ]);
@@ -245,6 +300,8 @@ test('bulk delete requires at least one post id', function () {
 test('bulk delete rejects non-existent post ids', function () {
     $user = User::factory()->create();
     Brand::factory()->forUser($user)->create();
+
+    setupUserWithPermissions($user);
 
     $response = $this->actingAs($user)->delete(route('posts.bulk-destroy'), [
         'ids' => [99999],

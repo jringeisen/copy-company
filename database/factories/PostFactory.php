@@ -75,7 +75,13 @@ class PostFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'brand_id' => $brand->id,
-            'user_id' => $brand->user_id,
+        ]);
+    }
+
+    public function forUser(User $user): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'user_id' => $user->id,
         ]);
     }
 }

@@ -12,7 +12,9 @@
       "Bash(grep:*)",
       "mcp__laravel-boost__database-schema",
       "Bash(composer require:*)",
-      "Bash(vendor/bin/pint:*)"
+      "Bash(vendor/bin/pint:*)",
+      "mcp__laravel-boost__tinker",
+      "mcp__laravel-boost__list-routes"
     ]
   },
   "enableAllProjectMcpServers": true,

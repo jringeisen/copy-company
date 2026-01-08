@@ -14,21 +14,32 @@ class BrandPolicy
 
     public function view(User $user, Brand $brand): bool
     {
-        return $user->id === $brand->user_id;
+        $account = $user->currentAccount();
+
+        return $account && $brand->account_id === $account->id;
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->currentAccount() !== null
+            && $user->can('brands.create');
     }
 
     public function update(User $user, Brand $brand): bool
     {
-        return $user->id === $brand->user_id;
+        $account = $user->currentAccount();
+
+        return $account
+            && $brand->account_id === $account->id
+            && $user->can('brands.update');
     }
 
     public function delete(User $user, Brand $brand): bool
     {
-        return $user->id === $brand->user_id;
+        $account = $user->currentAccount();
+
+        return $account
+            && $brand->account_id === $account->id
+            && $user->can('brands.delete');
     }
 }

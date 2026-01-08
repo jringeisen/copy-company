@@ -1,16 +1,16 @@
 <?php
 
 use App\Http\Resources\BrandResource;
+use App\Models\Account;
 use App\Models\Brand;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
 uses(RefreshDatabase::class);
 
 test('brand resource transforms brand correctly', function () {
-    $user = User::factory()->create();
-    $brand = Brand::factory()->forUser($user)->create([
+    $account = Account::factory()->create();
+    $brand = Brand::factory()->forAccount($account)->create([
         'name' => 'Test Brand',
         'slug' => 'test-brand',
         'tagline' => 'A test tagline',
@@ -34,8 +34,8 @@ test('brand resource transforms brand correctly', function () {
 });
 
 test('brand resource includes url attribute', function () {
-    $user = User::factory()->create();
-    $brand = Brand::factory()->forUser($user)->create([
+    $account = Account::factory()->create();
+    $brand = Brand::factory()->forAccount($account)->create([
         'slug' => 'my-brand',
     ]);
 
@@ -47,8 +47,8 @@ test('brand resource includes url attribute', function () {
 });
 
 test('brand resource formats dates correctly', function () {
-    $user = User::factory()->create();
-    $brand = Brand::factory()->forUser($user)->create();
+    $account = Account::factory()->create();
+    $brand = Brand::factory()->forAccount($account)->create();
 
     $resource = new BrandResource($brand);
     $array = $resource->toArray(app(Request::class));
@@ -58,8 +58,8 @@ test('brand resource formats dates correctly', function () {
 });
 
 test('brand resource converts newsletter provider to value', function () {
-    $user = User::factory()->create();
-    $brand = Brand::factory()->forUser($user)->create();
+    $account = Account::factory()->create();
+    $brand = Brand::factory()->forAccount($account)->create();
 
     $resource = new BrandResource($brand);
     $array = $resource->toArray(app(Request::class));

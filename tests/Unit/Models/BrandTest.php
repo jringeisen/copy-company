@@ -1,17 +1,17 @@
 <?php
 
+use App\Models\Account;
 use App\Models\Brand;
 use App\Models\Post;
 use App\Models\Subscriber;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-test('brand belongs to a user', function () {
+test('brand belongs to an account', function () {
     $brand = Brand::factory()->create();
 
-    expect($brand->user)->toBeInstanceOf(User::class);
+    expect($brand->account)->toBeInstanceOf(Account::class);
 });
 
 test('brand has many posts', function () {

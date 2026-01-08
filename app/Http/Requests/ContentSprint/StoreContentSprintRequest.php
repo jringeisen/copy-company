@@ -8,7 +8,7 @@ class StoreContentSprintRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->currentBrand() !== null;
+        return $this->user()->can('create', \App\Models\ContentSprint::class);
     }
 
     public function rules(): array

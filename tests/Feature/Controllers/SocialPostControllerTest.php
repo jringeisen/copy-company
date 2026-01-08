@@ -8,8 +8,31 @@ use App\Models\SocialPost;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    // Create all permissions needed for social post operations
+    Permission::findOrCreate('social.manage', 'web');
+    Permission::findOrCreate('social.publish', 'web');
+
+    $adminRole = Role::findOrCreate('admin', 'web');
+    $adminRole->givePermissionTo([
+        'social.manage',
+        'social.publish',
+    ]);
+});
+
+function setupUserWithSocialPermissions(User $user): void
+{
+    $account = $user->accounts()->first();
+    if ($account) {
+        setPermissionsTeamId($account->id);
+        $user->assignRole('admin');
+    }
+}
 
 test('guests cannot access social posts index', function () {
     $response = $this->get(route('social-posts.index'));
@@ -22,6 +45,8 @@ test('users with brand can view social posts index', function () {
     $brand = Brand::factory()->forUser($user)->create();
     SocialPost::factory()->forBrand($brand)->count(3)->create();
 
+    setupUserWithSocialPermissions($user);
+
     $response = $this->actingAs($user)->get(route('social-posts.index'));
 
     $response->assertStatus(200);
@@ -33,6 +58,8 @@ test('users with brand can view social posts index', function () {
 test('users can create a social post', function () {
     $user = User::factory()->create();
     $brand = Brand::factory()->forUser($user)->create();
+
+    setupUserWithSocialPermissions($user);
 
     $response = $this->actingAs($user)->post(route('social-posts.store'), [
         'platform' => SocialPlatform::Instagram->value,
@@ -53,6 +80,8 @@ test('social post content is required', function () {
     $user = User::factory()->create();
     Brand::factory()->forUser($user)->create();
 
+    setupUserWithSocialPermissions($user);
+
     $response = $this->actingAs($user)->post(route('social-posts.store'), [
         'platform' => SocialPlatform::Instagram->value,
         'format' => SocialFormat::Feed->value,
@@ -65,6 +94,8 @@ test('users can update a social post', function () {
     $user = User::factory()->create();
     $brand = Brand::factory()->forUser($user)->create();
     $socialPost = SocialPost::factory()->forBrand($brand)->draft()->create();
+
+    setupUserWithSocialPermissions($user);
 
     $response = $this->actingAs($user)->put(route('social-posts.update', $socialPost), [
         'content' => 'Updated content!',
@@ -82,6 +113,8 @@ test('users cannot update social posts from other brands', function () {
     $user = User::factory()->create();
     Brand::factory()->forUser($user)->create();
 
+    setupUserWithSocialPermissions($user);
+
     $otherUser = User::factory()->create();
     $otherBrand = Brand::factory()->forUser($otherUser)->create();
     $socialPost = SocialPost::factory()->forBrand($otherBrand)->create();
@@ -98,6 +131,8 @@ test('users can delete a social post', function () {
     $brand = Brand::factory()->forUser($user)->create();
     $socialPost = SocialPost::factory()->forBrand($brand)->create();
 
+    setupUserWithSocialPermissions($user);
+
     $response = $this->actingAs($user)->delete(route('social-posts.destroy', $socialPost));
 
     $response->assertRedirect();
@@ -108,6 +143,8 @@ test('users can schedule a social post', function () {
     $user = User::factory()->create();
     $brand = Brand::factory()->forUser($user)->create();
     $socialPost = SocialPost::factory()->forBrand($brand)->draft()->create();
+
+    setupUserWithSocialPermissions($user);
 
     $scheduledAt = now()->addDay()->format('Y-m-d H:i:s');
 
@@ -127,6 +164,8 @@ test('users can view social posts queue', function () {
     $brand = Brand::factory()->forUser($user)->create();
     SocialPost::factory()->forBrand($brand)->queued()->count(2)->create();
 
+    setupUserWithSocialPermissions($user);
+
     $response = $this->actingAs($user)->get(route('social-posts.queue'));
 
     $response->assertStatus(200);
@@ -139,6 +178,8 @@ test('users can add social post to queue', function () {
     $user = User::factory()->create();
     $brand = Brand::factory()->forUser($user)->create();
     $socialPost = SocialPost::factory()->forBrand($brand)->draft()->create();
+
+    setupUserWithSocialPermissions($user);
 
     $response = $this->actingAs($user)->post(route('social-posts.queue-post', $socialPost));
 

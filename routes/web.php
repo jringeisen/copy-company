@@ -11,7 +11,9 @@ use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\Public\BlogController;
 use App\Http\Controllers\Public\SubscribeController;
+use App\Http\Controllers\Settings\AccountInvitationController;
 use App\Http\Controllers\Settings\EmailDomainController;
+use App\Http\Controllers\Settings\TeamSettingsController;
 use App\Http\Controllers\SocialPostController;
 use App\Http\Controllers\SocialSettingsController;
 use App\Http\Controllers\SubscriberController;
@@ -19,10 +21,9 @@ use App\Http\Controllers\Webhooks\SesWebhookController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Webhook routes (no CSRF)
+// Webhook routes (CSRF excluded in bootstrap/app.php)
 Route::post('/webhooks/ses', [SesWebhookController::class, 'handle'])
-    ->name('webhooks.ses')
-    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    ->name('webhooks.ses');
 
 // Coming soon page (production only)
 Route::get('/coming-soon', function () {
@@ -44,6 +45,9 @@ Route::post('/@{brand:slug}/subscribe', [SubscribeController::class, 'store'])
     ->name('public.subscribe');
 Route::get('/@{brand:slug}/confirm/{token}', [SubscribeController::class, 'confirm'])->name('public.subscribe.confirm');
 Route::get('/@{brand:slug}/unsubscribe/{token}', [SubscribeController::class, 'unsubscribe'])->name('public.subscribe.unsubscribe');
+
+// Public invitation acceptance route
+Route::get('/invitations/{token}', [AccountInvitationController::class, 'accept'])->name('invitations.accept');
 
 // Public media routes (permanent URLs that redirect to signed S3 URLs)
 Route::get('/m/{media}', [MediaController::class, 'view'])->name('media.view');
@@ -85,6 +89,14 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/settings/email-domain/check', [EmailDomainController::class, 'checkStatus'])->name('settings.email-domain.check');
     Route::put('/settings/email-domain/from', [EmailDomainController::class, 'updateFrom'])->name('settings.email-domain.update-from');
     Route::delete('/settings/email-domain', [EmailDomainController::class, 'remove'])->name('settings.email-domain.remove');
+
+    // Team Settings routes
+    Route::get('/settings/team', [TeamSettingsController::class, 'index'])->name('settings.team');
+    Route::post('/settings/team/invite', [AccountInvitationController::class, 'store'])->name('team.invite');
+    Route::patch('/settings/team/{user}/role', [TeamSettingsController::class, 'updateRole'])->name('team.update-role');
+    Route::delete('/settings/team/{user}', [TeamSettingsController::class, 'removeMember'])->name('team.remove');
+    Route::delete('/settings/team/invitations/{invitation}', [AccountInvitationController::class, 'destroy'])->name('team.invitation.cancel');
+    Route::post('/settings/team/invitations/{invitation}/resend', [AccountInvitationController::class, 'resend'])->name('team.invitation.resend');
 
     // Post routes
     Route::delete('/posts/bulk-delete', [PostController::class, 'bulkDestroy'])->name('posts.bulk-destroy');

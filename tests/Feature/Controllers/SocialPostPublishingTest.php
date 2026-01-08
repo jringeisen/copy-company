@@ -5,12 +5,15 @@ namespace Tests\Feature\Controllers;
 use App\Enums\SocialPlatform;
 use App\Enums\SocialPostStatus;
 use App\Jobs\PublishSocialPost;
+use App\Models\Account;
 use App\Models\Brand;
 use App\Models\SocialPost;
 use App\Models\User;
 use App\Services\SocialPublishing\TokenManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class SocialPostPublishingTest extends TestCase
@@ -21,13 +24,32 @@ class SocialPostPublishingTest extends TestCase
 
     protected Brand $brand;
 
+    protected Account $account;
+
     protected function setUp(): void
     {
         parent::setUp();
 
+        // Create permissions needed for social post operations
+        Permission::findOrCreate('social.manage', 'web');
+        Permission::findOrCreate('social.publish', 'web');
+
+        $adminRole = Role::findOrCreate('admin', 'web');
+        $adminRole->givePermissionTo([
+            'social.manage',
+            'social.publish',
+        ]);
+
         $this->user = User::factory()->create();
-        $this->brand = Brand::factory()->create(['user_id' => $this->user->id]);
-        $this->user->update(['current_brand_id' => $this->brand->id]);
+        $this->account = Account::factory()->create();
+        $this->account->users()->attach($this->user->id, ['role' => 'admin']);
+        $this->brand = Brand::factory()->forAccount($this->account)->create();
+
+        // Set permissions team context and assign role
+        setPermissionsTeamId($this->account->id);
+        $this->user->assignRole('admin');
+
+        session(['current_account_id' => $this->account->id]);
     }
 
     public function test_publish_requires_authentication(): void
@@ -50,7 +72,9 @@ class SocialPostPublishingTest extends TestCase
             'status' => SocialPostStatus::Draft,
         ]);
 
-        $response = $this->actingAs($this->user)->post("/social-posts/{$socialPost->id}/publish");
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->post("/social-posts/{$socialPost->id}/publish");
 
         $response->assertRedirect();
         $response->assertSessionHas('error');
@@ -71,7 +95,9 @@ class SocialPostPublishingTest extends TestCase
             'status' => SocialPostStatus::Draft,
         ]);
 
-        $response = $this->actingAs($this->user)->post("/social-posts/{$socialPost->id}/publish");
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->post("/social-posts/{$socialPost->id}/publish");
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -94,7 +120,9 @@ class SocialPostPublishingTest extends TestCase
             'status' => SocialPostStatus::Published,
         ]);
 
-        $response = $this->actingAs($this->user)->post("/social-posts/{$socialPost->id}/publish");
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->post("/social-posts/{$socialPost->id}/publish");
 
         $response->assertRedirect();
         $response->assertSessionHas('error', 'This post cannot be published.');
@@ -116,7 +144,9 @@ class SocialPostPublishingTest extends TestCase
             'failure_reason' => 'Previous error',
         ]);
 
-        $response = $this->actingAs($this->user)->post("/social-posts/{$socialPost->id}/retry");
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->post("/social-posts/{$socialPost->id}/retry");
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -136,7 +166,9 @@ class SocialPostPublishingTest extends TestCase
             'status' => SocialPostStatus::Draft,
         ]);
 
-        $response = $this->actingAs($this->user)->post("/social-posts/{$socialPost->id}/retry");
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->post("/social-posts/{$socialPost->id}/retry");
 
         $response->assertRedirect();
         $response->assertSessionHas('error', 'Only failed posts can be retried.');
@@ -144,15 +176,17 @@ class SocialPostPublishingTest extends TestCase
 
     public function test_users_cannot_publish_other_brands_posts(): void
     {
-        $otherUser = User::factory()->create();
-        $otherBrand = Brand::factory()->create(['user_id' => $otherUser->id]);
+        $otherAccount = Account::factory()->create();
+        $otherBrand = Brand::factory()->forAccount($otherAccount)->create();
 
         $socialPost = SocialPost::factory()->create([
             'brand_id' => $otherBrand->id,
             'status' => SocialPostStatus::Draft,
         ]);
 
-        $response = $this->actingAs($this->user)->post("/social-posts/{$socialPost->id}/publish");
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->post("/social-posts/{$socialPost->id}/publish");
 
         $response->assertForbidden();
     }
@@ -179,7 +213,9 @@ class SocialPostPublishingTest extends TestCase
 
         // This will fail because we don't have real API credentials,
         // but it tests that the synchronous path is working
-        $response = $this->actingAs($this->user)->post("/social-posts/{$socialPost->id}/publish-now");
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->post("/social-posts/{$socialPost->id}/publish-now");
 
         $response->assertRedirect();
 
@@ -203,7 +239,9 @@ class SocialPostPublishingTest extends TestCase
             'status' => SocialPostStatus::Queued,
         ]);
 
-        $response = $this->actingAs($this->user)->post("/social-posts/{$socialPost->id}/publish");
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->post("/social-posts/{$socialPost->id}/publish");
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -227,7 +265,9 @@ class SocialPostPublishingTest extends TestCase
             'scheduled_at' => now()->addDay(),
         ]);
 
-        $response = $this->actingAs($this->user)->post("/social-posts/{$socialPost->id}/publish");
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->post("/social-posts/{$socialPost->id}/publish");
 
         $response->assertRedirect();
         $response->assertSessionHas('success');

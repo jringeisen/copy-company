@@ -5,6 +5,7 @@ namespace Tests\Feature\Jobs;
 use App\Enums\SocialPlatform;
 use App\Enums\SocialPostStatus;
 use App\Jobs\PublishSocialPost;
+use App\Models\Account;
 use App\Models\Brand;
 use App\Models\SocialPost;
 use App\Models\User;
@@ -18,12 +19,16 @@ class PublishSocialPostTest extends TestCase
 
     protected Brand $brand;
 
+    protected Account $account;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $user = User::factory()->create();
-        $this->brand = Brand::factory()->create(['user_id' => $user->id]);
+        $this->account = Account::factory()->create();
+        $this->account->users()->attach($user->id, ['role' => 'admin']);
+        $this->brand = Brand::factory()->forAccount($this->account)->create();
     }
 
     public function test_job_updates_status_to_failed_when_not_connected(): void

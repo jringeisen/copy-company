@@ -21,34 +21,34 @@ class PostPolicy
 
     public function create(User $user): bool
     {
-        return $user->currentBrand() !== null;
+        return $user->currentBrand() !== null && $user->can('posts.create');
     }
 
     public function update(User $user, Post $post): bool
     {
         $brand = $user->currentBrand();
 
-        return $brand && $post->brand_id === $brand->id;
+        return $brand && $post->brand_id === $brand->id && $user->can('posts.update');
     }
 
     public function delete(User $user, Post $post): bool
     {
         $brand = $user->currentBrand();
 
-        return $brand && $post->brand_id === $brand->id;
+        return $brand && $post->brand_id === $brand->id && $user->can('posts.delete');
     }
 
     public function restore(User $user, Post $post): bool
     {
         $brand = $user->currentBrand();
 
-        return $brand && $post->brand_id === $brand->id;
+        return $brand && $post->brand_id === $brand->id && $user->can('posts.update');
     }
 
     public function forceDelete(User $user, Post $post): bool
     {
         $brand = $user->currentBrand();
 
-        return $brand && $post->brand_id === $brand->id;
+        return $brand && $post->brand_id === $brand->id && $user->can('posts.delete');
     }
 }

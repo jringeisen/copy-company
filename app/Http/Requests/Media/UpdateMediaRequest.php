@@ -8,7 +8,7 @@ class UpdateMediaRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->currentBrand() !== null;
+        return $this->user()->can('update', $this->route('media'));
     }
 
     public function rules(): array

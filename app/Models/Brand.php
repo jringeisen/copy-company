@@ -13,7 +13,7 @@ class Brand extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
+        'account_id',
         'name',
         'slug',
         'tagline',
@@ -50,9 +50,9 @@ class Brand extends Model
         'email_domain_verified_at' => 'datetime',
     ];
 
-    public function user(): BelongsTo
+    public function account(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Account::class);
     }
 
     public function posts(): HasMany

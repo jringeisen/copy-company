@@ -4,6 +4,7 @@ namespace Tests\Unit\Services\SocialPublishing;
 
 use App\Enums\SocialPlatform;
 use App\Enums\SocialPostStatus;
+use App\Models\Account;
 use App\Models\Brand;
 use App\Models\SocialPost;
 use App\Models\User;
@@ -22,6 +23,8 @@ class SocialPublishingServiceTest extends TestCase
 
     protected Brand $brand;
 
+    protected Account $account;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -30,7 +33,9 @@ class SocialPublishingServiceTest extends TestCase
         $this->service = new SocialPublishingService($this->tokenManager);
 
         $user = User::factory()->create();
-        $this->brand = Brand::factory()->create(['user_id' => $user->id]);
+        $this->account = Account::factory()->create();
+        $this->account->users()->attach($user->id, ['role' => 'admin']);
+        $this->brand = Brand::factory()->forAccount($this->account)->create();
     }
 
     public function test_publish_fails_when_platform_not_connected(): void

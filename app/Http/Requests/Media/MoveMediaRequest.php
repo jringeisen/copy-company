@@ -10,7 +10,7 @@ class MoveMediaRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->currentBrand() !== null;
+        return $this->user()->currentBrand() !== null && $this->user()->can('media.upload');
     }
 
     public function rules(): array

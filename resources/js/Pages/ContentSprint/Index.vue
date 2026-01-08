@@ -1,6 +1,9 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import AppNavigation from '@/Components/AppNavigation.vue';
+import { usePermissions } from '@/Composables/usePermissions';
+
+const { canCreateSprints } = usePermissions();
 
 const props = defineProps({
     sprints: Array,
@@ -73,9 +76,10 @@ const statusColors = {
                 </svg>
                 <h3 class="mt-4 text-lg font-medium text-gray-900">No content sprints yet</h3>
                 <p class="mt-2 text-sm text-gray-500">
-                    Start a sprint to generate a month of blog post ideas.
+                    {{ canCreateSprints ? 'Start a sprint to generate a month of blog post ideas.' : 'No content sprints have been created yet.' }}
                 </p>
                 <Link
+                    v-if="canCreateSprints"
                     href="/content-sprints/create"
                     class="mt-4 inline-block px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition"
                 >

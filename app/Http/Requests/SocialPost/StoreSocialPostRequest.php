@@ -8,7 +8,7 @@ class StoreSocialPostRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->currentBrand() !== null;
+        return $this->user()->can('create', \App\Models\SocialPost::class);
     }
 
     public function rules(): array

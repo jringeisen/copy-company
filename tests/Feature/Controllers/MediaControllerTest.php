@@ -8,13 +8,34 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Storage::fake('media');
     Storage::fake('public');
+
+    // Create all permissions needed for media operations
+    Permission::findOrCreate('media.upload', 'web');
+    Permission::findOrCreate('media.delete', 'web');
+
+    $adminRole = Role::findOrCreate('admin', 'web');
+    $adminRole->givePermissionTo([
+        'media.upload',
+        'media.delete',
+    ]);
 });
+
+function setupUserWithMediaPermissions(User $user): void
+{
+    $account = $user->accounts()->first();
+    if ($account) {
+        setPermissionsTeamId($account->id);
+        $user->assignRole('admin');
+    }
+}
 
 // ===========================================
 // Index / List Tests
@@ -31,6 +52,8 @@ test('users with brand can view media index', function () {
     $brand = Brand::factory()->forUser($user)->create();
     Media::factory()->forBrand($brand)->count(5)->create();
 
+    setupUserWithMediaPermissions($user);
+
     $response = $this->actingAs($user)->get(route('media.index'));
 
     $response->assertStatus(200);
@@ -46,6 +69,8 @@ test('media list api returns media for current brand', function () {
     $brand = Brand::factory()->forUser($user)->create();
     Media::factory()->forBrand($brand)->count(3)->create();
 
+    setupUserWithMediaPermissions($user);
+
     $response = $this->actingAs($user)->get(route('media.list'));
 
     $response->assertStatus(200);
@@ -59,6 +84,8 @@ test('media list filters by folder', function () {
 
     Media::factory()->forBrand($brand)->count(2)->create();
     Media::factory()->forBrand($brand)->inFolder($folder)->count(3)->create();
+
+    setupUserWithMediaPermissions($user);
 
     $response = $this->actingAs($user)->get(route('media.list', ['folder_id' => $folder->id]));
 
@@ -74,6 +101,8 @@ test('media list filters by search', function () {
     Media::factory()->forBrand($brand)->create(['filename' => 'banner.jpg']);
     Media::factory()->forBrand($brand)->create(['filename' => 'company-logo.png']);
 
+    setupUserWithMediaPermissions($user);
+
     $response = $this->actingAs($user)->get(route('media.list', ['search' => 'logo']));
 
     $response->assertStatus(200);
@@ -87,6 +116,8 @@ test('media list filters by search', function () {
 test('users can upload images', function () {
     $user = User::factory()->create();
     $brand = Brand::factory()->forUser($user)->create();
+
+    setupUserWithMediaPermissions($user);
 
     $file = UploadedFile::fake()->image('test-image.jpg', 800, 600);
 
@@ -108,6 +139,8 @@ test('users can upload multiple images', function () {
     $user = User::factory()->create();
     $brand = Brand::factory()->forUser($user)->create();
 
+    setupUserWithMediaPermissions($user);
+
     $files = [
         UploadedFile::fake()->image('image1.jpg', 800, 600),
         UploadedFile::fake()->image('image2.png', 1024, 768),
@@ -126,6 +159,8 @@ test('users can upload images to a folder', function () {
     $user = User::factory()->create();
     $brand = Brand::factory()->forUser($user)->create();
     $folder = MediaFolder::factory()->forBrand($brand)->create();
+
+    setupUserWithMediaPermissions($user);
 
     $file = UploadedFile::fake()->image('test-image.jpg', 800, 600);
 
@@ -146,6 +181,8 @@ test('upload rejects files that are too large', function () {
     $user = User::factory()->create();
     Brand::factory()->forUser($user)->create();
 
+    setupUserWithMediaPermissions($user);
+
     // Create a file larger than 10MB
     $file = UploadedFile::fake()->create('large-image.jpg', 11 * 1024, 'image/jpeg');
 
@@ -160,6 +197,8 @@ test('upload rejects non-image files', function () {
     $user = User::factory()->create();
     Brand::factory()->forUser($user)->create();
 
+    setupUserWithMediaPermissions($user);
+
     $file = UploadedFile::fake()->create('document.pdf', 100, 'application/pdf');
 
     $response = $this->actingAs($user)->post(route('media.store'), [
@@ -172,6 +211,8 @@ test('upload rejects non-image files', function () {
 test('users cannot upload to folders from other brands', function () {
     $user = User::factory()->create();
     Brand::factory()->forUser($user)->create();
+
+    setupUserWithMediaPermissions($user);
 
     $otherUser = User::factory()->create();
     $otherBrand = Brand::factory()->forUser($otherUser)->create();
@@ -196,6 +237,8 @@ test('users can update media alt text', function () {
     $brand = Brand::factory()->forUser($user)->create();
     $media = Media::factory()->forBrand($brand)->create();
 
+    setupUserWithMediaPermissions($user);
+
     $response = $this->actingAs($user)->patch(route('media.update', $media), [
         'alt_text' => 'A beautiful sunset over the ocean',
     ]);
@@ -212,6 +255,8 @@ test('users can update media alt text', function () {
 test('users cannot update media from other brands', function () {
     $user = User::factory()->create();
     Brand::factory()->forUser($user)->create();
+
+    setupUserWithMediaPermissions($user);
 
     $otherUser = User::factory()->create();
     $otherBrand = Brand::factory()->forUser($otherUser)->create();
@@ -233,6 +278,8 @@ test('users can delete their media', function () {
     $brand = Brand::factory()->forUser($user)->create();
     $media = Media::factory()->forBrand($brand)->create();
 
+    setupUserWithMediaPermissions($user);
+
     $response = $this->actingAs($user)->delete(route('media.destroy', $media));
 
     $response->assertRedirect();
@@ -244,6 +291,8 @@ test('users can delete their media', function () {
 test('users cannot delete media from other brands', function () {
     $user = User::factory()->create();
     Brand::factory()->forUser($user)->create();
+
+    setupUserWithMediaPermissions($user);
 
     $otherUser = User::factory()->create();
     $otherBrand = Brand::factory()->forUser($otherUser)->create();
@@ -264,6 +313,8 @@ test('users can bulk delete media', function () {
     $brand = Brand::factory()->forUser($user)->create();
     $media = Media::factory()->forBrand($brand)->count(5)->create();
 
+    setupUserWithMediaPermissions($user);
+
     $idsToDelete = $media->take(3)->pluck('id')->toArray();
 
     $response = $this->actingAs($user)->post(route('media.bulk-destroy'), [
@@ -279,6 +330,8 @@ test('users can bulk delete media', function () {
 test('bulk delete validates media belongs to current brand', function () {
     $user = User::factory()->create();
     Brand::factory()->forUser($user)->create();
+
+    setupUserWithMediaPermissions($user);
 
     $otherUser = User::factory()->create();
     $otherBrand = Brand::factory()->forUser($otherUser)->create();
@@ -302,6 +355,8 @@ test('users can move media to a folder', function () {
     $folder = MediaFolder::factory()->forBrand($brand)->create();
     $media = Media::factory()->forBrand($brand)->count(3)->create();
 
+    setupUserWithMediaPermissions($user);
+
     $response = $this->actingAs($user)->post(route('media.move'), [
         'ids' => $media->pluck('id')->toArray(),
         'folder_id' => $folder->id,
@@ -319,6 +374,8 @@ test('users can move media to root (no folder)', function () {
     $folder = MediaFolder::factory()->forBrand($brand)->create();
     $media = Media::factory()->forBrand($brand)->inFolder($folder)->count(3)->create();
 
+    setupUserWithMediaPermissions($user);
+
     $response = $this->actingAs($user)->post(route('media.move'), [
         'ids' => $media->pluck('id')->toArray(),
         'folder_id' => null,
@@ -332,6 +389,8 @@ test('users cannot move media to folders from other brands', function () {
     $user = User::factory()->create();
     $brand = Brand::factory()->forUser($user)->create();
     $media = Media::factory()->forBrand($brand)->create();
+
+    setupUserWithMediaPermissions($user);
 
     $otherUser = User::factory()->create();
     $otherBrand = Brand::factory()->forUser($otherUser)->create();

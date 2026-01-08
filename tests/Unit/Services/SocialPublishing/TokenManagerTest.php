@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Services\SocialPublishing;
 
+use App\Models\Account;
 use App\Models\Brand;
 use App\Models\User;
 use App\Services\SocialPublishing\Contracts\TokenRefreshableInterface;
@@ -18,13 +19,17 @@ class TokenManagerTest extends TestCase
 
     protected Brand $brand;
 
+    protected Account $account;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->tokenManager = new TokenManager;
         $user = User::factory()->create();
-        $this->brand = Brand::factory()->create(['user_id' => $user->id]);
+        $this->account = Account::factory()->create();
+        $this->account->users()->attach($user->id, ['role' => 'admin']);
+        $this->brand = Brand::factory()->forAccount($this->account)->create();
     }
 
     public function test_get_credentials_returns_null_when_not_connected(): void

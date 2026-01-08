@@ -59,6 +59,9 @@ class HandleInertiaRequests extends Middleware
                     'slug' => $request->user()->currentBrand()->slug,
                     'primary_color' => $request->user()->currentBrand()->primary_color,
                 ] : null,
+                'permissions' => fn () => $request->user()
+                    ? $request->user()->getAllPermissions()->pluck('name')->toArray()
+                    : [],
             ],
         ];
     }

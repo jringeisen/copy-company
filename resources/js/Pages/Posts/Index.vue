@@ -4,11 +4,14 @@ import { ref, computed } from 'vue';
 import AppNavigation from '@/Components/AppNavigation.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
 import FeatureEducationBanner from '@/Components/FeatureEducationBanner.vue';
+import { usePermissions } from '@/Composables/usePermissions';
 
 const props = defineProps({
     posts: Array,
     brand: Object,
 });
+
+const { canCreatePosts, canDeletePosts, canUpdatePosts } = usePermissions();
 
 const selectedIds = ref([]);
 const isDeleting = ref(false);
@@ -84,13 +87,14 @@ const getStatusColor = (status) => {
                 </div>
                 <div class="flex items-center gap-3">
                     <button
-                        v-if="selectedIds.length > 0"
+                        v-if="canDeletePosts && selectedIds.length > 0"
                         @click="showDeleteModal = true"
                         class="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition"
                     >
                         Delete ({{ selectedIds.length }})
                     </button>
                     <Link
+                        v-if="canCreatePosts"
                         href="/posts/create"
                         class="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition"
                     >
@@ -105,8 +109,8 @@ const getStatusColor = (status) => {
                 title="Your Content Hub"
                 description="Posts are the heart of your content. Write blog posts, then share them as newsletters to subscribers or generate social media content automatically."
                 gradient="from-primary-500 to-blue-600"
-                cta-text="Create First Post"
-                cta-href="/posts/create"
+                :cta-text="canCreatePosts ? 'Create First Post' : null"
+                :cta-href="canCreatePosts ? '/posts/create' : null"
             >
                 <template #extra>
                     <div class="mt-3 flex flex-wrap items-center gap-4 text-sm text-white/80">
@@ -139,7 +143,7 @@ const getStatusColor = (status) => {
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left">
+                            <th v-if="canDeletePosts" class="px-6 py-3 text-left">
                                 <input
                                     type="checkbox"
                                     :checked="allSelected"
@@ -167,7 +171,7 @@ const getStatusColor = (status) => {
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         <tr v-for="post in posts" :key="post.id" class="hover:bg-gray-50">
-                            <td class="px-6 py-4">
+                            <td v-if="canDeletePosts" class="px-6 py-4">
                                 <input
                                     type="checkbox"
                                     :checked="selectedIds.includes(post.id)"
@@ -210,8 +214,11 @@ const getStatusColor = (status) => {
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 <h3 class="mt-4 text-lg font-medium text-gray-900">No posts yet</h3>
-                <p class="mt-2 text-gray-500">Get started by creating your first post.</p>
+                <p class="mt-2 text-gray-500">
+                    {{ canCreatePosts ? 'Get started by creating your first post.' : 'No posts have been created yet.' }}
+                </p>
                 <Link
+                    v-if="canCreatePosts"
                     href="/posts/create"
                     class="mt-4 inline-flex items-center px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition"
                 >

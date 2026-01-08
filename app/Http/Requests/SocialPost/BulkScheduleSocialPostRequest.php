@@ -15,6 +15,11 @@ class BulkScheduleSocialPostRequest extends FormRequest
             return false;
         }
 
+        // Check if user has social.manage permission
+        if (! $this->user()->can('social.manage')) {
+            return false;
+        }
+
         // Verify all social posts belong to the user's brand
         $ids = $this->input('social_post_ids', []);
 

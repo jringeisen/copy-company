@@ -25,7 +25,8 @@
         "prism-php/prism": "^0.99.10",
         "socialiteproviders/instagram": "^5.1",
         "socialiteproviders/pinterest": "^4.3",
-        "socialiteproviders/tiktok": "^5.2"
+        "socialiteproviders/tiktok": "^5.2",
+        "spatie/laravel-permission": "^6.24"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

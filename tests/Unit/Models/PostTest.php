@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Account;
 use App\Models\Brand;
 use App\Models\Post;
 use App\Models\SocialPost;
@@ -9,15 +10,21 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 test('post belongs to a brand', function () {
-    $post = Post::factory()->create();
+    $account = Account::factory()->create();
+    $brand = Brand::factory()->forAccount($account)->create();
+    $post = Post::factory()->forBrand($brand)->create();
 
     expect($post->brand)->toBeInstanceOf(Brand::class);
 });
 
 test('post belongs to a user', function () {
-    $post = Post::factory()->create();
+    $user = User::factory()->create();
+    $account = Account::factory()->create();
+    $brand = Brand::factory()->forAccount($account)->create();
+    $post = Post::factory()->forBrand($brand)->forUser($user)->create();
 
     expect($post->user)->toBeInstanceOf(User::class);
+    expect($post->user->id)->toBe($user->id);
 });
 
 test('post has many social posts', function () {

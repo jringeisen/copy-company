@@ -11,8 +11,33 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    // Create all permissions needed for newsletter operations
+    Permission::findOrCreate('posts.create', 'web');
+    Permission::findOrCreate('posts.update', 'web');
+    Permission::findOrCreate('posts.publish', 'web');
+
+    $adminRole = Role::findOrCreate('admin', 'web');
+    $adminRole->givePermissionTo([
+        'posts.create',
+        'posts.update',
+        'posts.publish',
+    ]);
+});
+
+function setupUserWithNewsletterPermissions(User $user): void
+{
+    $account = $user->accounts()->first();
+    if ($account) {
+        setPermissionsTeamId($account->id);
+        $user->assignRole('admin');
+    }
+}
 
 test('process newsletter send dispatches jobs for confirmed subscribers', function () {
     Bus::fake([SendNewsletterToSubscriber::class]);
@@ -116,6 +141,8 @@ test('publishing post with newsletter dispatches process job', function () {
     $user = User::factory()->create();
     $brand = Brand::factory()->forUser($user)->create();
     $post = Post::factory()->forBrand($brand)->draft()->create();
+
+    setupUserWithNewsletterPermissions($user);
 
     $this->actingAs($user)->post(route('posts.publish', $post), [
         'schedule_mode' => 'now',

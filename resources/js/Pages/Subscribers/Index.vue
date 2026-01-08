@@ -4,6 +4,9 @@ import { ref, computed } from 'vue';
 import AppNavigation from '@/Components/AppNavigation.vue';
 import FeatureEducationBanner from '@/Components/FeatureEducationBanner.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
+import { usePermissions } from '@/Composables/usePermissions';
+
+const { canExportSubscribers, canDeleteSubscribers, canViewSubscribers } = usePermissions();
 
 const props = defineProps({
     subscribers: Object,
@@ -102,7 +105,7 @@ const onFileChange = (e) => {
                     <h1 class="text-2xl font-bold text-gray-900">Subscribers</h1>
                     <p class="text-gray-600 mt-1">Manage your newsletter subscribers</p>
                 </div>
-                <div class="flex space-x-3">
+                <div v-if="canExportSubscribers" class="flex space-x-3">
                     <a
                         href="/subscribers/export"
                         class="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition"
@@ -161,7 +164,7 @@ const onFileChange = (e) => {
             </div>
 
             <!-- Import -->
-            <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <div v-if="canExportSubscribers" class="bg-white rounded-lg shadow-sm p-6 mb-8">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Import Subscribers</h2>
                 <p class="text-sm text-gray-600 mb-4">Upload a CSV file with columns: email, name (optional)</p>
                 <div class="flex items-center space-x-4">
@@ -228,12 +231,14 @@ const onFileChange = (e) => {
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-3">
                                 <button
+                                    v-if="canDeleteSubscribers"
                                     @click="editSubscriber(subscriber)"
                                     class="text-primary-600 hover:text-primary-800"
                                 >
                                     Edit
                                 </button>
                                 <button
+                                    v-if="canDeleteSubscribers"
                                     @click="deleteSubscriber(subscriber)"
                                     class="text-red-600 hover:text-red-800"
                                 >
