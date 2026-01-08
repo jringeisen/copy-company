@@ -21,6 +21,7 @@
         "laravel/tinker": "^2.10.1",
         "league/flysystem-aws-s3-v3": "^3.30",
         "mews/purifier": "^3.4",
+        "predis/predis": "^3.3",
         "prism-php/prism": "^0.99.10",
         "socialiteproviders/instagram": "^5.1",
         "socialiteproviders/pinterest": "^4.3",

@@ -20,7 +20,7 @@ const submit = () => {
 
     <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-50">
         <div class="w-full sm:max-w-md">
-            <h1 class="text-3xl font-bold text-center text-gray-900 mb-2">Content Platform</h1>
+            <h1 class="text-3xl font-bold text-center text-gray-900 mb-2">Copy Company</h1>
             <p class="text-center text-gray-600 mb-8">Create your account to get started.</p>
         </div>
 
