@@ -1,7 +1,7 @@
 <script setup>
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import AppNavigation from '@/Components/AppNavigation.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({
     queuedPosts: Array,
@@ -74,10 +74,8 @@ const submitBulkSchedule = () => {
 <template>
     <Head title="Social Queue" />
 
-    <div class="min-h-screen bg-gray-50">
-        <AppNavigation current-page="social" />
-
-        <main class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <AppLayout current-page="social">
+        <div class="max-w-4xl mx-auto">
             <!-- Page Header -->
             <div class="flex justify-between items-center mb-6">
                 <div class="flex items-center gap-3">
@@ -192,7 +190,7 @@ const submitBulkSchedule = () => {
                     View All Social Posts
                 </Link>
             </div>
-        </main>
+        </div>
 
         <!-- Bulk Schedule Modal -->
         <div v-if="showBulkScheduleModal" class="fixed inset-0 z-50 overflow-y-auto">
@@ -256,5 +254,5 @@ const submitBulkSchedule = () => {
                 </div>
             </div>
         </div>
-    </div>
+    </AppLayout>
 </template>

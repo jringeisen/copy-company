@@ -1,7 +1,7 @@
 <script setup>
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
-import AppNavigation from '@/Components/AppNavigation.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 import FeatureEducationBanner from '@/Components/FeatureEducationBanner.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
 import { usePermissions } from '@/Composables/usePermissions';
@@ -95,10 +95,8 @@ const onFileChange = (e) => {
 <template>
     <Head title="Subscribers" />
 
-    <div class="min-h-screen bg-gray-50">
-        <AppNavigation current-page="subscribers" />
-
-        <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <AppLayout current-page="subscribers">
+        <div class="max-w-7xl mx-auto">
             <!-- Header -->
             <div class="flex justify-between items-center mb-8">
                 <div>
@@ -279,7 +277,7 @@ const onFileChange = (e) => {
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
 
         <ConfirmModal
             :show="showDeleteModal"
@@ -348,5 +346,5 @@ const onFileChange = (e) => {
                 </div>
             </Transition>
         </Teleport>
-    </div>
+    </AppLayout>
 </template>

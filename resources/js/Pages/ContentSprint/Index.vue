@@ -1,6 +1,6 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
-import AppNavigation from '@/Components/AppNavigation.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 import { usePermissions } from '@/Composables/usePermissions';
 
 const { canCreateSprints } = usePermissions();
@@ -21,10 +21,8 @@ const statusColors = {
 <template>
     <Head title="Content Sprints" />
 
-    <div class="min-h-screen bg-gray-50">
-        <AppNavigation current-page="sprints" />
-
-        <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <AppLayout current-page="sprints">
+        <div class="max-w-7xl mx-auto">
             <!-- Intro section -->
             <div class="mb-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 text-white">
                 <h2 class="text-xl font-semibold mb-2">Generate a Month of Content</h2>
@@ -86,6 +84,6 @@ const statusColors = {
                     Start Your First Sprint
                 </Link>
             </div>
-        </main>
-    </div>
+        </div>
+    </AppLayout>
 </template>

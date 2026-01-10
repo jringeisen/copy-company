@@ -1,6 +1,6 @@
 <script setup>
 import { Head, Link, router } from '@inertiajs/vue3';
-import AppNavigation from '@/Components/AppNavigation.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 defineProps({
     platforms: Array,
@@ -48,42 +48,8 @@ const formatDate = (dateString) => {
 <template>
     <Head title="Social Connections" />
 
-    <div class="min-h-screen bg-gray-50">
-        <AppNavigation current-page="settings" />
-
-        <!-- Settings Sub-navigation -->
-        <div class="bg-white border-b border-gray-200">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                <nav class="flex space-x-8">
-                    <Link
-                        href="/settings/brand"
-                        class="border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    >
-                        Brand
-                    </Link>
-                    <Link
-                        href="/settings/social"
-                        class="border-b-2 border-primary-500 py-4 px-1 text-sm font-medium text-primary-600"
-                    >
-                        Social Connections
-                    </Link>
-                    <Link
-                        href="/settings/email-domain"
-                        class="border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    >
-                        Email Domain
-                    </Link>
-                    <Link
-                        href="/settings/team"
-                        class="border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    >
-                        Team
-                    </Link>
-                </nav>
-            </div>
-        </div>
-
-        <main class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <AppLayout current-page="social-settings">
+        <div class="max-w-4xl mx-auto">
             <div class="mb-8">
                 <h1 class="text-2xl font-bold text-gray-900">Social Connections</h1>
                 <p class="text-gray-600 mt-1">Connect your social media accounts to publish content directly from the platform.</p>
@@ -209,6 +175,6 @@ const formatDate = (dateString) => {
                     </div>
                 </div>
             </div>
-        </main>
-    </div>
+        </div>
+    </AppLayout>
 </template>

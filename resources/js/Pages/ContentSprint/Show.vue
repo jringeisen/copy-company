@@ -1,7 +1,7 @@
 <script setup>
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import AppNavigation from '@/Components/AppNavigation.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
 import { usePermissions } from '@/Composables/usePermissions';
 
@@ -112,12 +112,10 @@ const deleteSprint = () => {
 <template>
     <Head :title="sprint.title" />
 
-    <div class="min-h-screen bg-gray-50">
-        <AppNavigation current-page="sprints" />
-
+    <AppLayout current-page="sprints">
         <!-- Page Header -->
-        <div class="bg-white border-b border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div class="bg-white border-b border-gray-200 -mt-8 -mx-4 sm:-mx-6 lg:-mx-8 mb-8 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto py-4">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-4">
                         <Link href="/content-sprints" class="text-gray-500 hover:text-gray-700">
@@ -152,7 +150,7 @@ const deleteSprint = () => {
             </div>
         </div>
 
-        <main class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto">
             <!-- Generating State -->
             <div v-if="isGenerating" class="text-center py-16">
                 <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 rounded-full mb-6">
@@ -322,7 +320,7 @@ const deleteSprint = () => {
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
 
         <ConfirmModal
             :show="showDeleteModal"
@@ -333,5 +331,5 @@ const deleteSprint = () => {
             @confirm="deleteSprint"
             @cancel="showDeleteModal = false"
         />
-    </div>
+    </AppLayout>
 </template>

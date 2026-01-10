@@ -1,7 +1,7 @@
 <script setup>
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import AppNavigation from '@/Components/AppNavigation.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({
     account: Object,
@@ -77,42 +77,8 @@ const getRoleBadgeClass = (role) => {
 <template>
     <Head title="Team Settings" />
 
-    <div class="min-h-screen bg-gray-50">
-        <AppNavigation current-page="settings" />
-
-        <!-- Settings Sub-navigation -->
-        <div class="bg-white border-b border-gray-200">
-            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                <nav class="flex space-x-8">
-                    <Link
-                        href="/settings/brand"
-                        class="border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    >
-                        Brand
-                    </Link>
-                    <Link
-                        href="/settings/social"
-                        class="border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    >
-                        Social Connections
-                    </Link>
-                    <Link
-                        href="/settings/email-domain"
-                        class="border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    >
-                        Email Domain
-                    </Link>
-                    <Link
-                        href="/settings/team"
-                        class="border-b-2 border-primary-500 py-4 px-1 text-sm font-medium text-primary-600"
-                    >
-                        Team
-                    </Link>
-                </nav>
-            </div>
-        </div>
-
-        <main class="max-w-3xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <AppLayout current-page="team">
+        <div class="max-w-3xl mx-auto">
             <div class="mb-8 flex items-center justify-between">
                 <div>
                     <h1 class="text-2xl font-bold text-gray-900">Team Settings</h1>
@@ -231,11 +197,10 @@ const getRoleBadgeClass = (role) => {
                     <p class="mt-1 text-sm text-gray-500">Invite team members to collaborate on your brands.</p>
                 </div>
             </div>
-        </main>
-    </div>
+        </div>
 
-    <!-- Invite Modal -->
-    <Teleport to="body">
+        <!-- Invite Modal -->
+        <Teleport to="body">
         <div v-if="showInviteModal" class="fixed inset-0 z-50 overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen px-4">
                 <div class="fixed inset-0 bg-black opacity-30" @click="showInviteModal = false"></div>
@@ -294,4 +259,5 @@ const getRoleBadgeClass = (role) => {
             </div>
         </div>
     </Teleport>
+    </AppLayout>
 </template>

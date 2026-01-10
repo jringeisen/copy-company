@@ -1,7 +1,7 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import AppNavigation from '@/Components/AppNavigation.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({
     platform: String,
@@ -34,30 +34,8 @@ const submit = () => {
 <template>
     <Head :title="`Select ${platformName} ${accountType}`" />
 
-    <div class="min-h-screen bg-gray-50">
-        <AppNavigation current-page="settings" />
-
-        <!-- Settings Sub-navigation -->
-        <div class="bg-white border-b border-gray-200">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                <nav class="flex space-x-8">
-                    <Link
-                        href="/settings/brand"
-                        class="border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    >
-                        Brand
-                    </Link>
-                    <Link
-                        href="/settings/social"
-                        class="border-b-2 border-primary-500 py-4 px-1 text-sm font-medium text-primary-600"
-                    >
-                        Social Connections
-                    </Link>
-                </nav>
-            </div>
-        </div>
-
-        <main class="max-w-2xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <AppLayout current-page="social-settings">
+        <div class="max-w-2xl mx-auto">
             <div class="mb-8">
                 <Link
                     href="/settings/social"
@@ -142,6 +120,6 @@ const submit = () => {
                     {{ form.processing ? 'Saving...' : 'Save Selection' }}
                 </button>
             </div>
-        </main>
-    </div>
+        </div>
+    </AppLayout>
 </template>

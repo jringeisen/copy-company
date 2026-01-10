@@ -1,7 +1,7 @@
 <script setup>
 import { Head, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
-import AppNavigation from '@/Components/AppNavigation.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
 import MediaGrid from '@/Components/Media/MediaGrid.vue';
 import MediaUploader from '@/Components/Media/MediaUploader.vue';
@@ -94,10 +94,8 @@ const deleteMessage = computed(() => {
 <template>
     <Head title="Media Library" />
 
-    <div class="min-h-screen bg-gray-50">
-        <AppNavigation current-page="media" />
-
-        <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <AppLayout current-page="media">
+        <div class="max-w-7xl mx-auto">
             <!-- Header -->
             <div class="flex justify-between items-center mb-8">
                 <div>
@@ -225,7 +223,7 @@ const deleteMessage = computed(() => {
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
 
         <!-- Modals -->
         <MediaUploader
@@ -262,5 +260,5 @@ const deleteMessage = computed(() => {
             @confirm="deleteSelected"
             @cancel="showDeleteModal = false"
         />
-    </div>
+    </AppLayout>
 </template>

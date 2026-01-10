@@ -2,7 +2,7 @@
 import { Head, Link, router, useForm, usePoll } from '@inertiajs/vue3';
 import { ref, watch, computed } from 'vue';
 import axios from 'axios';
-import AppNavigation from '@/Components/AppNavigation.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 import SocialPostCard from '@/Components/Social/SocialPostCard.vue';
 import SocialPostEditor from '@/Components/Social/SocialPostEditor.vue';
 import FeatureEducationBanner from '@/Components/FeatureEducationBanner.vue';
@@ -165,10 +165,8 @@ const showGenerateContentBanner = computed(() => {
 <template>
     <Head title="Social Posts" />
 
-    <div class="min-h-screen bg-gray-50">
-        <AppNavigation current-page="social" />
-
-        <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <AppLayout current-page="social">
+        <div class="max-w-7xl mx-auto">
             <!-- Page Header -->
             <div class="flex justify-between items-center mb-6">
                 <div>
@@ -315,7 +313,7 @@ const showGenerateContentBanner = computed(() => {
                     />
                 </nav>
             </div>
-        </main>
+        </div>
 
         <!-- Generate Modal -->
         <div v-if="showGenerateModal" class="fixed inset-0 z-50 overflow-y-auto">
@@ -426,5 +424,5 @@ const showGenerateContentBanner = computed(() => {
             :social-post="editingSocialPost"
             @close="showEditorModal = false; editingSocialPost = null"
         />
-    </div>
+    </AppLayout>
 </template>

@@ -1,7 +1,7 @@
 <script setup>
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
-import AppNavigation from '@/Components/AppNavigation.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
 import FeatureEducationBanner from '@/Components/FeatureEducationBanner.vue';
 import { usePermissions } from '@/Composables/usePermissions';
@@ -75,10 +75,8 @@ const getStatusColor = (status) => {
 <template>
     <Head title="Posts" />
 
-    <div class="min-h-screen bg-gray-50">
-        <AppNavigation current-page="posts" />
-
-        <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <AppLayout current-page="posts">
+        <div class="max-w-7xl mx-auto">
             <!-- Header -->
             <div class="flex justify-between items-center mb-8">
                 <div>
@@ -225,7 +223,7 @@ const getStatusColor = (status) => {
                     Create Your First Post
                 </Link>
             </div>
-        </main>
+        </div>
 
         <ConfirmModal
             :show="showDeleteModal"
@@ -236,5 +234,5 @@ const getStatusColor = (status) => {
             @confirm="deleteSelected"
             @cancel="showDeleteModal = false"
         />
-    </div>
+    </AppLayout>
 </template>

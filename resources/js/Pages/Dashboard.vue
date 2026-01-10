@@ -1,7 +1,7 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import AppNavigation from '@/Components/AppNavigation.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 import OnboardingChecklist from '@/Components/OnboardingChecklist.vue';
 
 const props = defineProps({
@@ -26,10 +26,8 @@ const showEmptyStateGuidance = computed(() => {
 <template>
     <Head title="Dashboard" />
 
-    <div class="min-h-screen bg-gray-50">
-        <AppNavigation current-page="dashboard" />
-
-        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <AppLayout current-page="dashboard">
+        <div class="max-w-7xl mx-auto">
             <!-- Brand setup prompt if no brand exists -->
             <div v-if="!brand" class="bg-white rounded-lg shadow p-6 mb-6">
                 <h2 class="text-xl font-semibold text-gray-900 mb-2">Welcome to Copy Company!</h2>
@@ -192,6 +190,6 @@ const showEmptyStateGuidance = computed(() => {
                 </div>
             </div>
             </template>
-        </main>
-    </div>
+        </div>
+    </AppLayout>
 </template>

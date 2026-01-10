@@ -1,7 +1,7 @@
 <script setup>
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import AppNavigation from '@/Components/AppNavigation.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 import ContentCalendar from '@/Components/Calendar/ContentCalendar.vue';
 import CalendarEventModal from '@/Components/Calendar/CalendarEventModal.vue';
 
@@ -41,10 +41,8 @@ const handleSelectEvent = (event) => {
 <template>
     <Head title="Content Calendar" />
 
-    <div class="min-h-screen bg-gray-50">
-        <AppNavigation current-page="calendar" />
-
-        <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <AppLayout current-page="calendar">
+        <div class="max-w-7xl mx-auto">
             <!-- Legend -->
             <div class="mb-6 flex flex-wrap items-center gap-6">
                 <span class="text-sm font-medium text-gray-700">Content Types:</span>
@@ -126,7 +124,7 @@ const handleSelectEvent = (event) => {
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
 
         <!-- Event Detail Modal -->
         <CalendarEventModal
@@ -134,5 +132,5 @@ const handleSelectEvent = (event) => {
             :event="selectedEvent"
             @close="showEventModal = false"
         />
-    </div>
+    </AppLayout>
 </template>

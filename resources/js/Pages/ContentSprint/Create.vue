@@ -1,7 +1,7 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import AppNavigation from '@/Components/AppNavigation.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({
     brand: Object,
@@ -41,10 +41,8 @@ const submit = () => {
 <template>
     <Head title="Start Content Sprint" />
 
-    <div class="min-h-screen bg-gray-50">
-        <AppNavigation current-page="sprints" />
-
-        <main class="max-w-2xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <AppLayout current-page="sprints">
+        <div class="max-w-2xl mx-auto">
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
                 <div class="mb-6">
                     <h2 class="text-xl font-semibold text-gray-900">Let's brainstorm your content</h2>
@@ -157,6 +155,6 @@ const submit = () => {
                     </div>
                 </form>
             </div>
-        </main>
-    </div>
+        </div>
+    </AppLayout>
 </template>
