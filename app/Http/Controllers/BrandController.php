@@ -61,4 +61,18 @@ class BrandController extends Controller
 
         return back()->with('success', 'Brand updated successfully!');
     }
+
+    public function switch(Brand $brand): RedirectResponse
+    {
+        $user = auth()->user();
+        $account = $user->currentAccount();
+
+        if (! $account || ! $account->brands()->where('brands.id', $brand->id)->exists()) {
+            return back()->with('error', 'Brand not found.');
+        }
+
+        $user->switchBrand($brand);
+
+        return redirect()->route('dashboard')->with('success', "Switched to {$brand->name}");
+    }
 }

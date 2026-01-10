@@ -72,6 +72,7 @@ Route::middleware(['auth'])->group(function () {
     // Brand routes
     Route::get('/brands/create', [BrandController::class, 'create'])->name('brands.create');
     Route::post('/brands', [BrandController::class, 'store'])->name('brands.store');
+    Route::post('/brands/{brand}/switch', [BrandController::class, 'switch'])->name('brands.switch');
     Route::get('/settings/brand', [BrandController::class, 'edit'])->name('settings.brand');
     Route::put('/settings/brand/{brand}', [BrandController::class, 'update'])->name('settings.brand.update');
 
