@@ -7,6 +7,7 @@ use App\Http\Controllers\ContentSprintController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\MediaFolderController;
+use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\Public\BlogController;
@@ -125,6 +126,10 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/subscribers/{subscriber}', [SubscriberController::class, 'destroy'])->name('subscribers.destroy');
     Route::get('/subscribers/export', [SubscriberController::class, 'export'])->name('subscribers.export');
     Route::post('/subscribers/import', [SubscriberController::class, 'import'])->name('subscribers.import');
+
+    // Newsletter routes
+    Route::get('/newsletters', [NewsletterController::class, 'index'])->name('newsletters.index');
+    Route::get('/newsletters/{newsletterSend}', [NewsletterController::class, 'show'])->name('newsletters.show');
 
     // Social Post routes
     Route::get('/social-posts', [SocialPostController::class, 'index'])->name('social-posts.index');

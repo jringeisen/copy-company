@@ -35,6 +35,7 @@ const navLinks = [
     { name: 'Media', href: '/media', key: 'media', icon: 'photo' },
     { name: 'Social', href: '/social-posts', key: 'social', icon: 'share' },
     { name: 'Subscribers', href: '/subscribers', key: 'subscribers', icon: 'users' },
+    { name: 'Newsletters', href: '/newsletters', key: 'newsletters', icon: 'envelope' },
     { name: 'Calendar', href: '/calendar', key: 'calendar', icon: 'calendar' },
     { name: 'Content Sprints', href: '/content-sprints', key: 'sprints', icon: 'bolt' },
 ];
@@ -105,6 +106,10 @@ const closeMobileMenu = () => {
                     <!-- Bolt icon -->
                     <svg v-else-if="link.icon === 'bolt'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <!-- Envelope icon -->
+                    <svg v-else-if="link.icon === 'envelope'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                     {{ link.name }}
                 </Link>
@@ -322,6 +327,9 @@ const closeMobileMenu = () => {
                                     </svg>
                                     <svg v-else-if="link.icon === 'bolt'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                    <svg v-else-if="link.icon === 'envelope'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                     </svg>
                                     {{ link.name }}
                                 </Link>
