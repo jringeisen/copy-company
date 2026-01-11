@@ -525,7 +525,9 @@ const formatCurrency = (num) => {
                                     <span class="text-5xl font-light text-[#0b1215]">${{ pricing.starter[billingPeriod] }}</span>
                                     <span class="text-[#0b1215]/50">/month</span>
                                 </div>
-                                <p v-if="billingPeriod === 'annual'" class="text-xs text-[#a1854f]">Billed annually (${{ pricing.starter.annual * 12 }}/year)</p>
+                                <Transition name="fade">
+                                    <p v-if="billingPeriod === 'annual'" class="text-xs text-[#a1854f]">Billed annually (${{ pricing.starter.annual * 12 }}/year)</p>
+                                </Transition>
                                 <p class="text-sm text-[#0b1215]/60 mt-2">Perfect for getting started</p>
                             </div>
                             <ul class="space-y-4 mb-8">
@@ -589,7 +591,9 @@ const formatCurrency = (num) => {
                                     <span class="text-5xl font-light text-white">${{ pricing.creator[billingPeriod] }}</span>
                                     <span class="text-white/50">/month</span>
                                 </div>
-                                <p v-if="billingPeriod === 'annual'" class="text-xs text-[#a1854f]">Billed annually (${{ pricing.creator.annual * 12 }}/year)</p>
+                                <Transition name="fade">
+                                    <p v-if="billingPeriod === 'annual'" class="text-xs text-[#a1854f]">Billed annually (${{ pricing.creator.annual * 12 }}/year)</p>
+                                </Transition>
                                 <p class="text-sm text-white/60 mt-2">For growing creators</p>
                             </div>
                             <ul class="space-y-4 mb-8">
@@ -658,7 +662,9 @@ const formatCurrency = (num) => {
                                     <span class="text-5xl font-light text-[#0b1215]">${{ pricing.pro[billingPeriod] }}</span>
                                     <span class="text-[#0b1215]/50">/month</span>
                                 </div>
-                                <p v-if="billingPeriod === 'annual'" class="text-xs text-[#a1854f]">Billed annually (${{ pricing.pro.annual * 12 }}/year)</p>
+                                <Transition name="fade">
+                                    <p v-if="billingPeriod === 'annual'" class="text-xs text-[#a1854f]">Billed annually (${{ pricing.pro.annual * 12 }}/year)</p>
+                                </Transition>
                                 <p class="text-sm text-[#0b1215]/60 mt-2">For professional creators</p>
                             </div>
                             <ul class="space-y-4 mb-8">
@@ -857,5 +863,21 @@ const formatCurrency = (num) => {
 /* Serif font for display headings - using system serif stack */
 .font-serif {
     font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+/* Smooth scroll for anchor links */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Fade transition for billing period text */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>
