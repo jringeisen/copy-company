@@ -18,7 +18,7 @@ class PromptBuilder
         'change_tone' => 'You are an expert at adapting writing tone while preserving the core message and information.',
         'expand_content' => 'You are a skilled writer who expands content with relevant details, examples, and insights.',
         'freeform' => 'You are a helpful writing assistant who provides thoughtful guidance on content creation.',
-        'atomize_social' => "You are a social media expert who transforms blog content into engaging social media posts. You understand each platform's unique voice, format, and audience expectations. Create content that feels native to each platform while maintaining the core message.",
+        'atomize_social' => "You are a social media expert who transforms blog content into engaging social media posts. You understand each platform's unique voice, format, and audience expectations. Create content that feels native to each platform while maintaining the core message. Do not include emojis in your output - leave emoji usage to the user's discretion.",
         'content_sprint' => 'You are an expert content strategist who generates creative, engaging blog post ideas. You understand what makes content valuable, shareable, and SEO-friendly. Generate diverse ideas that provide real value to readers while supporting business goals.',
     ];
 

@@ -6,6 +6,7 @@ use App\Enums\PostStatus;
 use App\Enums\SocialPlatform;
 use App\Enums\SocialPostStatus;
 use App\Http\Controllers\Concerns\HasBrandAuthorization;
+use App\Http\Requests\SocialPost\BulkPublishNowRequest;
 use App\Http\Requests\SocialPost\BulkScheduleSocialPostRequest;
 use App\Http\Requests\SocialPost\ScheduleSocialPostRequest;
 use App\Http\Requests\SocialPost\StoreSocialPostRequest;
@@ -40,7 +41,7 @@ class SocialPostController extends Controller
         $query = $brand->socialPosts()->with('post:id,title');
 
         if (request()->has('platform') && request()->platform !== 'all') {
-            $query->forPlatform(request()->platform);
+            $query->forPlatform(SocialPlatform::from(request()->platform));
         }
 
         if (request()->has('status') && request()->status !== 'all') {
@@ -195,6 +196,46 @@ class SocialPostController extends Controller
         }
 
         return back()->with('success', count($socialPosts).' posts scheduled!');
+    }
+
+    public function bulkPublishNow(BulkPublishNowRequest $request): RedirectResponse
+    {
+        $brand = $this->currentBrand();
+        $validated = $request->validated();
+        $intervalMinutes = $validated['interval_minutes'];
+
+        $socialPosts = SocialPost::whereIn('id', $validated['social_post_ids'])
+            ->where('brand_id', $brand->id)
+            ->whereIn('status', [SocialPostStatus::Draft, SocialPostStatus::Queued])
+            ->orderBy('created_at')
+            ->get();
+
+        // Check all platforms are connected before starting
+        foreach ($socialPosts as $socialPost) {
+            $platform = $socialPost->platform->value;
+            if (! $this->tokenManager->isConnected($brand, $platform)) {
+                return back()->with('error', 'Please connect your '.$socialPost->platform->displayName().' account first.');
+            }
+        }
+
+        foreach ($socialPosts as $index => $socialPost) {
+            if ($index === 0) {
+                // First post: dispatch job immediately
+                PublishSocialPost::dispatch($socialPost);
+            } else {
+                // Subsequent posts: delay by interval * position
+                $delay = now()->addMinutes($intervalMinutes * $index);
+
+                $socialPost->update([
+                    'status' => SocialPostStatus::Scheduled,
+                    'scheduled_at' => $delay,
+                ]);
+
+                PublishSocialPost::dispatch($socialPost)->delay($delay);
+            }
+        }
+
+        return back()->with('success', count($socialPosts).' posts queued for publishing!');
     }
 
     public function publish(SocialPost $socialPost): RedirectResponse

@@ -2,6 +2,9 @@
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 
+// Auto-detect browser timezone
+const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
 const form = useForm({
     name: '',
     slug: '',
@@ -9,6 +12,7 @@ const form = useForm({
     description: '',
     industry: '',
     primary_color: '#6366f1',
+    timezone: detectedTimezone,
 });
 
 const slugEdited = ref(false);

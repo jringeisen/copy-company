@@ -93,7 +93,7 @@ const handleRetry = () => {
 </script>
 
 <template>
-    <div class="bg-white rounded-2xl border border-[#0b1215]/10 hover:border-[#0b1215]/20 transition">
+    <div class="bg-white rounded-2xl border border-[#0b1215]/10 hover:border-[#0b1215]/20 transition flex flex-col h-full">
         <!-- Header -->
         <div class="flex items-center justify-between p-4 border-b border-[#0b1215]/10">
             <div class="flex items-center space-x-3">
@@ -133,7 +133,7 @@ const handleRetry = () => {
         </div>
 
         <!-- Content Preview -->
-        <div class="p-4">
+        <div class="p-4 grow">
             <p class="text-sm text-[#0b1215]/70 whitespace-pre-wrap">{{ truncatedContent }}</p>
 
             <!-- Hashtags -->

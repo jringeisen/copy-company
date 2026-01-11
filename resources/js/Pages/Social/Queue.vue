@@ -1,20 +1,51 @@
 <script setup>
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+
+const timezoneLabels = {
+    'America/New_York': 'Eastern Time',
+    'America/Chicago': 'Central Time',
+    'America/Denver': 'Mountain Time',
+    'America/Los_Angeles': 'Pacific Time',
+    'America/Anchorage': 'Alaska Time',
+    'Pacific/Honolulu': 'Hawaii Time',
+    'America/Phoenix': 'Arizona',
+    'America/Toronto': 'Toronto',
+    'America/Vancouver': 'Vancouver',
+    'Europe/London': 'London',
+    'Europe/Paris': 'Paris',
+    'Europe/Berlin': 'Berlin',
+    'Asia/Tokyo': 'Tokyo',
+    'Asia/Shanghai': 'Shanghai',
+    'Asia/Singapore': 'Singapore',
+    'Australia/Sydney': 'Sydney',
+    'Australia/Melbourne': 'Melbourne',
+    'UTC': 'UTC',
+};
 
 const props = defineProps({
     queuedPosts: Array,
     brand: Object,
 });
 
+const timezoneDisplay = computed(() => {
+    return timezoneLabels[props.brand?.timezone] || props.brand?.timezone || 'Eastern Time';
+});
+
 const selectedPosts = ref([]);
 const showBulkScheduleModal = ref(false);
+const showPublishNowModal = ref(false);
 
 const bulkScheduleForm = useForm({
     social_post_ids: [],
     scheduled_at: '',
     interval_minutes: 60,
+});
+
+const bulkPublishNowForm = useForm({
+    social_post_ids: [],
+    interval_minutes: 5,
 });
 
 const platformColors = {
@@ -69,6 +100,20 @@ const submitBulkSchedule = () => {
         },
     });
 };
+
+const openPublishNow = () => {
+    bulkPublishNowForm.social_post_ids = [...selectedPosts.value];
+    showPublishNowModal.value = true;
+};
+
+const submitPublishNow = () => {
+    bulkPublishNowForm.post('/social-posts/bulk-publish-now', {
+        onSuccess: () => {
+            showPublishNowModal.value = false;
+            selectedPosts.value = [];
+        },
+    });
+};
 </script>
 
 <template>
@@ -91,6 +136,13 @@ const submitBulkSchedule = () => {
                     >
                         Back to Social Posts
                     </Link>
+                    <button
+                        v-if="selectedPosts.length > 0"
+                        @click="openPublishNow"
+                        class="px-4 py-2 bg-[#a1854f] text-white font-medium rounded-full hover:bg-[#a1854f]/90 transition"
+                    >
+                        Publish Now
+                    </button>
                     <button
                         v-if="selectedPosts.length > 0"
                         @click="openBulkSchedule"
@@ -218,6 +270,9 @@ const submitBulkSchedule = () => {
                                 class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                                 :class="{ 'border-red-500': bulkScheduleForm.errors.scheduled_at }"
                             />
+                            <p class="mt-1 text-sm text-[#0b1215]/50">
+                                Times are in {{ timezoneDisplay }}
+                            </p>
                         </div>
 
                         <div>
@@ -249,6 +304,66 @@ const submitBulkSchedule = () => {
                             class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50"
                         >
                             {{ bulkScheduleForm.processing ? 'Scheduling...' : 'Schedule All' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Publish Now Modal -->
+        <div v-if="showPublishNowModal" class="fixed inset-0 z-50 overflow-y-auto">
+            <div class="flex min-h-screen items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showPublishNowModal = false"></div>
+
+                <div class="relative bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+                    <h2 class="text-xl font-semibold text-[#0b1215] mb-4">
+                        Publish {{ bulkPublishNowForm.social_post_ids.length }} Posts Now
+                    </h2>
+
+                    <div class="space-y-4">
+                        <!-- Validation Errors -->
+                        <div v-if="Object.keys(bulkPublishNowForm.errors).length > 0" class="bg-red-50 border border-red-200 rounded-xl p-3">
+                            <ul class="text-sm text-red-600 list-disc list-inside">
+                                <li v-for="(error, key) in bulkPublishNowForm.errors" :key="key">{{ error }}</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-[#a1854f]/10 border border-[#a1854f]/20 rounded-xl p-3">
+                            <p class="text-sm text-[#0b1215]">
+                                The first post will be published immediately. Each following post will be published after the interval you specify.
+                            </p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-[#0b1215] mb-2">
+                                Interval between posts (minutes)
+                            </label>
+                            <input
+                                v-model.number="bulkPublishNowForm.interval_minutes"
+                                type="number"
+                                min="5"
+                                class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                                :class="{ 'border-red-500': bulkPublishNowForm.errors.interval_minutes }"
+                            />
+                            <p class="mt-1 text-sm text-[#0b1215]/50">
+                                Minimum 5 minutes to prevent rate limiting.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex justify-end space-x-3">
+                        <button
+                            @click="showPublishNowModal = false"
+                            class="px-4 py-2 text-[#0b1215] font-medium hover:bg-[#0b1215]/5 rounded-xl transition"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            @click="submitPublishNow"
+                            :disabled="bulkPublishNowForm.processing"
+                            class="px-4 py-2 bg-[#a1854f] text-white font-medium rounded-full hover:bg-[#a1854f]/90 transition disabled:opacity-50"
+                        >
+                            {{ bulkPublishNowForm.processing ? 'Publishing...' : 'Publish All' }}
                         </button>
                     </div>
                 </div>

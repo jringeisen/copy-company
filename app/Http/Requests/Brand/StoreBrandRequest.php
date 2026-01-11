@@ -20,6 +20,7 @@ class StoreBrandRequest extends FormRequest
             'description' => ['nullable', 'string', 'max:1000'],
             'industry' => ['nullable', 'string', 'max:255'],
             'primary_color' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'timezone' => ['nullable', 'string', 'timezone:all'],
         ];
     }
 

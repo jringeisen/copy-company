@@ -21,6 +21,7 @@ class Brand extends Model
         'account_id',
         'name',
         'slug',
+        'timezone',
         'tagline',
         'description',
         'logo_path',

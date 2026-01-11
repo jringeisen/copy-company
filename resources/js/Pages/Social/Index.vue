@@ -9,6 +9,27 @@ import { usePermissions } from '@/Composables/usePermissions';
 
 const { canManageSocial } = usePermissions();
 
+const timezoneLabels = {
+    'America/New_York': 'Eastern Time',
+    'America/Chicago': 'Central Time',
+    'America/Denver': 'Mountain Time',
+    'America/Los_Angeles': 'Pacific Time',
+    'America/Anchorage': 'Alaska Time',
+    'Pacific/Honolulu': 'Hawaii Time',
+    'America/Phoenix': 'Arizona',
+    'America/Toronto': 'Toronto',
+    'America/Vancouver': 'Vancouver',
+    'Europe/London': 'London',
+    'Europe/Paris': 'Paris',
+    'Europe/Berlin': 'Berlin',
+    'Asia/Tokyo': 'Tokyo',
+    'Asia/Shanghai': 'Shanghai',
+    'Asia/Singapore': 'Singapore',
+    'Australia/Sydney': 'Sydney',
+    'Australia/Melbourne': 'Melbourne',
+    'UTC': 'UTC',
+};
+
 const props = defineProps({
     socialPosts: Object,
     posts: Array,
@@ -20,6 +41,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+});
+
+const timezoneDisplay = computed(() => {
+    return timezoneLabels[props.brand?.timezone] || props.brand?.timezone || 'Eastern Time';
 });
 
 // Check if there are any posts in "active" states that might change
@@ -336,6 +361,9 @@ const availablePlatformsForGenerate = [
                             type="datetime-local"
                             class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                         />
+                        <p class="mt-1 text-sm text-[#0b1215]/50">
+                            Times are in {{ timezoneDisplay }}
+                        </p>
                     </div>
 
                     <div class="flex justify-end space-x-3">

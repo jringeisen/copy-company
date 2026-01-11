@@ -143,6 +143,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/social-posts/{socialPost}/publish-now', [SocialPostController::class, 'publishNow'])->name('social-posts.publish-now');
     Route::post('/social-posts/{socialPost}/retry', [SocialPostController::class, 'retry'])->name('social-posts.retry');
     Route::post('/social-posts/bulk-schedule', [SocialPostController::class, 'bulkSchedule'])->name('social-posts.bulk-schedule');
+    Route::post('/social-posts/bulk-publish-now', [SocialPostController::class, 'bulkPublishNow'])->name('social-posts.bulk-publish-now');
 
     // AI Assistant routes
     Route::prefix('ai')->group(function () {

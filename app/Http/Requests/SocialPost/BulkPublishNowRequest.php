@@ -3,10 +3,9 @@
 namespace App\Http\Requests\SocialPost;
 
 use App\Models\SocialPost;
-use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 
-class BulkScheduleSocialPostRequest extends FormRequest
+class BulkPublishNowRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -35,39 +34,21 @@ class BulkScheduleSocialPostRequest extends FormRequest
         return $ownedCount === count($ids);
     }
 
-    /**
-     * Convert the scheduled_at from brand timezone to UTC before validation.
-     */
-    protected function prepareForValidation(): void
-    {
-        if ($this->has('scheduled_at') && $this->scheduled_at) {
-            $brand = $this->user()->currentBrand();
-            $timezone = $brand->timezone ?? 'America/New_York';
-
-            // Parse the datetime in the brand's timezone and convert to UTC
-            $scheduledAt = Carbon::parse($this->scheduled_at, $timezone)->setTimezone('UTC');
-
-            $this->merge([
-                'scheduled_at' => $scheduledAt->toDateTimeString(),
-            ]);
-        }
-    }
-
     public function rules(): array
     {
         return [
             'social_post_ids' => ['required', 'array'],
             'social_post_ids.*' => ['exists:social_posts,id'],
-            'scheduled_at' => ['required', 'date', 'after:now'],
-            'interval_minutes' => ['nullable', 'integer', 'min:0'],
+            'interval_minutes' => ['required', 'integer', 'min:5'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'social_post_ids.required' => 'Please select at least one post to schedule.',
-            'scheduled_at.after' => 'The scheduled date must be in the future.',
+            'social_post_ids.required' => 'Please select at least one post to publish.',
+            'interval_minutes.required' => 'Please enter an interval between posts.',
+            'interval_minutes.min' => 'Interval must be at least 5 minutes to prevent rate limiting.',
         ];
     }
 }

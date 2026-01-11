@@ -25,6 +25,7 @@ class BrandResource extends JsonResource
             'tagline' => $this->tagline,
             'description' => $this->description,
             'industry' => $this->industry,
+            'timezone' => $this->timezone,
             'logo_path' => $this->logo_path,
             'favicon_path' => $this->favicon_path,
             'primary_color' => $this->primary_color,

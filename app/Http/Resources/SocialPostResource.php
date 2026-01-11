@@ -19,6 +19,8 @@ class SocialPostResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $timezone = $this->brand?->timezone ?? 'America/New_York';
+
         return [
             'id' => $this->id,
             'platform' => $this->platform->value ?? null,
@@ -36,9 +38,9 @@ class SocialPostResource extends JsonResource
             'failure_reason' => $this->failure_reason,
             'external_id' => $this->external_id,
             'analytics' => $this->analytics,
-            'scheduled_at' => $this->scheduled_at?->format('M d, Y g:i A'),
-            'scheduled_at_form' => $this->scheduled_at?->format('Y-m-d\TH:i'),
-            'published_at' => $this->published_at?->format('M d, Y g:i A'),
+            'scheduled_at' => $this->scheduled_at?->setTimezone($timezone)->format('M d, Y g:i A'),
+            'scheduled_at_form' => $this->scheduled_at?->setTimezone($timezone)->format('Y-m-d\TH:i'),
+            'published_at' => $this->published_at?->setTimezone($timezone)->format('M d, Y g:i A'),
             'created_at' => $this->created_at?->format('M d, Y g:i A'),
             'updated_at' => $this->updated_at?->format('M d, Y g:i A'),
             'post' => $this->when($this->relationLoaded('post') && $this->post, function () {

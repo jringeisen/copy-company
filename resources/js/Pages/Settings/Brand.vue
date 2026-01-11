@@ -2,6 +2,7 @@
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Autocomplete from '@/Components/Autocomplete.vue';
 
 const props = defineProps({
     brand: Object,
@@ -15,6 +16,7 @@ const form = useForm({
     tagline: props.brand.tagline || '',
     description: props.brand.description || '',
     industry: props.brand.industry || '',
+    timezone: props.brand.timezone || 'America/New_York',
     primary_color: props.brand.primary_color || '#6366f1',
     secondary_color: props.brand.secondary_color || '#4f46e5',
     voice_settings: {
@@ -27,17 +29,38 @@ const form = useForm({
 const newSampleText = ref('');
 
 const industries = [
-    'Technology',
-    'Marketing',
-    'Finance',
-    'Health & Wellness',
-    'Education',
-    'Creative & Design',
-    'Food & Beverage',
-    'Travel',
-    'Real Estate',
-    'E-commerce',
-    'Other',
+    { value: 'Technology', label: 'Technology' },
+    { value: 'Marketing', label: 'Marketing' },
+    { value: 'Finance', label: 'Finance' },
+    { value: 'Health & Wellness', label: 'Health & Wellness' },
+    { value: 'Education', label: 'Education' },
+    { value: 'Creative & Design', label: 'Creative & Design' },
+    { value: 'Food & Beverage', label: 'Food & Beverage' },
+    { value: 'Travel', label: 'Travel' },
+    { value: 'Real Estate', label: 'Real Estate' },
+    { value: 'E-commerce', label: 'E-commerce' },
+    { value: 'Other', label: 'Other' },
+];
+
+const timezones = [
+    { value: 'America/New_York', label: 'Eastern Time (ET)' },
+    { value: 'America/Chicago', label: 'Central Time (CT)' },
+    { value: 'America/Denver', label: 'Mountain Time (MT)' },
+    { value: 'America/Los_Angeles', label: 'Pacific Time (PT)' },
+    { value: 'America/Anchorage', label: 'Alaska Time (AKT)' },
+    { value: 'Pacific/Honolulu', label: 'Hawaii Time (HT)' },
+    { value: 'America/Phoenix', label: 'Arizona (no DST)' },
+    { value: 'America/Toronto', label: 'Toronto (ET)' },
+    { value: 'America/Vancouver', label: 'Vancouver (PT)' },
+    { value: 'Europe/London', label: 'London (GMT/BST)' },
+    { value: 'Europe/Paris', label: 'Paris (CET)' },
+    { value: 'Europe/Berlin', label: 'Berlin (CET)' },
+    { value: 'Asia/Tokyo', label: 'Tokyo (JST)' },
+    { value: 'Asia/Shanghai', label: 'Shanghai (CST)' },
+    { value: 'Asia/Singapore', label: 'Singapore (SGT)' },
+    { value: 'Australia/Sydney', label: 'Sydney (AEST)' },
+    { value: 'Australia/Melbourne', label: 'Melbourne (AEST)' },
+    { value: 'UTC', label: 'UTC' },
 ];
 
 const tones = [
@@ -155,19 +178,26 @@ const submit = () => {
 
                     <!-- Industry -->
                     <div>
-                        <label for="industry" class="block text-sm font-medium text-[#0b1215]">Industry</label>
-                        <select
-                            id="industry"
+                        <label for="industry" class="block text-sm font-medium text-[#0b1215] mb-1">Industry</label>
+                        <Autocomplete
                             v-model="form.industry"
-                            class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
-                        >
-                            <option value="">Select an industry</option>
-                            <option v-for="industry in industries" :key="industry" :value="industry">
-                                {{ industry }}
-                            </option>
-                        </select>
+                            :options="industries"
+                            placeholder="Search industries..."
+                        />
                         <p class="mt-1 text-sm text-[#0b1215]/50">Helps AI understand your content context better.</p>
                         <p v-if="form.errors.industry" class="mt-1 text-sm text-red-600">{{ form.errors.industry }}</p>
+                    </div>
+
+                    <!-- Timezone -->
+                    <div>
+                        <label for="timezone" class="block text-sm font-medium text-[#0b1215] mb-1">Timezone</label>
+                        <Autocomplete
+                            v-model="form.timezone"
+                            :options="timezones"
+                            placeholder="Search timezones..."
+                        />
+                        <p class="mt-1 text-sm text-[#0b1215]/50">Used for scheduling social posts and newsletters.</p>
+                        <p v-if="form.errors.timezone" class="mt-1 text-sm text-red-600">{{ form.errors.timezone }}</p>
                     </div>
 
                     <!-- Colors -->

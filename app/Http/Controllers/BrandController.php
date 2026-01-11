@@ -44,6 +44,7 @@ class BrandController extends Controller
         $account->brands()->create([
             'name' => $validated['name'],
             'slug' => Str::slug($validated['slug']),
+            'timezone' => $validated['timezone'] ?? 'America/New_York',
             'tagline' => $validated['tagline'] ?? null,
             'description' => $validated['description'] ?? null,
             'industry' => $validated['industry'] ?? null,
