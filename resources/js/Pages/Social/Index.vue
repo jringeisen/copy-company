@@ -181,7 +181,7 @@ const availablePlatformsForGenerate = [
 <template>
     <Head title="Social Posts" />
 
-    <AppLayout current-page="social">
+    <AppLayout current-page="social-posts">
         <div class="max-w-7xl mx-auto">
             <!-- Page Header -->
             <div class="flex justify-between items-center mb-6">

@@ -138,7 +138,7 @@ const formatTime = (time) => {
                         <button
                             type="button"
                             @click="showScheduleForm = true"
-                            class="px-4 py-2 text-sm font-medium text-[#a1854f] border border-[#a1854f] rounded-xl hover:bg-[#a1854f]/5 transition-colors"
+                            class="px-4 py-2 text-sm font-medium text-[#0b1215] border border-[#0b1215] rounded-xl hover:bg-[#0b1215]/5 transition-colors"
                         >
                             Add Time Slot
                         </button>
@@ -212,7 +212,7 @@ const formatTime = (time) => {
                             <button
                                 type="button"
                                 @click="addSchedule"
-                                class="px-4 py-2 text-sm font-medium text-white bg-[#a1854f] rounded-xl hover:bg-[#8a7243] transition-colors"
+                                class="px-4 py-2 text-sm font-medium text-white bg-[#0b1215] rounded-xl hover:bg-[#0b1215]/90 transition-colors"
                             >
                                 Add
                             </button>
@@ -235,7 +235,7 @@ const formatTime = (time) => {
                     <button
                         type="submit"
                         :disabled="form.processing"
-                        class="px-6 py-2.5 text-sm font-medium text-white bg-[#a1854f] rounded-xl hover:bg-[#8a7243] transition-colors disabled:opacity-50"
+                        class="px-6 py-2.5 text-sm font-medium text-white bg-[#0b1215] rounded-xl hover:bg-[#0b1215]/90 transition-colors disabled:opacity-50"
                     >
                         {{ form.processing ? 'Creating...' : 'Create Loop' }}
                     </button>

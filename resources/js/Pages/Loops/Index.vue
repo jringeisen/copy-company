@@ -32,7 +32,7 @@ const deleteLoop = (loop) => {
                 </div>
                 <Link
                     href="/loops/create"
-                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#a1854f] text-white text-sm font-medium rounded-xl hover:bg-[#8a7243] transition-colors"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#0b1215] text-white text-sm font-medium rounded-xl hover:bg-[#0b1215]/90 transition-colors"
                 >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -52,7 +52,7 @@ const deleteLoop = (loop) => {
                 </p>
                 <Link
                     href="/loops/create"
-                    class="mt-6 inline-flex items-center gap-2 px-4 py-2.5 bg-[#a1854f] text-white text-sm font-medium rounded-xl hover:bg-[#8a7243] transition-colors"
+                    class="mt-6 inline-flex items-center gap-2 px-4 py-2.5 bg-[#0b1215] text-white text-sm font-medium rounded-xl hover:bg-[#0b1215]/90 transition-colors"
                 >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />

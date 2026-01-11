@@ -1,7 +1,9 @@
 <script setup>
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import ConfirmModal from '@/Components/ConfirmModal.vue';
+import MediaPickerModal from '@/Components/Media/MediaPickerModal.vue';
 import draggable from 'vuedraggable';
 
 const props = defineProps({
@@ -13,29 +15,73 @@ const props = defineProps({
 
 const showAddItemModal = ref(false);
 const showImportModal = ref(false);
+const showDeleteModal = ref(false);
+const showEditModal = ref(false);
+const showMediaPicker = ref(false);
+const showEditMediaPicker = ref(false);
+const itemToDelete = ref(null);
+const itemToEdit = ref(null);
+const isDeleting = ref(false);
 const addItemMode = ref('existing'); // 'existing' or 'new'
 
 const addItemForm = useForm({
     social_post_id: null,
     content: '',
-    platform: null,
     format: 'feed',
     hashtags: [],
     link: '',
+    media: [],
 });
 
 const importForm = useForm({
     file: null,
 });
 
+const editItemForm = useForm({
+    content: '',
+    format: 'feed',
+    hashtags: [],
+    link: '',
+    media: [],
+});
+
 const hashtagInput = ref('');
+const editHashtagInput = ref('');
 
 const items = ref(Array.isArray(props.loop.items) ? props.loop.items.map(item => ({ ...item })) : []);
+
+// Watch for changes to props.loop.items and sync with local items ref
+watch(() => props.loop.items, (newItems) => {
+    items.value = Array.isArray(newItems) ? newItems.map(item => ({ ...item })) : [];
+}, { deep: true });
 
 const currentItem = computed(() => {
     if (!items.value.length) return null;
     return items.value.find(item => item.position === props.loop.current_position);
 });
+
+const platformLabels = {
+    instagram: 'IG',
+    facebook: 'FB',
+    pinterest: 'Pin',
+    linkedin: 'LI',
+    tiktok: 'TT',
+};
+
+const getPlatformLabel = (platform) => {
+    return platformLabels[platform] || platform.slice(0, 2).toUpperCase();
+};
+
+const itemHasWarning = (item) => {
+    const qualified = item.qualified_platforms || [];
+    const total = props.loop.platforms?.length || 0;
+    return qualified.length < total && qualified.length > 0;
+};
+
+const itemHasError = (item) => {
+    const qualified = item.qualified_platforms || [];
+    return qualified.length === 0 && (props.loop.platforms?.length || 0) > 0;
+};
 
 const addHashtag = () => {
     if (hashtagInput.value.trim()) {
@@ -49,6 +95,22 @@ const addHashtag = () => {
 
 const removeHashtag = (index) => {
     addItemForm.hashtags.splice(index, 1);
+};
+
+const handleMediaSelect = (selectedMedia) => {
+    // Handle both single and multiple media selections
+    const mediaItems = Array.isArray(selectedMedia) ? selectedMedia : [selectedMedia];
+    addItemForm.media = mediaItems.map(item => ({
+        id: item.id,
+        url: item.url,
+        thumbnail_url: item.thumbnail_url,
+        alt_text: item.alt_text,
+    }));
+    showMediaPicker.value = false;
+};
+
+const removeMedia = (index) => {
+    addItemForm.media.splice(index, 1);
 };
 
 const submitAddItem = () => {
@@ -70,9 +132,86 @@ const submitAddItem = () => {
 };
 
 const removeItem = (item) => {
-    if (confirm('Remove this item from the loop?')) {
-        router.delete(`/loops/${props.loop.id}/items/${item.id}`);
+    itemToDelete.value = item;
+    showDeleteModal.value = true;
+};
+
+const confirmDelete = () => {
+    if (!itemToDelete.value) return;
+
+    isDeleting.value = true;
+    router.delete(`/loops/${props.loop.id}/items/${itemToDelete.value.id}`, {
+        onFinish: () => {
+            isDeleting.value = false;
+            showDeleteModal.value = false;
+            itemToDelete.value = null;
+        },
+    });
+};
+
+const cancelDelete = () => {
+    showDeleteModal.value = false;
+    itemToDelete.value = null;
+};
+
+const openEditModal = (item) => {
+    // Don't allow editing linked items
+    if (item.is_linked) {
+        return;
     }
+    itemToEdit.value = item;
+    editItemForm.content = item.content || '';
+    editItemForm.format = item.format || 'feed';
+    editItemForm.hashtags = item.hashtags || [];
+    editItemForm.link = item.link || '';
+    editItemForm.media = item.media || [];
+    editHashtagInput.value = '';
+    showEditModal.value = true;
+};
+
+const submitEditItem = () => {
+    if (!itemToEdit.value) return;
+
+    editItemForm.put(`/loops/${props.loop.id}/items/${itemToEdit.value.id}`, {
+        onSuccess: () => {
+            showEditModal.value = false;
+            itemToEdit.value = null;
+            editItemForm.reset();
+        },
+    });
+};
+
+const cancelEdit = () => {
+    showEditModal.value = false;
+    itemToEdit.value = null;
+    editItemForm.reset();
+};
+
+const addEditHashtag = () => {
+    const tag = editHashtagInput.value.trim().replace(/^#/, '');
+    if (tag && !editItemForm.hashtags.includes(tag)) {
+        editItemForm.hashtags.push(tag);
+        editHashtagInput.value = '';
+    }
+};
+
+const removeEditHashtag = (index) => {
+    editItemForm.hashtags.splice(index, 1);
+};
+
+const handleEditMediaSelect = (selectedMedia) => {
+    const mediaItems = Array.isArray(selectedMedia) ? selectedMedia : [selectedMedia];
+    editItemForm.media = mediaItems.map(item => ({
+        id: item.id,
+        url: item.url,
+        thumbnail_url: item.thumbnail_url,
+        alt_text: item.alt_text,
+    }));
+    showEditMediaPicker.value = false;
+};
+
+const removeEditMedia = (index) => {
+    editItemForm.media.splice(index, 1);
 };
 
 const onDragEnd = () => {
@@ -210,7 +349,7 @@ const truncateContent = (content, length = 100) => {
                         </button>
                         <button
                             @click="showAddItemModal = true"
-                            class="px-4 py-2 text-sm font-medium text-white bg-[#a1854f] rounded-xl hover:bg-[#8a7243] transition-colors"
+                            class="px-4 py-2 text-sm font-medium text-white bg-[#0b1215] rounded-xl hover:bg-[#0b1215]/90 transition-colors"
                         >
                             Add Item
                         </button>
@@ -251,19 +390,64 @@ const truncateContent = (content, length = 100) => {
                                 {{ index + 1 }}
                             </div>
 
+                            <!-- Media Thumbnail -->
+                            <div v-if="item.media && item.media.length > 0" class="relative shrink-0 w-12 h-12 rounded-lg overflow-hidden border border-gray-200">
+                                <img
+                                    :src="item.media[0].thumbnail_url || item.media[0].url || item.media[0]"
+                                    alt="Media"
+                                    class="w-full h-full object-cover"
+                                />
+                                <div v-if="item.media.length > 1" class="absolute bottom-0.5 right-0.5 px-1 py-0.5 bg-black/70 text-white text-[10px] font-medium rounded">
+                                    +{{ item.media.length - 1 }}
+                                </div>
+                            </div>
+
                             <!-- Content -->
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm text-gray-900">{{ truncateContent(item.content) }}</p>
-                                <div class="flex items-center gap-2 mt-2">
-                                    <span v-if="item.platform" class="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded-full capitalize">
-                                        {{ item.platform }}
-                                    </span>
+                                <div class="flex items-center gap-2 mt-2 flex-wrap">
                                     <span v-if="item.is_linked" class="px-2 py-0.5 text-xs bg-blue-100 text-blue-600 rounded-full">
                                         Linked Post
                                     </span>
                                     <span class="text-xs text-gray-400">
                                         Posted {{ item.times_posted }}x
                                     </span>
+                                    <!-- Platform indicators -->
+                                    <div class="flex items-center gap-1 ml-auto">
+                                        <!-- Warning icon if not all platforms qualify -->
+                                        <span
+                                            v-if="itemHasWarning(item)"
+                                            class="text-amber-500"
+                                            title="This item won't post to all platforms"
+                                        >
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            </svg>
+                                        </span>
+                                        <!-- Error icon if no platforms qualify -->
+                                        <span
+                                            v-else-if="itemHasError(item)"
+                                            class="text-red-500"
+                                            title="This item won't post to any platforms"
+                                        >
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </span>
+                                        <template v-for="platform in loop.platforms" :key="platform">
+                                            <span
+                                                :class="[
+                                                    'px-1.5 py-0.5 text-[10px] font-medium rounded',
+                                                    item.qualified_platforms?.includes(platform)
+                                                        ? 'bg-green-100 text-green-700'
+                                                        : 'bg-gray-100 text-gray-400 line-through'
+                                                ]"
+                                                :title="item.disqualified_platforms?.[platform] || 'Ready to post'"
+                                            >
+                                                {{ getPlatformLabel(platform) }}
+                                            </span>
+                                        </template>
+                                    </div>
                                 </div>
                             </div>
 
@@ -273,6 +457,17 @@ const truncateContent = (content, length = 100) => {
                                     Next
                                 </span>
                             </div>
+
+                            <!-- Edit (only for non-linked items) -->
+                            <button
+                                v-if="!item.is_linked"
+                                @click="openEditModal(item)"
+                                class="shrink-0 text-gray-400 hover:text-[#0b1215] transition-colors"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </button>
 
                             <!-- Remove -->
                             <button
@@ -312,7 +507,7 @@ const truncateContent = (content, length = 100) => {
                                 @click="addItemMode = 'existing'"
                                 :class="[
                                     'px-4 py-2 text-sm font-medium rounded-xl transition-colors',
-                                    addItemMode === 'existing' ? 'bg-[#a1854f] text-white' : 'bg-gray-100 text-gray-700'
+                                    addItemMode === 'existing' ? 'bg-[#0b1215] text-white' : 'bg-gray-100 text-gray-700'
                                 ]"
                             >
                                 Existing Post
@@ -321,7 +516,7 @@ const truncateContent = (content, length = 100) => {
                                 @click="addItemMode = 'new'"
                                 :class="[
                                     'px-4 py-2 text-sm font-medium rounded-xl transition-colors',
-                                    addItemMode === 'new' ? 'bg-[#a1854f] text-white' : 'bg-gray-100 text-gray-700'
+                                    addItemMode === 'new' ? 'bg-[#0b1215] text-white' : 'bg-gray-100 text-gray-700'
                                 ]"
                             >
                                 New Content
@@ -356,31 +551,17 @@ const truncateContent = (content, length = 100) => {
                                 />
                             </div>
 
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Platform (optional)</label>
-                                    <select
-                                        v-model="addItemForm.platform"
-                                        class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#a1854f] focus:border-transparent"
-                                    >
-                                        <option :value="null">Use loop platforms</option>
-                                        <option v-for="platform in platforms" :key="platform.value" :value="platform.value">
-                                            {{ platform.label }}
-                                        </option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Format</label>
-                                    <select
-                                        v-model="addItemForm.format"
-                                        class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#a1854f] focus:border-transparent"
-                                    >
-                                        <option value="feed">Feed</option>
-                                        <option value="story">Story</option>
-                                        <option value="reel">Reel</option>
-                                        <option value="carousel">Carousel</option>
-                                    </select>
-                                </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Format</label>
+                                <select
+                                    v-model="addItemForm.format"
+                                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#a1854f] focus:border-transparent"
+                                >
+                                    <option value="feed">Feed</option>
+                                    <option value="story">Story</option>
+                                    <option value="reel">Reel</option>
+                                    <option value="carousel">Carousel</option>
+                                </select>
                             </div>
 
                             <div>
@@ -426,6 +607,42 @@ const truncateContent = (content, length = 100) => {
                                     </button>
                                 </div>
                             </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Images</label>
+                                <div v-if="addItemForm.media.length > 0" class="flex flex-wrap gap-2 mb-2">
+                                    <div
+                                        v-for="(item, index) in addItemForm.media"
+                                        :key="item.id"
+                                        class="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200"
+                                    >
+                                        <img
+                                            :src="item.thumbnail_url || item.url"
+                                            :alt="item.alt_text || 'Selected image'"
+                                            class="w-full h-full object-cover"
+                                        />
+                                        <button
+                                            type="button"
+                                            @click="removeMedia(index)"
+                                            class="absolute top-1 right-1 w-5 h-5 bg-black/60 text-white rounded-full flex items-center justify-center hover:bg-black/80"
+                                        >
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    @click="showMediaPicker = true"
+                                    class="w-full px-4 py-3 border-2 border-dashed border-gray-200 rounded-xl text-sm text-gray-600 hover:border-[#a1854f] hover:text-[#a1854f] transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    {{ addItemForm.media.length > 0 ? 'Change Images' : 'Add Images' }}
+                                </button>
+                            </div>
                         </div>
 
                         <div class="flex justify-end gap-2 mt-6">
@@ -438,7 +655,7 @@ const truncateContent = (content, length = 100) => {
                             <button
                                 @click="submitAddItem"
                                 :disabled="addItemForm.processing"
-                                class="px-4 py-2 text-sm font-medium text-white bg-[#a1854f] rounded-xl hover:bg-[#8a7243] transition-colors disabled:opacity-50"
+                                class="px-4 py-2 text-sm font-medium text-white bg-[#0b1215] rounded-xl hover:bg-[#0b1215]/90 transition-colors disabled:opacity-50"
                             >
                                 {{ addItemForm.processing ? 'Adding...' : 'Add Item' }}
                             </button>
@@ -447,6 +664,15 @@ const truncateContent = (content, length = 100) => {
                 </div>
             </div>
         </Teleport>
+
+        <!-- Media Picker Modal -->
+        <MediaPickerModal
+            :show="showMediaPicker"
+            :multiple="true"
+            :max-items="10"
+            @select="handleMediaSelect"
+            @close="showMediaPicker = false"
+        />
 
         <!-- Import Modal -->
         <Teleport to="body">
@@ -459,7 +685,7 @@ const truncateContent = (content, length = 100) => {
                         <div class="mb-4">
                             <p class="text-sm text-gray-600 mb-2">Upload a CSV file with the following columns:</p>
                             <code class="block p-3 bg-gray-100 rounded-xl text-xs text-gray-700">
-                                content,platform,format,hashtags,link,media_url
+                                content,format,hashtags,link,media_url
                             </code>
                         </div>
 
@@ -484,7 +710,7 @@ const truncateContent = (content, length = 100) => {
                             <button
                                 @click="submitImport"
                                 :disabled="importForm.processing || !importForm.file"
-                                class="px-4 py-2 text-sm font-medium text-white bg-[#a1854f] rounded-xl hover:bg-[#8a7243] transition-colors disabled:opacity-50"
+                                class="px-4 py-2 text-sm font-medium text-white bg-[#0b1215] rounded-xl hover:bg-[#0b1215]/90 transition-colors disabled:opacity-50"
                             >
                                 {{ importForm.processing ? 'Importing...' : 'Import' }}
                             </button>
@@ -493,5 +719,158 @@ const truncateContent = (content, length = 100) => {
                 </div>
             </div>
         </Teleport>
+
+        <!-- Delete Confirmation Modal -->
+        <ConfirmModal
+            :show="showDeleteModal"
+            title="Remove Item"
+            message="Are you sure you want to remove this item from the loop? This action cannot be undone."
+            confirm-text="Remove"
+            :processing="isDeleting"
+            @confirm="confirmDelete"
+            @cancel="cancelDelete"
+        />
+
+        <!-- Edit Item Modal -->
+        <Teleport to="body">
+            <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/50" @click="cancelEdit" />
+                <div class="relative bg-white rounded-2xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+                    <div class="p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Edit Item</h3>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                                <textarea
+                                    v-model="editItemForm.content"
+                                    rows="4"
+                                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                                    placeholder="Enter your post content..."
+                                />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Format</label>
+                                <select
+                                    v-model="editItemForm.format"
+                                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                                >
+                                    <option value="feed">Feed</option>
+                                    <option value="story">Story</option>
+                                    <option value="reel">Reel</option>
+                                    <option value="carousel">Carousel</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Link (optional)</label>
+                                <input
+                                    v-model="editItemForm.link"
+                                    type="url"
+                                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                                    placeholder="https://..."
+                                />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Hashtags</label>
+                                <div class="flex flex-wrap gap-1 mb-2">
+                                    <span
+                                        v-for="(tag, index) in editItemForm.hashtags"
+                                        :key="index"
+                                        class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-full flex items-center gap-1"
+                                    >
+                                        #{{ tag }}
+                                        <button @click="removeEditHashtag(index)" class="text-gray-400 hover:text-red-500">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <input
+                                        v-model="editHashtagInput"
+                                        type="text"
+                                        class="flex-1 px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                                        placeholder="Add hashtag"
+                                        @keydown.enter.prevent="addEditHashtag"
+                                    />
+                                    <button
+                                        type="button"
+                                        @click="addEditHashtag"
+                                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200"
+                                    >
+                                        Add
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Images</label>
+                                <div v-if="editItemForm.media.length > 0" class="flex flex-wrap gap-2 mb-2">
+                                    <div
+                                        v-for="(mediaItem, index) in editItemForm.media"
+                                        :key="mediaItem.id || index"
+                                        class="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200"
+                                    >
+                                        <img
+                                            :src="mediaItem.thumbnail_url || mediaItem.url || mediaItem"
+                                            :alt="mediaItem.alt_text || 'Selected image'"
+                                            class="w-full h-full object-cover"
+                                        />
+                                        <button
+                                            type="button"
+                                            @click="removeEditMedia(index)"
+                                            class="absolute top-1 right-1 w-5 h-5 bg-black/60 text-white rounded-full flex items-center justify-center hover:bg-black/80"
+                                        >
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    @click="showEditMediaPicker = true"
+                                    class="w-full px-4 py-3 border-2 border-dashed border-gray-200 rounded-xl text-sm text-gray-600 hover:border-[#0b1215] hover:text-[#0b1215] transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    {{ editItemForm.media.length > 0 ? 'Change Images' : 'Add Images' }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end gap-2 mt-6">
+                            <button
+                                @click="cancelEdit"
+                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                @click="submitEditItem"
+                                :disabled="editItemForm.processing"
+                                class="px-4 py-2 text-sm font-medium text-white bg-[#0b1215] rounded-xl hover:bg-[#0b1215]/90 transition-colors disabled:opacity-50"
+                            >
+                                {{ editItemForm.processing ? 'Saving...' : 'Save Changes' }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Teleport>
+
+        <!-- Edit Media Picker Modal -->
+        <MediaPickerModal
+            :show="showEditMediaPicker"
+            :multiple="true"
+            :max-items="10"
+            @select="handleEditMediaSelect"
+            @close="showEditMediaPicker = false"
+        />
     </AppLayout>
 </template>

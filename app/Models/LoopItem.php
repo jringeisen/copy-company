@@ -17,7 +17,6 @@ class LoopItem extends Model
         'social_post_id',
         'position',
         'content',
-        'platform',
         'format',
         'hashtags',
         'link',
@@ -27,7 +26,6 @@ class LoopItem extends Model
     ];
 
     protected $casts = [
-        'platform' => SocialPlatform::class,
         'format' => SocialFormat::class,
         'hashtags' => 'array',
         'media' => 'array',
@@ -105,18 +103,6 @@ class LoopItem extends Model
     }
 
     /**
-     * Get the platform (from social_post or standalone).
-     */
-    public function getPostPlatform(): ?SocialPlatform
-    {
-        if ($this->socialPost !== null) {
-            return $this->socialPost->platform;
-        }
-
-        return $this->platform;
-    }
-
-    /**
      * Get the format (from social_post or standalone).
      */
     public function getPostFormat(): SocialFormat
@@ -143,5 +129,101 @@ class LoopItem extends Model
     public function isLinked(): bool
     {
         return $this->social_post_id !== null;
+    }
+
+    /**
+     * Check if this item has media (images or videos).
+     */
+    public function hasMedia(): bool
+    {
+        $media = $this->getPostMedia();
+
+        return ! empty($media);
+    }
+
+    /**
+     * Check if this item meets the requirements for a specific platform.
+     */
+    public function meetsRequirementsFor(SocialPlatform $platform): bool
+    {
+        // Check media requirements
+        if ($platform->requiresMedia() && ! $this->hasMedia()) {
+            return false;
+        }
+
+        // Check video requirements (TikTok)
+        if ($platform->requiresVideo()) {
+            // For now, we don't support video, so TikTok is never eligible
+            return false;
+        }
+
+        // Check character limits
+        $content = $this->getPostContent();
+        $maxChars = $platform->maxCharacters();
+        if ($maxChars !== null && mb_strlen($content) > $maxChars) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Get the platforms this item qualifies for based on the loop's target platforms.
+     *
+     * @return array<string>
+     */
+    public function getQualifiedPlatforms(): array
+    {
+        // Use the already-loaded relationship if available to avoid N+1
+        if (! $this->relationLoaded('loop')) {
+            return [];
+        }
+
+        $loop = $this->loop;
+        if ($loop === null) {
+            return [];
+        }
+
+        $targetPlatforms = $loop->platforms ?? [];
+        $qualified = [];
+
+        foreach ($targetPlatforms as $platformValue) {
+            $platform = SocialPlatform::tryFrom($platformValue);
+            if ($platform !== null && $this->meetsRequirementsFor($platform)) {
+                $qualified[] = $platformValue;
+            }
+        }
+
+        return $qualified;
+    }
+
+    /**
+     * Get platforms this item does NOT qualify for with reasons.
+     *
+     * @return array<string, string>
+     */
+    public function getDisqualifiedPlatforms(): array
+    {
+        // Use the already-loaded relationship if available to avoid N+1
+        if (! $this->relationLoaded('loop')) {
+            return [];
+        }
+
+        $loop = $this->loop;
+        if ($loop === null) {
+            return [];
+        }
+
+        $targetPlatforms = $loop->platforms ?? [];
+        $disqualified = [];
+
+        foreach ($targetPlatforms as $platformValue) {
+            $platform = SocialPlatform::tryFrom($platformValue);
+            if ($platform !== null && ! $this->meetsRequirementsFor($platform)) {
+                $disqualified[$platformValue] = $platform->requirementsDescription();
+            }
+        }
+
+        return $disqualified;
     }
 }

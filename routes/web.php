@@ -156,6 +156,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/loops/{loop}', [LoopController::class, 'destroy'])->name('loops.destroy');
     Route::post('/loops/{loop}/toggle', [LoopController::class, 'toggle'])->name('loops.toggle');
     Route::post('/loops/{loop}/items', [LoopController::class, 'addItem'])->name('loops.items.store');
+    Route::put('/loops/{loop}/items/{item}', [LoopController::class, 'updateItem'])->name('loops.items.update');
     Route::delete('/loops/{loop}/items/{item}', [LoopController::class, 'removeItem'])->name('loops.items.destroy');
     Route::post('/loops/{loop}/reorder', [LoopController::class, 'reorder'])->name('loops.reorder');
     Route::post('/loops/{loop}/import', [LoopController::class, 'import'])->name('loops.import');

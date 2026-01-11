@@ -9,6 +9,7 @@ use App\Http\Requests\Loop\ImportLoopItemsRequest;
 use App\Http\Requests\Loop\ReorderLoopItemsRequest;
 use App\Http\Requests\Loop\StoreLoopItemRequest;
 use App\Http\Requests\Loop\StoreLoopRequest;
+use App\Http\Requests\Loop\UpdateLoopItemRequest;
 use App\Http\Requests\Loop\UpdateLoopRequest;
 use App\Http\Resources\LoopResource;
 use App\Http\Resources\SocialPostResource;
@@ -35,6 +36,9 @@ class LoopController extends Controller
             ->withCount('items')
             ->orderByDesc('updated_at')
             ->get();
+
+        // Set brand relationship to avoid N+1 queries in LoopResource
+        $loops->each(fn ($loop) => $loop->setRelation('brand', $brand));
 
         return Inertia::render('Loops/Index', [
             'loops' => LoopResource::collection($loops)->resolve(),
@@ -92,7 +96,10 @@ class LoopController extends Controller
 
         $brand = $this->currentBrand();
 
-        $loop->load(['items.socialPost', 'schedules']);
+        $loop->load(['items.socialPost', 'schedules', 'brand']);
+
+        // Set the loop relationship on each item to avoid N+1 queries in LoopItemResource
+        $loop->items->each(fn ($item) => $item->setRelation('loop', $loop));
 
         // Get available social posts for adding to loop
         $availableSocialPosts = $brand->socialPosts()
@@ -100,6 +107,9 @@ class LoopController extends Controller
             ->orderByDesc('created_at')
             ->limit(100)
             ->get();
+
+        // Set brand relationship to avoid N+1 queries in SocialPostResource
+        $availableSocialPosts->each(fn ($post) => $post->setRelation('brand', $brand));
 
         return Inertia::render('Loops/Show', [
             'loop' => (new LoopResource($loop))->resolve(),
@@ -113,7 +123,7 @@ class LoopController extends Controller
     {
         $this->authorize('update', $loop);
 
-        $loop->load('schedules');
+        $loop->load(['schedules', 'brand']);
 
         return Inertia::render('Loops/Edit', [
             'loop' => (new LoopResource($loop))->resolve(),
@@ -174,7 +184,6 @@ class LoopController extends Controller
             'social_post_id' => $validated['social_post_id'] ?? null,
             'position' => $maxPosition + 1,
             'content' => $validated['content'] ?? null,
-            'platform' => $validated['platform'] ?? null,
             'format' => $validated['format'] ?? 'feed',
             'hashtags' => $validated['hashtags'] ?? [],
             'link' => $validated['link'] ?? null,
@@ -182,6 +191,32 @@ class LoopController extends Controller
         ]);
 
         return back()->with('success', 'Item added to loop!');
+    }
+
+    public function updateItem(UpdateLoopItemRequest $request, Loop $loop, LoopItem $item): RedirectResponse
+    {
+        $this->authorize('update', $loop);
+
+        if ($item->loop_id !== $loop->id) {
+            abort(404);
+        }
+
+        // Don't allow editing linked items - they should be edited via the social post
+        if ($item->isLinked()) {
+            return back()->with('error', 'Linked items cannot be edited directly. Edit the original social post instead.');
+        }
+
+        $validated = $request->validated();
+
+        $item->update([
+            'content' => $validated['content'],
+            'format' => $validated['format'] ?? $item->format,
+            'hashtags' => $validated['hashtags'] ?? [],
+            'link' => $validated['link'] ?? null,
+            'media' => $validated['media'] ?? [],
+        ]);
+
+        return back()->with('success', 'Item updated successfully!');
     }
 
     public function removeItem(Loop $loop, LoopItem $item): RedirectResponse
@@ -253,17 +288,10 @@ class LoopController extends Controller
                 // Sanitize content (CSV injection prevention)
                 $content = preg_replace('/^[\=\+\-\@\t\r]/', "'", $content);
 
-                $platform = strtolower(trim($row[1] ?? ''));
-                $format = strtolower(trim($row[2] ?? 'feed'));
-                $hashtags = ! empty($row[3]) ? array_map('trim', explode(',', $row[3])) : [];
-                $link = trim($row[4] ?? '') ?: null;
-                $mediaUrl = trim($row[5] ?? '') ?: null;
-
-                // Validate platform
-                $validPlatforms = array_column(SocialPlatform::cases(), 'value');
-                if (! empty($platform) && ! in_array($platform, $validPlatforms)) {
-                    $platform = null;
-                }
+                $format = strtolower(trim($row[1] ?? 'feed'));
+                $hashtags = ! empty($row[2]) ? array_map('trim', explode(',', $row[2])) : [];
+                $link = trim($row[3] ?? '') ?: null;
+                $mediaUrl = trim($row[4] ?? '') ?: null;
 
                 // Validate format
                 $validFormats = ['feed', 'story', 'reel', 'carousel', 'pin', 'thread'];
@@ -276,7 +304,6 @@ class LoopController extends Controller
                 $loop->items()->create([
                     'position' => $maxPosition,
                     'content' => $content,
-                    'platform' => $platform ?: null,
                     'format' => $format,
                     'hashtags' => $hashtags,
                     'link' => $link,

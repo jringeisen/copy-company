@@ -18,7 +18,10 @@ class LoopResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $timezone = $this->brand->timezone ?? 'America/New_York';
+        // Use already-loaded brand relationship to avoid N+1 queries
+        $timezone = $this->relationLoaded('brand')
+            ? ($this->brand->timezone ?? 'America/New_York')
+            : 'America/New_York';
 
         return [
             'id' => $this->id,

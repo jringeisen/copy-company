@@ -18,13 +18,15 @@ class LoopItemResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $timezone = $this->loop->brand->timezone ?? 'America/New_York';
+        // Get timezone from the already-loaded loop->brand relationship
+        $timezone = $this->relationLoaded('loop') && $this->loop->relationLoaded('brand')
+            ? ($this->loop->brand->timezone ?? 'America/New_York')
+            : 'America/New_York';
 
         return [
             'id' => $this->id,
             'position' => $this->position,
             'content' => $this->getPostContent(),
-            'platform' => $this->getPostPlatform()?->value,
             'format' => $this->getPostFormat()->value,
             'hashtags' => $this->getPostHashtags(),
             'link' => $this->getPostLink(),
@@ -33,6 +35,9 @@ class LoopItemResource extends JsonResource
             'last_posted_at' => $this->last_posted_at?->setTimezone($timezone)->format('M d, Y g:i A'),
             'social_post' => new SocialPostResource($this->whenLoaded('socialPost')),
             'is_linked' => $this->isLinked(),
+            'has_media' => $this->hasMedia(),
+            'qualified_platforms' => $this->getQualifiedPlatforms(),
+            'disqualified_platforms' => $this->getDisqualifiedPlatforms(),
         ];
     }
 }

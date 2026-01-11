@@ -119,7 +119,7 @@ const submitPublishNow = () => {
 <template>
     <Head title="Social Queue" />
 
-    <AppLayout current-page="social">
+    <AppLayout current-page="social-queue">
         <div class="max-w-4xl mx-auto">
             <!-- Page Header -->
             <div class="flex justify-between items-center mb-6">
