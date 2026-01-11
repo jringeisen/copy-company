@@ -16,6 +16,7 @@ const brands = computed(() => page.props.auth?.brands || []);
 
 const mobileMenuOpen = ref(false);
 const showBrandSwitcher = ref(false);
+const expandedMenus = ref(['social']); // Social expanded by default when on social pages
 const logoutForm = useForm({});
 
 const logout = () => {
@@ -27,11 +28,36 @@ const switchBrand = (brandId) => {
     showBrandSwitcher.value = false;
 };
 
+const toggleSubmenu = (key) => {
+    const index = expandedMenus.value.indexOf(key);
+    if (index > -1) {
+        expandedMenus.value.splice(index, 1);
+    } else {
+        expandedMenus.value.push(key);
+    }
+};
+
+const isParentActive = (link) => {
+    if (link.children) {
+        return link.children.some(child => props.currentPage === child.key);
+    }
+    return props.currentPage === link.key;
+};
+
 const navLinks = [
     { name: 'Dashboard', href: '/dashboard', key: 'dashboard', icon: 'home' },
     { name: 'Posts', href: '/posts', key: 'posts', icon: 'document' },
     { name: 'Media', href: '/media', key: 'media', icon: 'photo' },
-    { name: 'Social', href: '/social-posts', key: 'social', icon: 'share' },
+    {
+        name: 'Social',
+        key: 'social',
+        icon: 'share',
+        children: [
+            { name: 'All Posts', href: '/social-posts', key: 'social-posts' },
+            { name: 'Queue', href: '/social-posts/queue', key: 'social-queue' },
+            { name: 'Loops', href: '/loops', key: 'loops' },
+        ]
+    },
     { name: 'Subscribers', href: '/subscribers', key: 'subscribers', icon: 'users' },
     { name: 'Newsletters', href: '/newsletters', key: 'newsletters', icon: 'envelope' },
     { name: 'Calendar', href: '/calendar', key: 'calendar', icon: 'calendar' },
@@ -67,51 +93,92 @@ const closeMobileMenu = () => {
 
             <!-- Navigation -->
             <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-                <Link
-                    v-for="link in navLinks"
-                    :key="link.key"
-                    :href="link.href"
-                    :class="[
-                        'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors',
-                        isActive(link.key)
-                            ? 'bg-white/10 text-white'
-                            : 'text-white/60 hover:bg-white/5 hover:text-white',
-                    ]"
-                >
-                    <!-- Home icon -->
-                    <svg v-if="link.icon === 'home'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
-                    <!-- Document icon -->
-                    <svg v-else-if="link.icon === 'document'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <!-- Photo icon -->
-                    <svg v-else-if="link.icon === 'photo'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <!-- Share icon -->
-                    <svg v-else-if="link.icon === 'share'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                    </svg>
-                    <!-- Users icon -->
-                    <svg v-else-if="link.icon === 'users'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                    <!-- Calendar icon -->
-                    <svg v-else-if="link.icon === 'calendar'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <!-- Bolt icon -->
-                    <svg v-else-if="link.icon === 'bolt'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    <!-- Envelope icon -->
-                    <svg v-else-if="link.icon === 'envelope'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    {{ link.name }}
-                </Link>
+                <template v-for="link in navLinks" :key="link.key">
+                    <!-- Link with children (expandable) -->
+                    <div v-if="link.children">
+                        <button
+                            @click="toggleSubmenu(link.key)"
+                            :class="[
+                                'w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors',
+                                isParentActive(link)
+                                    ? 'bg-white/10 text-white'
+                                    : 'text-white/60 hover:bg-white/5 hover:text-white',
+                            ]"
+                        >
+                            <span class="flex items-center gap-3">
+                                <!-- Share icon for Social -->
+                                <svg v-if="link.icon === 'share'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                </svg>
+                                {{ link.name }}
+                            </span>
+                            <svg
+                                :class="['w-4 h-4 transition-transform', expandedMenus.includes(link.key) && 'rotate-180']"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div v-show="expandedMenus.includes(link.key)" class="ml-8 mt-1 space-y-1">
+                            <Link
+                                v-for="child in link.children"
+                                :key="child.key"
+                                :href="child.href"
+                                :class="[
+                                    'block px-3 py-2 rounded-xl text-sm transition-colors',
+                                    isActive(child.key)
+                                        ? 'bg-white/10 text-white'
+                                        : 'text-white/50 hover:bg-white/5 hover:text-white',
+                                ]"
+                            >
+                                {{ child.name }}
+                            </Link>
+                        </div>
+                    </div>
+                    <!-- Regular link -->
+                    <Link
+                        v-else
+                        :href="link.href"
+                        :class="[
+                            'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors',
+                            isActive(link.key)
+                                ? 'bg-white/10 text-white'
+                                : 'text-white/60 hover:bg-white/5 hover:text-white',
+                        ]"
+                    >
+                        <!-- Home icon -->
+                        <svg v-if="link.icon === 'home'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        <!-- Document icon -->
+                        <svg v-else-if="link.icon === 'document'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <!-- Photo icon -->
+                        <svg v-else-if="link.icon === 'photo'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <!-- Users icon -->
+                        <svg v-else-if="link.icon === 'users'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <!-- Calendar icon -->
+                        <svg v-else-if="link.icon === 'calendar'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <!-- Bolt icon -->
+                        <svg v-else-if="link.icon === 'bolt'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <!-- Envelope icon -->
+                        <svg v-else-if="link.icon === 'envelope'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        {{ link.name }}
+                    </Link>
+                </template>
             </nav>
 
             <!-- Settings Section -->
@@ -281,45 +348,87 @@ const closeMobileMenu = () => {
 
                             <!-- Navigation -->
                             <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-                                <Link
-                                    v-for="link in navLinks"
-                                    :key="link.key"
-                                    :href="link.href"
-                                    @click="closeMobileMenu"
-                                    :class="[
-                                        'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors',
-                                        isActive(link.key)
-                                            ? 'bg-white/10 text-white'
-                                            : 'text-white/60 hover:bg-white/5 hover:text-white',
-                                    ]"
-                                >
-                                    <!-- Icons same as desktop -->
-                                    <svg v-if="link.icon === 'home'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                    </svg>
-                                    <svg v-else-if="link.icon === 'document'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    <svg v-else-if="link.icon === 'photo'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    <svg v-else-if="link.icon === 'share'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                                    </svg>
-                                    <svg v-else-if="link.icon === 'users'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                    </svg>
-                                    <svg v-else-if="link.icon === 'calendar'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    <svg v-else-if="link.icon === 'bolt'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                    </svg>
-                                    <svg v-else-if="link.icon === 'envelope'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                    </svg>
-                                    {{ link.name }}
-                                </Link>
+                                <template v-for="link in navLinks" :key="link.key">
+                                    <!-- Link with children (expandable) -->
+                                    <div v-if="link.children">
+                                        <button
+                                            @click="toggleSubmenu(link.key)"
+                                            :class="[
+                                                'w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors',
+                                                isParentActive(link)
+                                                    ? 'bg-white/10 text-white'
+                                                    : 'text-white/60 hover:bg-white/5 hover:text-white',
+                                            ]"
+                                        >
+                                            <span class="flex items-center gap-3">
+                                                <svg v-if="link.icon === 'share'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                                </svg>
+                                                {{ link.name }}
+                                            </span>
+                                            <svg
+                                                :class="['w-4 h-4 transition-transform', expandedMenus.includes(link.key) && 'rotate-180']"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </button>
+                                        <div v-show="expandedMenus.includes(link.key)" class="ml-8 mt-1 space-y-1">
+                                            <Link
+                                                v-for="child in link.children"
+                                                :key="child.key"
+                                                :href="child.href"
+                                                @click="closeMobileMenu"
+                                                :class="[
+                                                    'block px-3 py-2 rounded-xl text-sm transition-colors',
+                                                    isActive(child.key)
+                                                        ? 'bg-white/10 text-white'
+                                                        : 'text-white/50 hover:bg-white/5 hover:text-white',
+                                                ]"
+                                            >
+                                                {{ child.name }}
+                                            </Link>
+                                        </div>
+                                    </div>
+                                    <!-- Regular link -->
+                                    <Link
+                                        v-else
+                                        :href="link.href"
+                                        @click="closeMobileMenu"
+                                        :class="[
+                                            'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors',
+                                            isActive(link.key)
+                                                ? 'bg-white/10 text-white'
+                                                : 'text-white/60 hover:bg-white/5 hover:text-white',
+                                        ]"
+                                    >
+                                        <!-- Icons same as desktop -->
+                                        <svg v-if="link.icon === 'home'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                        </svg>
+                                        <svg v-else-if="link.icon === 'document'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <svg v-else-if="link.icon === 'photo'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        <svg v-else-if="link.icon === 'users'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                        </svg>
+                                        <svg v-else-if="link.icon === 'calendar'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        <svg v-else-if="link.icon === 'bolt'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                        <svg v-else-if="link.icon === 'envelope'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                        {{ link.name }}
+                                    </Link>
+                                </template>
                             </nav>
 
                             <!-- Settings Section -->

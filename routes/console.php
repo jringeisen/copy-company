@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\ProcessScheduledLoops;
 use App\Jobs\ProcessScheduledSocialPosts;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -17,6 +18,9 @@ Schedule::command('newsletters:process-scheduled')->everyMinute();
 
 // Process scheduled social posts every minute
 Schedule::job(new ProcessScheduledSocialPosts)->everyMinute();
+
+// Process scheduled loops every minute
+Schedule::job(new ProcessScheduledLoops)->everyMinute();
 
 // Check SES reputation hourly
 Schedule::command('ses:check-reputation')->hourly();

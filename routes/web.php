@@ -5,6 +5,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ContentSprintController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LoopController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\MediaFolderController;
 use App\Http\Controllers\NewsletterController;
@@ -144,6 +145,20 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/social-posts/{socialPost}/retry', [SocialPostController::class, 'retry'])->name('social-posts.retry');
     Route::post('/social-posts/bulk-schedule', [SocialPostController::class, 'bulkSchedule'])->name('social-posts.bulk-schedule');
     Route::post('/social-posts/bulk-publish-now', [SocialPostController::class, 'bulkPublishNow'])->name('social-posts.bulk-publish-now');
+
+    // Loop routes
+    Route::get('/loops', [LoopController::class, 'index'])->name('loops.index');
+    Route::get('/loops/create', [LoopController::class, 'create'])->name('loops.create');
+    Route::post('/loops', [LoopController::class, 'store'])->name('loops.store');
+    Route::get('/loops/{loop}', [LoopController::class, 'show'])->name('loops.show');
+    Route::get('/loops/{loop}/edit', [LoopController::class, 'edit'])->name('loops.edit');
+    Route::put('/loops/{loop}', [LoopController::class, 'update'])->name('loops.update');
+    Route::delete('/loops/{loop}', [LoopController::class, 'destroy'])->name('loops.destroy');
+    Route::post('/loops/{loop}/toggle', [LoopController::class, 'toggle'])->name('loops.toggle');
+    Route::post('/loops/{loop}/items', [LoopController::class, 'addItem'])->name('loops.items.store');
+    Route::delete('/loops/{loop}/items/{item}', [LoopController::class, 'removeItem'])->name('loops.items.destroy');
+    Route::post('/loops/{loop}/reorder', [LoopController::class, 'reorder'])->name('loops.reorder');
+    Route::post('/loops/{loop}/import', [LoopController::class, 'import'])->name('loops.import');
 
     // AI Assistant routes
     Route::prefix('ai')->group(function () {

@@ -87,6 +87,14 @@ class Brand extends Model
         return $this->hasMany(SocialPost::class);
     }
 
+    /**
+     * @return HasMany<Loop, $this>
+     */
+    public function loops(): HasMany
+    {
+        return $this->hasMany(Loop::class);
+    }
+
     public function contentSprints(): HasMany
     {
         return $this->hasMany(ContentSprint::class);
