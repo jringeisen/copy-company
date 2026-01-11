@@ -14,8 +14,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
-use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\User as SocialiteUser;
 
 class SocialSettingsController extends Controller
 {
@@ -96,7 +96,7 @@ class SocialSettingsController extends Controller
         ]);
     }
 
-    public function redirect(string $platform): RedirectResponse
+    public function redirect(string $platform): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         if (! $this->isValidPlatform($platform)) {
             return back()->with('error', 'Invalid platform.');
@@ -107,6 +107,8 @@ class SocialSettingsController extends Controller
         try {
             // Instagram Business API uses Facebook OAuth
             $driverName = $platform === 'instagram' ? 'facebook' : $platform;
+
+            /** @var \Laravel\Socialite\Two\AbstractProvider $driver */
             $driver = Socialite::driver($driverName);
 
             // Add scopes
@@ -144,6 +146,8 @@ class SocialSettingsController extends Controller
         try {
             // Instagram Business API uses Facebook OAuth
             $driverName = $platform === 'instagram' ? 'facebook' : $platform;
+
+            /** @var \Laravel\Socialite\Two\AbstractProvider $driver */
             $driver = Socialite::driver($driverName);
 
             // For Instagram, set the correct redirect URL for the callback
@@ -151,6 +155,7 @@ class SocialSettingsController extends Controller
                 $driver->redirectUrl(url(config('services.instagram.redirect')));
             }
 
+            /** @var SocialiteUser $socialUser */
             $socialUser = $driver->user();
 
             $credentials = $this->buildCredentials($platform, $socialUser);
@@ -312,7 +317,7 @@ class SocialSettingsController extends Controller
     {
         $credentials = [
             'access_token' => $socialUser->token,
-            'refresh_token' => $socialUser->refreshToken ?? null,
+            'refresh_token' => $socialUser->refreshToken ?: null,
             'expires_at' => $socialUser->expiresIn
                 ? now()->addSeconds($socialUser->expiresIn)->toDateTimeString()
                 : null,

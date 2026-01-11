@@ -46,17 +46,20 @@ class CreateNewUser implements CreatesNewUsers
             $invitationToken = session('invitation_token');
 
             if ($invitationToken) {
+                /** @var AccountInvitation|null $invitation */
                 $invitation = AccountInvitation::where('token', $invitationToken)
                     ->whereNull('accepted_at')
                     ->first();
 
                 if ($invitation && $invitation->isValid() && $invitation->email === $user->email) {
                     // Accept the invitation
-                    $invitation->account->users()->attach($user->id, ['role' => $invitation->role]);
+                    /** @var Account $invitationAccount */
+                    $invitationAccount = $invitation->account;
+                    $invitationAccount->users()->attach($user->id, ['role' => $invitation->role]);
                     $invitation->markAsAccepted();
 
                     // Set team context and assign role if role exists
-                    setPermissionsTeamId($invitation->account->id);
+                    setPermissionsTeamId($invitationAccount->id);
                     if (\Spatie\Permission\Models\Role::where('name', $invitation->role)->exists()) {
                         $user->assignRole($invitation->role);
                     }

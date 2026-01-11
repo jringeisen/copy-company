@@ -20,11 +20,12 @@ class DashboardController extends Controller
 
         // Eager load counts in a single query
         if ($brand) {
+            /** @var Brand|null $brand */
             $brand = Brand::where('id', $brand->id)
                 ->withCount([
                     'posts',
                     'posts as drafts_count' => fn (Builder $query) => $query->where('status', PostStatus::Draft),
-                    'subscribers as confirmed_subscribers_count' => fn (Builder $query) => $query->confirmed(),
+                    'subscribers as confirmed_subscribers_count' => fn (Builder $query) => $query->where('status', \App\Enums\SubscriberStatus::Confirmed),
                 ])
                 ->first();
         }
@@ -33,9 +34,9 @@ class DashboardController extends Controller
             'user' => $user,
             'brand' => $brand,
             'stats' => [
-                'postsCount' => $brand?->posts_count ?? 0,
-                'subscribersCount' => $brand?->confirmed_subscribers_count ?? 0,
-                'draftsCount' => $brand?->drafts_count ?? 0,
+                'postsCount' => $brand->posts_count ?? 0,
+                'subscribersCount' => $brand->confirmed_subscribers_count ?? 0,
+                'draftsCount' => $brand->drafts_count ?? 0,
             ],
             'onboarding' => $brand?->getOnboardingProgress(),
         ]);

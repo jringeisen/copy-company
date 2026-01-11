@@ -89,6 +89,7 @@ class MediaFolderService
      */
     public function getTree(Brand $brand): Collection
     {
+        /** @var Collection<int, MediaFolder> */
         return $brand->mediaFolders()
             ->whereNull('parent_id')
             ->with(['descendants', 'media'])
@@ -104,6 +105,7 @@ class MediaFolderService
      */
     public function getFlatList(Brand $brand): Collection
     {
+        /** @var Collection<int, MediaFolder> */
         return $brand->mediaFolders()
             ->with('ancestors')
             ->orderBy('name')

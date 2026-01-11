@@ -36,6 +36,7 @@ class ProcessNewsletterSend implements ShouldQueue
             return;
         }
 
+        /** @var \App\Models\Brand $brand */
         $brand = $newsletterSend->brand;
 
         // Get confirmed subscribers count

@@ -2,9 +2,13 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin Brand
+ */
 class BrandResource extends JsonResource
 {
     /**
@@ -27,7 +31,7 @@ class BrandResource extends JsonResource
             'secondary_color' => $this->secondary_color,
             'custom_domain' => $this->custom_domain,
             'domain_verified' => $this->domain_verified,
-            'newsletter_provider' => $this->newsletter_provider?->value,
+            'newsletter_provider' => $this->newsletter_provider->value ?? null,
             'voice_settings' => $this->voice_settings,
             'url' => $this->url,
             'active_subscribers_count' => $this->when(

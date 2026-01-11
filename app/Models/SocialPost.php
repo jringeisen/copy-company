@@ -49,11 +49,17 @@ class SocialPost extends Model
         'user_edited' => 'boolean',
     ];
 
+    /**
+     * @return BelongsTo<Brand, $this>
+     */
     public function brand(): BelongsTo
     {
         return $this->belongsTo(Brand::class);
     }
 
+    /**
+     * @return BelongsTo<Post, $this>
+     */
     public function post(): BelongsTo
     {
         return $this->belongsTo(Post::class);
@@ -154,7 +160,6 @@ class SocialPost extends Model
             SocialPostStatus::Scheduled => 'blue',
             SocialPostStatus::Published => 'green',
             SocialPostStatus::Failed => 'red',
-            default => 'gray',
         };
     }
 }

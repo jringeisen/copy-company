@@ -88,6 +88,7 @@ class User extends Authenticatable
         $accountId = session('current_account_id');
 
         if ($accountId) {
+            /** @var Account|null $account */
             $account = $this->accounts()->find($accountId);
             if ($account) {
                 $this->cachedCurrentAccount = $account;
@@ -97,7 +98,9 @@ class User extends Authenticatable
             }
         }
 
-        $this->cachedCurrentAccount = $this->accounts()->first();
+        /** @var Account|null $firstAccount */
+        $firstAccount = $this->accounts()->first();
+        $this->cachedCurrentAccount = $firstAccount;
         $this->accountCacheLoaded = true;
 
         return $this->cachedCurrentAccount;
@@ -148,6 +151,7 @@ class User extends Authenticatable
         $brandId = session('current_brand_id');
 
         if ($brandId) {
+            /** @var Brand|null $brand */
             $brand = $account->brands()->find($brandId);
             if ($brand) {
                 $this->cachedCurrentBrand = $brand;
@@ -157,7 +161,9 @@ class User extends Authenticatable
             }
         }
 
-        $this->cachedCurrentBrand = $account->brands()->first();
+        /** @var Brand|null $firstBrand */
+        $firstBrand = $account->brands()->first();
+        $this->cachedCurrentBrand = $firstBrand;
         $this->brandCacheLoaded = true;
 
         return $this->cachedCurrentBrand;

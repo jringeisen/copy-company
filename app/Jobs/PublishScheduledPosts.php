@@ -36,6 +36,7 @@ class PublishScheduledPosts implements ShouldQueue
 
                 // Dispatch newsletter if configured
                 if ($post->send_as_newsletter) {
+                    /** @var NewsletterSend|null $newsletterSend */
                     $newsletterSend = $post->newsletterSend;
 
                     if ($newsletterSend && $newsletterSend->status === NewsletterSendStatus::Draft) {
@@ -60,7 +61,11 @@ class PublishScheduledPosts implements ShouldQueue
     {
         // Eager load if not already loaded
         $newsletterSend->loadMissing('post.brand');
-        $brand = $newsletterSend->post->brand;
+
+        /** @var \App\Models\Post $post */
+        $post = $newsletterSend->post;
+        /** @var \App\Models\Brand $brand */
+        $brand = $post->brand;
 
         $subscriberCount = $brand->subscribers()->confirmed()->count();
 

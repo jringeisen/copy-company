@@ -3,9 +3,13 @@
 namespace App\Http\Resources;
 
 use App\Models\Media;
+use App\Models\SocialPost;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin SocialPost
+ */
 class SocialPostResource extends JsonResource
 {
     /**
@@ -17,14 +21,14 @@ class SocialPostResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'platform' => $this->platform?->value,
+            'platform' => $this->platform->value ?? null,
             'platform_display' => $this->platform_display_name,
-            'format' => $this->format?->value,
+            'format' => $this->format->value ?? null,
             'content' => $this->content,
             'media' => $this->getHydratedMedia(),
             'hashtags' => $this->hashtags,
             'link' => $this->link,
-            'status' => $this->status?->value,
+            'status' => $this->status->value ?? null,
             'status_color' => $this->status_color,
             'ai_generated' => $this->ai_generated,
             'user_edited' => $this->user_edited,
@@ -37,10 +41,15 @@ class SocialPostResource extends JsonResource
             'published_at' => $this->published_at?->format('M d, Y g:i A'),
             'created_at' => $this->created_at?->format('M d, Y g:i A'),
             'updated_at' => $this->updated_at?->format('M d, Y g:i A'),
-            'post' => $this->when($this->relationLoaded('post') && $this->post, [
-                'id' => $this->post?->id,
-                'title' => $this->post?->title,
-            ]),
+            'post' => $this->when($this->relationLoaded('post') && $this->post, function () {
+                /** @var \App\Models\Post $post */
+                $post = $this->post;
+
+                return [
+                    'id' => $post->id,
+                    'title' => $post->title,
+                ];
+            }),
             'brand' => new BrandResource($this->whenLoaded('brand')),
         ];
     }

@@ -80,6 +80,7 @@ class Account extends Model
             ->where('users.id', $user->id)
             ->first();
 
-        return $membership?->pivot->role;
+        /** @var string|null */
+        return $membership?->pivot?->role;
     }
 }

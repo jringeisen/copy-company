@@ -33,6 +33,7 @@ class PostService
      */
     public function create(Brand $brand, int $userId, array $validated): Post
     {
+        /** @var Post */
         return $brand->posts()->create([
             'user_id' => $userId,
             'title' => $validated['title'],
@@ -137,11 +138,15 @@ class PostService
      */
     protected function createNewsletterSend(Post $post, array $options, Carbon $scheduledAt): \App\Models\NewsletterSend
     {
+        /** @var Brand $brand */
+        $brand = $post->brand;
+
+        /** @var \App\Models\NewsletterSend */
         return $post->newsletterSend()->create([
             'brand_id' => $post->brand_id,
             'subject_line' => $options['subject_line'],
             'preview_text' => $options['preview_text'] ?? null,
-            'provider' => $post->brand->newsletter_provider,
+            'provider' => $brand->newsletter_provider,
             'status' => NewsletterSendStatus::Scheduled,
             'scheduled_at' => $scheduledAt,
         ]);

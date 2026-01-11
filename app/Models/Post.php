@@ -125,7 +125,10 @@ class Post extends Model
 
     public function getUrlAttribute(): string
     {
-        return $this->brand->url.'/'.$this->slug;
+        /** @var Brand $brand */
+        $brand = $this->brand;
+
+        return $brand->url.'/'.$this->slug;
     }
 
     public function isPublished(): bool

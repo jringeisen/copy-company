@@ -54,7 +54,9 @@ class HandleInertiaRequests extends Middleware
                     'email' => $request->user()->email,
                 ] : null,
                 'brand' => function () use ($request) {
-                    $brand = $request->user()?->currentBrand();
+                    /** @var \App\Models\User|null $user */
+                    $user = $request->user();
+                    $brand = $user?->currentBrand();
 
                     return $brand ? [
                         'id' => $brand->id,
@@ -64,10 +66,12 @@ class HandleInertiaRequests extends Middleware
                     ] : null;
                 },
                 'brands' => function () use ($request) {
-                    $account = $request->user()?->currentAccount();
+                    /** @var \App\Models\User|null $user */
+                    $user = $request->user();
+                    $account = $user?->currentAccount();
 
                     return $account
-                        ? $account->brands->map(fn ($brand) => [
+                        ? $account->brands->map(fn (\App\Models\Brand $brand) => [
                             'id' => $brand->id,
                             'name' => $brand->name,
                             'slug' => $brand->slug,

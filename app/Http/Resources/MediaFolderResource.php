@@ -2,9 +2,13 @@
 
 namespace App\Http\Resources;
 
+use App\Models\MediaFolder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin MediaFolder
+ */
 class MediaFolderResource extends JsonResource
 {
     /**

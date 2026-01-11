@@ -25,8 +25,11 @@ class AccountInvitationMail extends Mailable
      */
     public function envelope(): Envelope
     {
+        /** @var \App\Models\Account $account */
+        $account = $this->invitation->account;
+
         return new Envelope(
-            subject: "You've been invited to join {$this->invitation->account->name} on Copy Company",
+            subject: "You've been invited to join {$account->name} on Copy Company",
         );
     }
 
@@ -35,11 +38,16 @@ class AccountInvitationMail extends Mailable
      */
     public function content(): Content
     {
+        /** @var \App\Models\Account $account */
+        $account = $this->invitation->account;
+        /** @var \App\Models\User $inviter */
+        $inviter = $this->invitation->inviter;
+
         return new Content(
             markdown: 'emails.account-invitation',
             with: [
-                'accountName' => $this->invitation->account->name,
-                'inviterName' => $this->invitation->inviter->name,
+                'accountName' => $account->name,
+                'inviterName' => $inviter->name,
                 'role' => ucfirst($this->invitation->role),
                 'acceptUrl' => route('invitations.accept', ['token' => $this->invitation->token]),
                 'expiresAt' => $this->invitation->expires_at->format('F j, Y'),

@@ -2,9 +2,13 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin Post
+ */
 class PostResource extends JsonResource
 {
     /**
@@ -22,7 +26,7 @@ class PostResource extends JsonResource
             'content' => $this->content,
             'content_html' => $this->content_html,
             'featured_image' => $this->featured_image,
-            'status' => $this->status?->value,
+            'status' => $this->status->value ?? null,
             'seo_title' => $this->seo_title,
             'seo_description' => $this->seo_description,
             'tags' => $this->tags,

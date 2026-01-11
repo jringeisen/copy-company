@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property-read int $posts_count
+ * @property-read int $drafts_count
+ * @property-read int $confirmed_subscribers_count
+ */
 class Brand extends Model
 {
     use HasFactory;
@@ -60,6 +65,9 @@ class Brand extends Model
         return $this->hasMany(Post::class);
     }
 
+    /**
+     * @return HasMany<Subscriber, $this>
+     */
     public function subscribers(): HasMany
     {
         return $this->hasMany(Subscriber::class);
@@ -70,6 +78,9 @@ class Brand extends Model
         return $this->hasMany(NewsletterSend::class);
     }
 
+    /**
+     * @return HasMany<SocialPost, $this>
+     */
     public function socialPosts(): HasMany
     {
         return $this->hasMany(SocialPost::class);

@@ -90,7 +90,6 @@ class ContentSprint extends Model
             ContentSprintStatus::Generating => 'yellow',
             ContentSprintStatus::Completed => 'green',
             ContentSprintStatus::Failed => 'red',
-            default => 'gray',
         };
     }
 

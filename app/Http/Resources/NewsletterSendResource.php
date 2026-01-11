@@ -2,9 +2,13 @@
 
 namespace App\Http\Resources;
 
+use App\Models\NewsletterSend;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin NewsletterSend
+ */
 class NewsletterSendResource extends JsonResource
 {
     /**
@@ -18,7 +22,7 @@ class NewsletterSendResource extends JsonResource
             'id' => $this->id,
             'subject_line' => $this->subject_line,
             'preview_text' => $this->preview_text,
-            'status' => $this->status?->value,
+            'status' => $this->status->value ?? null,
             'total_recipients' => $this->total_recipients,
             'recipients_count' => $this->recipients_count,
             'sent_count' => $this->sent_count,
@@ -33,11 +37,16 @@ class NewsletterSendResource extends JsonResource
             'scheduled_at' => $this->scheduled_at?->format('M d, Y g:i A'),
             'sent_at' => $this->sent_at?->format('M d, Y g:i A'),
             'created_at' => $this->created_at?->format('M d, Y g:i A'),
-            'post' => $this->when($this->relationLoaded('post'), fn () => [
-                'id' => $this->post->id,
-                'title' => $this->post->title,
-                'slug' => $this->post->slug,
-            ]),
+            'post' => $this->when($this->relationLoaded('post') && $this->post, function () {
+                /** @var \App\Models\Post $post */
+                $post = $this->post;
+
+                return [
+                    'id' => $post->id,
+                    'title' => $post->title,
+                    'slug' => $post->slug,
+                ];
+            }),
         ];
     }
 }

@@ -20,6 +20,7 @@ class SocialPublishingService
      */
     public function publish(SocialPost $socialPost): array
     {
+        /** @var \App\Models\Brand $brand */
         $brand = $socialPost->brand;
         $platform = $socialPost->platform->value;
 

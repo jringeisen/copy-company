@@ -48,6 +48,7 @@ class SesEventProcessor
         $this->createEvent('bounce', $message, $sentEvent);
 
         if ($sentEvent?->subscriber) {
+            /** @var \App\Models\Subscriber $subscriber */
             $subscriber = $sentEvent->subscriber;
 
             if ($bounceType === 'Permanent') {
@@ -66,7 +67,9 @@ class SesEventProcessor
                 $subscriber->update(['last_bounce_at' => now()]);
 
                 // After 3 soft bounces, mark as bounced
-                if ($subscriber->fresh()->soft_bounce_count >= 3) {
+                /** @var \App\Models\Subscriber|null $freshSubscriber */
+                $freshSubscriber = $subscriber->fresh();
+                if ($freshSubscriber && $freshSubscriber->soft_bounce_count >= 3) {
                     $subscriber->update([
                         'status' => SubscriberStatus::Bounced,
                         'bounce_type' => 'soft',
@@ -93,13 +96,15 @@ class SesEventProcessor
 
         // Immediately mark as complained - critical for reputation
         if ($sentEvent?->subscriber) {
-            $sentEvent->subscriber->update([
+            /** @var \App\Models\Subscriber $subscriber */
+            $subscriber = $sentEvent->subscriber;
+            $subscriber->update([
                 'status' => SubscriberStatus::Complained,
             ]);
 
             Log::warning('Subscriber complained - marked immediately', [
-                'subscriber_id' => $sentEvent->subscriber->id,
-                'email' => $sentEvent->subscriber->email,
+                'subscriber_id' => $subscriber->id,
+                'email' => $subscriber->email,
             ]);
         }
 

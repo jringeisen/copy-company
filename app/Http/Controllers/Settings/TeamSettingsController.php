@@ -16,6 +16,7 @@ class TeamSettingsController extends Controller
      */
     public function index(): Response|RedirectResponse
     {
+        /** @var \App\Models\User $user */
         $user = auth()->user();
         $account = $user->currentAccount();
 
@@ -25,25 +26,30 @@ class TeamSettingsController extends Controller
 
         $members = $account->users()
             ->get()
-            ->map(fn ($member) => [
-                'id' => $member->id,
-                'name' => $member->name,
-                'email' => $member->email,
-                'role' => $member->pivot->role,
-                'joined_at' => $member->pivot->created_at->toIso8601String(),
-                'is_current_user' => $member->id === $user->id,
-            ]);
+            ->map(function ($member) use ($user) {
+                /** @var \Illuminate\Database\Eloquent\Relations\Pivot|null $pivot */
+                $pivot = $member->pivot;
+
+                return [
+                    'id' => $member->id,
+                    'name' => $member->name,
+                    'email' => $member->email,
+                    'role' => $pivot?->role,
+                    'joined_at' => $pivot?->created_at?->toIso8601String(),
+                    'is_current_user' => $member->id === $user->id,
+                ];
+            });
 
         $pendingInvitations = $account->invitations()
             ->whereNull('accepted_at')
             ->where('expires_at', '>', now())
             ->with('inviter')
             ->get()
-            ->map(fn ($invitation) => [
+            ->map(fn (\App\Models\AccountInvitation $invitation) => [
                 'id' => $invitation->id,
                 'email' => $invitation->email,
                 'role' => $invitation->role,
-                'invited_by' => $invitation->inviter->name,
+                'invited_by' => $invitation->inviter?->name,
                 'expires_at' => $invitation->expires_at->toIso8601String(),
             ]);
 
@@ -68,6 +74,7 @@ class TeamSettingsController extends Controller
      */
     public function updateRole(Request $request, User $user): RedirectResponse
     {
+        /** @var \App\Models\User $currentUser */
         $currentUser = auth()->user();
         $account = $currentUser->currentAccount();
 
@@ -105,6 +112,7 @@ class TeamSettingsController extends Controller
      */
     public function removeMember(User $user): RedirectResponse
     {
+        /** @var \App\Models\User $currentUser */
         $currentUser = auth()->user();
         $account = $currentUser->currentAccount();
 

@@ -46,6 +46,7 @@ class ContentSprintService
     {
         $content = $this->buildTipTapContent($idea);
 
+        /** @var Post */
         return $brand->posts()->create([
             'user_id' => $userId,
             'title' => $idea['title'],

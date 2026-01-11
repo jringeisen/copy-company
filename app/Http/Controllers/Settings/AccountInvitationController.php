@@ -17,6 +17,7 @@ class AccountInvitationController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        /** @var \App\Models\User $user */
         $user = auth()->user();
         $account = $user->currentAccount();
 
@@ -88,18 +89,21 @@ class AccountInvitationController extends Controller
         // Check if a user with this email exists
         $user = User::where('email', $invitation->email)->first();
 
+        /** @var \App\Models\Account $account */
+        $account = $invitation->account;
+
         if ($user) {
             // User exists - add them to the account
-            if ($invitation->account->hasMember($user)) {
+            if ($account->hasMember($user)) {
                 return redirect()->route('dashboard')
                     ->with('info', 'You are already a member of this account.');
             }
 
-            $invitation->account->users()->attach($user->id, ['role' => $invitation->role]);
+            $account->users()->attach($user->id, ['role' => $invitation->role]);
             $invitation->markAsAccepted();
 
             // Assign Spatie role (must set team ID first)
-            setPermissionsTeamId($invitation->account->id);
+            setPermissionsTeamId($account->id);
             $user->assignRole($invitation->role);
 
             // Log them in if not already
@@ -108,17 +112,17 @@ class AccountInvitationController extends Controller
             }
 
             // Switch to the new account
-            $user->switchAccount($invitation->account);
+            $user->switchAccount($account);
 
             return redirect()->route('dashboard')
-                ->with('success', 'You have joined '.$invitation->account->name.'!');
+                ->with('success', 'You have joined '.$account->name.'!');
         }
 
         // User doesn't exist - redirect to registration with token in session
         session(['invitation_token' => $token]);
 
         return redirect()->route('register')
-            ->with('info', 'Create an account to join '.$invitation->account->name.'.');
+            ->with('info', 'Create an account to join '.$account->name.'.');
     }
 
     /**
@@ -126,6 +130,7 @@ class AccountInvitationController extends Controller
      */
     public function destroy(AccountInvitation $invitation): RedirectResponse
     {
+        /** @var \App\Models\User $user */
         $user = auth()->user();
         $account = $user->currentAccount();
 
@@ -147,6 +152,7 @@ class AccountInvitationController extends Controller
      */
     public function resend(AccountInvitation $invitation): RedirectResponse
     {
+        /** @var \App\Models\User $user */
         $user = auth()->user();
         $account = $user->currentAccount();
 

@@ -78,18 +78,18 @@ class TokenManagerTest extends TestCase
         ]);
 
         $this->assertTrue($this->tokenManager->isConnected($this->brand, 'facebook'));
-        $this->assertFalse($this->tokenManager->isConnected($this->brand, 'facebook'));
+        $this->assertFalse($this->tokenManager->isConnected($this->brand, 'instagram'));
     }
 
     public function test_get_connected_platforms_returns_list_of_platforms(): void
     {
         $this->tokenManager->storeCredentials($this->brand, 'facebook', ['access_token' => 'token1']);
-        $this->tokenManager->storeCredentials($this->brand, 'facebook', ['access_token' => 'token2']);
+        $this->tokenManager->storeCredentials($this->brand, 'instagram', ['access_token' => 'token2']);
 
         $platforms = $this->tokenManager->getConnectedPlatforms($this->brand);
 
         $this->assertContains('facebook', $platforms);
-        $this->assertContains('facebook', $platforms);
+        $this->assertContains('instagram', $platforms);
         $this->assertCount(2, $platforms);
     }
 
@@ -159,9 +159,9 @@ class TokenManagerTest extends TestCase
 
     public function test_multiple_platforms_stored_independently(): void
     {
-        $this->tokenManager->storeCredentials($this->brand, 'facebook', [
-            'access_token' => 'twitter_token',
-            'account_name' => '@twitter_user',
+        $this->tokenManager->storeCredentials($this->brand, 'instagram', [
+            'access_token' => 'instagram_token',
+            'account_name' => '@instagram_user',
         ]);
 
         $this->tokenManager->storeCredentials($this->brand, 'facebook', [
@@ -169,10 +169,10 @@ class TokenManagerTest extends TestCase
             'account_name' => 'Facebook User',
         ]);
 
-        $twitterCreds = $this->tokenManager->getCredentials($this->brand, 'facebook');
+        $instagramCreds = $this->tokenManager->getCredentials($this->brand, 'instagram');
         $facebookCreds = $this->tokenManager->getCredentials($this->brand, 'facebook');
 
-        $this->assertEquals('twitter_token', $twitterCreds['access_token']);
+        $this->assertEquals('instagram_token', $instagramCreds['access_token']);
         $this->assertEquals('facebook_token', $facebookCreds['access_token']);
     }
 }

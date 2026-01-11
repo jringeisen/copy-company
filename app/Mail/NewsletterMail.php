@@ -22,6 +22,7 @@ class NewsletterMail extends Mailable
 
     public function envelope(): Envelope
     {
+        /** @var \App\Models\Brand $brand */
         $brand = $this->newsletterSend->brand;
 
         return new Envelope(
@@ -35,15 +36,18 @@ class NewsletterMail extends Mailable
 
     public function content(): Content
     {
+        /** @var \App\Models\Brand $brand */
+        $brand = $this->newsletterSend->brand;
+
         return new Content(
             view: 'emails.newsletter',
             with: [
                 'post' => $this->newsletterSend->post,
-                'brand' => $this->newsletterSend->brand,
+                'brand' => $brand,
                 'subscriber' => $this->subscriber,
                 'previewText' => $this->newsletterSend->preview_text,
                 'unsubscribeUrl' => route('public.subscribe.unsubscribe', [
-                    'brand' => $this->newsletterSend->brand->slug,
+                    'brand' => $brand->slug,
                     'token' => $this->subscriber->unsubscribe_token,
                 ]),
             ],
