@@ -103,7 +103,7 @@ test('calendar shows scheduled social posts as events', function () {
     $brand = Brand::factory()->forUser($user)->create();
 
     SocialPost::factory()->forBrand($brand)->scheduled()->create([
-        'platform' => SocialPlatform::Twitter,
+        'platform' => SocialPlatform::Facebook,
         'content' => 'This is a scheduled tweet about something interesting',
         'scheduled_at' => now()->startOfMonth()->addDays(15),
     ]);

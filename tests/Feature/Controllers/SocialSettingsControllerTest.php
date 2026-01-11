@@ -72,7 +72,7 @@ class SocialSettingsControllerTest extends TestCase
             ->get('/settings/social');
 
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->has('platforms', 6)
+            ->has('platforms', 5)
             ->where('platforms.0.identifier', 'instagram')
             ->where('platforms.0.connected', false)
         );
@@ -81,9 +81,9 @@ class SocialSettingsControllerTest extends TestCase
     public function test_social_settings_shows_connected_platforms(): void
     {
         $tokenManager = app(TokenManager::class);
-        $tokenManager->storeCredentials($this->brand, 'twitter', [
+        $tokenManager->storeCredentials($this->brand, 'linkedin', [
             'access_token' => 'test_token',
-            'account_name' => '@testuser',
+            'account_name' => 'Test User',
         ]);
 
         $response = $this->actingAs($this->user)
@@ -92,9 +92,9 @@ class SocialSettingsControllerTest extends TestCase
 
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->has('platforms', fn ($platforms) => $platforms
-                ->where('5.identifier', 'twitter')
-                ->where('5.connected', true)
-                ->where('5.account_name', '@testuser')
+                ->where('3.identifier', 'linkedin')
+                ->where('3.connected', true)
+                ->where('3.account_name', 'Test User')
                 ->etc()
             )
         );
@@ -113,21 +113,21 @@ class SocialSettingsControllerTest extends TestCase
     public function test_disconnect_removes_platform_credentials(): void
     {
         $tokenManager = app(TokenManager::class);
-        $tokenManager->storeCredentials($this->brand, 'twitter', [
+        $tokenManager->storeCredentials($this->brand, 'linkedin', [
             'access_token' => 'test_token',
         ]);
 
-        $this->assertTrue($tokenManager->isConnected($this->brand, 'twitter'));
+        $this->assertTrue($tokenManager->isConnected($this->brand, 'linkedin'));
 
         $response = $this->actingAs($this->user)
             ->withSession(['current_account_id' => $this->account->id])
-            ->delete('/settings/social/twitter');
+            ->delete('/settings/social/linkedin');
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
         $this->brand->refresh();
-        $this->assertFalse($tokenManager->isConnected($this->brand, 'twitter'));
+        $this->assertFalse($tokenManager->isConnected($this->brand, 'linkedin'));
     }
 
     public function test_disconnect_returns_error_for_invalid_platform(): void
@@ -157,7 +157,7 @@ class SocialSettingsControllerTest extends TestCase
     {
         $response = $this->actingAs($this->user)
             ->withSession(['current_account_id' => $this->account->id])
-            ->get('/settings/social/twitter/select');
+            ->get('/settings/social/linkedin/select');
 
         $response->assertRedirect(route('settings.social'));
         $response->assertSessionHas('error');

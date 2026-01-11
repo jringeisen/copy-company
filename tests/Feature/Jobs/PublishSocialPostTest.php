@@ -35,7 +35,7 @@ class PublishSocialPostTest extends TestCase
     {
         $socialPost = SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Queued,
         ]);
 
@@ -50,14 +50,14 @@ class PublishSocialPostTest extends TestCase
     public function test_job_updates_status_to_failed_when_invalid_credentials(): void
     {
         $tokenManager = app(TokenManager::class);
-        $tokenManager->storeCredentials($this->brand, 'twitter', [
+        $tokenManager->storeCredentials($this->brand, 'facebook', [
             // Missing access_token
             'account_id' => '12345',
         ]);
 
         $socialPost = SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Queued,
         ]);
 
@@ -73,7 +73,7 @@ class PublishSocialPostTest extends TestCase
     {
         $socialPost = SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Queued,
         ]);
 

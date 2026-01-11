@@ -17,6 +17,20 @@ class User extends Authenticatable
     use HasFactory, HasRoles, Notifiable, TwoFactorAuthenticatable;
 
     /**
+     * Cached current account for request-level memoization.
+     */
+    protected ?Account $cachedCurrentAccount = null;
+
+    protected bool $accountCacheLoaded = false;
+
+    /**
+     * Cached current brand for request-level memoization.
+     */
+    protected ?Brand $cachedCurrentBrand = null;
+
+    protected bool $brandCacheLoaded = false;
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
@@ -67,16 +81,26 @@ class User extends Authenticatable
      */
     public function currentAccount(): ?Account
     {
+        if ($this->accountCacheLoaded) {
+            return $this->cachedCurrentAccount;
+        }
+
         $accountId = session('current_account_id');
 
         if ($accountId) {
             $account = $this->accounts()->find($accountId);
             if ($account) {
+                $this->cachedCurrentAccount = $account;
+                $this->accountCacheLoaded = true;
+
                 return $account;
             }
         }
 
-        return $this->accounts()->first();
+        $this->cachedCurrentAccount = $this->accounts()->first();
+        $this->accountCacheLoaded = true;
+
+        return $this->cachedCurrentAccount;
     }
 
     /**
@@ -87,6 +111,8 @@ class User extends Authenticatable
         if ($this->accounts()->where('accounts.id', $account->id)->exists()) {
             session(['current_account_id' => $account->id]);
             session(['current_brand_id' => null]);
+            $this->clearAccountCache();
+            $this->clearBrandCache();
         }
     }
 
@@ -108,8 +134,14 @@ class User extends Authenticatable
      */
     public function currentBrand(): ?Brand
     {
+        if ($this->brandCacheLoaded) {
+            return $this->cachedCurrentBrand;
+        }
+
         $account = $this->currentAccount();
         if (! $account) {
+            $this->brandCacheLoaded = true;
+
             return null;
         }
 
@@ -118,11 +150,17 @@ class User extends Authenticatable
         if ($brandId) {
             $brand = $account->brands()->find($brandId);
             if ($brand) {
+                $this->cachedCurrentBrand = $brand;
+                $this->brandCacheLoaded = true;
+
                 return $brand;
             }
         }
 
-        return $account->brands()->first();
+        $this->cachedCurrentBrand = $account->brands()->first();
+        $this->brandCacheLoaded = true;
+
+        return $this->cachedCurrentBrand;
     }
 
     /**
@@ -133,7 +171,26 @@ class User extends Authenticatable
         $account = $this->currentAccount();
         if ($account && $account->brands()->where('brands.id', $brand->id)->exists()) {
             session(['current_brand_id' => $brand->id]);
+            $this->clearBrandCache();
         }
+    }
+
+    /**
+     * Clear the cached current account.
+     */
+    protected function clearAccountCache(): void
+    {
+        $this->cachedCurrentAccount = null;
+        $this->accountCacheLoaded = false;
+    }
+
+    /**
+     * Clear the cached current brand.
+     */
+    protected function clearBrandCache(): void
+    {
+        $this->cachedCurrentBrand = null;
+        $this->brandCacheLoaded = false;
     }
 
     /**

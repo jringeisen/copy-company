@@ -73,6 +73,6 @@ class BrandController extends Controller
 
         $user->switchBrand($brand);
 
-        return redirect()->route('dashboard')->with('success', "Switched to {$brand->name}");
+        return back()->with('success', "Switched to {$brand->name}");
     }
 }

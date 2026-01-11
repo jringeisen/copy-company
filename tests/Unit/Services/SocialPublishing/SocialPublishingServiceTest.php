@@ -42,7 +42,7 @@ class SocialPublishingServiceTest extends TestCase
     {
         $socialPost = SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Draft,
         ]);
 
@@ -56,7 +56,7 @@ class SocialPublishingServiceTest extends TestCase
     {
         $socialPost = SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Draft,
         ]);
 
@@ -65,13 +65,13 @@ class SocialPublishingServiceTest extends TestCase
 
     public function test_can_publish_returns_true_when_connected(): void
     {
-        $this->tokenManager->storeCredentials($this->brand, 'twitter', [
+        $this->tokenManager->storeCredentials($this->brand, 'facebook', [
             'access_token' => 'test_token',
         ]);
 
         $socialPost = SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Draft,
         ]);
 
@@ -82,7 +82,7 @@ class SocialPublishingServiceTest extends TestCase
     {
         $socialPost = SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Draft,
         ]);
 
@@ -98,14 +98,14 @@ class SocialPublishingServiceTest extends TestCase
     public function test_publish_validates_credentials_before_publishing(): void
     {
         // Store invalid credentials (missing required fields)
-        $this->tokenManager->storeCredentials($this->brand, 'twitter', [
+        $this->tokenManager->storeCredentials($this->brand, 'facebook', [
             // Missing access_token
             'account_id' => '12345',
         ]);
 
         $socialPost = SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Draft,
         ]);
 

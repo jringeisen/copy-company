@@ -9,7 +9,6 @@ use App\Services\SocialPublishing\Publishers\InstagramPublisher;
 use App\Services\SocialPublishing\Publishers\LinkedInPublisher;
 use App\Services\SocialPublishing\Publishers\PinterestPublisher;
 use App\Services\SocialPublishing\Publishers\TikTokPublisher;
-use App\Services\SocialPublishing\Publishers\TwitterPublisher;
 use InvalidArgumentException;
 
 class PublisherFactory
@@ -18,7 +17,6 @@ class PublisherFactory
      * @var array<string, class-string<PublisherInterface>>
      */
     protected static array $publishers = [
-        'twitter' => TwitterPublisher::class,
         'facebook' => FacebookPublisher::class,
         'instagram' => InstagramPublisher::class,
         'linkedin' => LinkedInPublisher::class,

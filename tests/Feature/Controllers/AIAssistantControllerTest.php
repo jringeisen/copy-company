@@ -211,14 +211,14 @@ test('atomize generates social posts from blog post', function () {
         ->shouldReceive('atomizeToSocial')
         ->once()
         ->andReturn([
-            'twitter' => ['content' => 'Tweet content', 'hashtags' => ['#blog']],
+            'facebook' => ['content' => 'Facebook post content', 'hashtags' => ['#blog']],
             'instagram' => ['content' => 'Instagram caption', 'hashtags' => ['#post']],
         ]);
 
     $response = $this->actingAs($user)
         ->postJson(route('ai.atomize'), [
             'post_id' => $post->id,
-            'platforms' => ['twitter', 'instagram'],
+            'platforms' => ['facebook', 'instagram'],
         ]);
 
     $response->assertOk()

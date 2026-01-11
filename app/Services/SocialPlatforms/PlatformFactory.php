@@ -11,7 +11,6 @@ class PlatformFactory
      * @var array<string, class-string<PlatformInterface>>
      */
     protected static array $platforms = [
-        'twitter' => TwitterPlatform::class,
         'instagram' => InstagramPlatform::class,
         'facebook' => FacebookPlatform::class,
         'linkedin' => LinkedInPlatform::class,

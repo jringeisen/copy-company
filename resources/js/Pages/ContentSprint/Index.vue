@@ -23,13 +23,19 @@ const statusColors = {
 
     <AppLayout current-page="sprints">
         <div class="max-w-7xl mx-auto">
-            <!-- Intro section -->
-            <div class="mb-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 text-white">
-                <h2 class="text-xl font-semibold mb-2">Generate a Month of Content</h2>
-                <p class="text-indigo-100">
-                    Content Sprints use AI to brainstorm blog post ideas based on your topics and goals.
-                    Select the ideas you like, and they'll become draft posts ready for you to write.
-                </p>
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Content Sprints</h1>
+                    <p class="text-gray-600">Generate blog post ideas with AI</p>
+                </div>
+                <Link
+                    v-if="canCreateSprints"
+                    href="/content-sprints/create"
+                    class="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition"
+                >
+                    New Sprint
+                </Link>
             </div>
 
             <!-- Sprints List -->

@@ -68,7 +68,7 @@ class SocialPostPublishingTest extends TestCase
     {
         $socialPost = SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Draft,
         ]);
 
@@ -85,13 +85,13 @@ class SocialPostPublishingTest extends TestCase
         Queue::fake();
 
         $tokenManager = app(TokenManager::class);
-        $tokenManager->storeCredentials($this->brand, 'twitter', [
+        $tokenManager->storeCredentials($this->brand, 'facebook', [
             'access_token' => 'test_token',
         ]);
 
         $socialPost = SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Draft,
         ]);
 
@@ -110,13 +110,13 @@ class SocialPostPublishingTest extends TestCase
     public function test_publish_fails_for_already_published_post(): void
     {
         $tokenManager = app(TokenManager::class);
-        $tokenManager->storeCredentials($this->brand, 'twitter', [
+        $tokenManager->storeCredentials($this->brand, 'facebook', [
             'access_token' => 'test_token',
         ]);
 
         $socialPost = SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Published,
         ]);
 
@@ -133,13 +133,13 @@ class SocialPostPublishingTest extends TestCase
         Queue::fake();
 
         $tokenManager = app(TokenManager::class);
-        $tokenManager->storeCredentials($this->brand, 'twitter', [
+        $tokenManager->storeCredentials($this->brand, 'facebook', [
             'access_token' => 'test_token',
         ]);
 
         $socialPost = SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Failed,
             'failure_reason' => 'Previous error',
         ]);
@@ -162,7 +162,7 @@ class SocialPostPublishingTest extends TestCase
     {
         $socialPost = SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Draft,
         ]);
 
@@ -200,13 +200,13 @@ class SocialPostPublishingTest extends TestCase
         ]);
 
         $tokenManager = app(TokenManager::class);
-        $tokenManager->storeCredentials($this->brand, 'twitter', [
+        $tokenManager->storeCredentials($this->brand, 'facebook', [
             'access_token' => 'test_token',
         ]);
 
         $socialPost = SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Draft,
             'content' => 'Test tweet content',
         ]);
@@ -229,13 +229,13 @@ class SocialPostPublishingTest extends TestCase
         Queue::fake();
 
         $tokenManager = app(TokenManager::class);
-        $tokenManager->storeCredentials($this->brand, 'twitter', [
+        $tokenManager->storeCredentials($this->brand, 'facebook', [
             'access_token' => 'test_token',
         ]);
 
         $socialPost = SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Queued,
         ]);
 
@@ -254,13 +254,13 @@ class SocialPostPublishingTest extends TestCase
         Queue::fake();
 
         $tokenManager = app(TokenManager::class);
-        $tokenManager->storeCredentials($this->brand, 'twitter', [
+        $tokenManager->storeCredentials($this->brand, 'facebook', [
             'access_token' => 'test_token',
         ]);
 
         $socialPost = SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Scheduled,
             'scheduled_at' => now()->addDay(),
         ]);

@@ -10,25 +10,17 @@ use App\Services\SocialPublishing\Publishers\InstagramPublisher;
 use App\Services\SocialPublishing\Publishers\LinkedInPublisher;
 use App\Services\SocialPublishing\Publishers\PinterestPublisher;
 use App\Services\SocialPublishing\Publishers\TikTokPublisher;
-use App\Services\SocialPublishing\Publishers\TwitterPublisher;
 use InvalidArgumentException;
 use Tests\TestCase;
 
 class PublisherFactoryTest extends TestCase
 {
-    public function test_make_creates_twitter_publisher(): void
-    {
-        $publisher = PublisherFactory::make('twitter');
-
-        $this->assertInstanceOf(TwitterPublisher::class, $publisher);
-        $this->assertInstanceOf(PublisherInterface::class, $publisher);
-    }
-
     public function test_make_creates_facebook_publisher(): void
     {
         $publisher = PublisherFactory::make('facebook');
 
         $this->assertInstanceOf(FacebookPublisher::class, $publisher);
+        $this->assertInstanceOf(PublisherInterface::class, $publisher);
     }
 
     public function test_make_creates_instagram_publisher(): void
@@ -69,15 +61,14 @@ class PublisherFactoryTest extends TestCase
 
     public function test_from_enum_creates_correct_publisher(): void
     {
-        $publisher = PublisherFactory::fromEnum(SocialPlatform::Twitter);
+        $publisher = PublisherFactory::fromEnum(SocialPlatform::Facebook);
 
-        $this->assertInstanceOf(TwitterPublisher::class, $publisher);
-        $this->assertEquals('twitter', $publisher->getPlatform());
+        $this->assertInstanceOf(FacebookPublisher::class, $publisher);
+        $this->assertEquals('facebook', $publisher->getPlatform());
     }
 
     public function test_is_supported_returns_true_for_supported_platforms(): void
     {
-        $this->assertTrue(PublisherFactory::isSupported('twitter'));
         $this->assertTrue(PublisherFactory::isSupported('facebook'));
         $this->assertTrue(PublisherFactory::isSupported('instagram'));
         $this->assertTrue(PublisherFactory::isSupported('linkedin'));
@@ -89,6 +80,7 @@ class PublisherFactoryTest extends TestCase
     {
         $this->assertFalse(PublisherFactory::isSupported('unsupported'));
         $this->assertFalse(PublisherFactory::isSupported('youtube'));
+        $this->assertFalse(PublisherFactory::isSupported('twitter'));
         $this->assertFalse(PublisherFactory::isSupported(''));
     }
 
@@ -96,22 +88,21 @@ class PublisherFactoryTest extends TestCase
     {
         $platforms = PublisherFactory::supportedPlatforms();
 
-        $this->assertContains('twitter', $platforms);
         $this->assertContains('facebook', $platforms);
         $this->assertContains('instagram', $platforms);
         $this->assertContains('linkedin', $platforms);
         $this->assertContains('pinterest', $platforms);
         $this->assertContains('tiktok', $platforms);
-        $this->assertCount(6, $platforms);
+        $this->assertCount(5, $platforms);
     }
 
     public function test_all_returns_all_publisher_instances(): void
     {
         $publishers = PublisherFactory::all();
 
-        $this->assertCount(6, $publishers);
-        $this->assertArrayHasKey('twitter', $publishers);
+        $this->assertCount(5, $publishers);
         $this->assertArrayHasKey('facebook', $publishers);
+        $this->assertArrayHasKey('instagram', $publishers);
 
         foreach ($publishers as $publisher) {
             $this->assertInstanceOf(PublisherInterface::class, $publisher);
@@ -120,7 +111,7 @@ class PublisherFactoryTest extends TestCase
 
     public function test_publishers_return_correct_platform_identifier(): void
     {
-        $platforms = ['twitter', 'facebook', 'instagram', 'linkedin', 'pinterest', 'tiktok'];
+        $platforms = ['facebook', 'instagram', 'linkedin', 'pinterest', 'tiktok'];
 
         foreach ($platforms as $platform) {
             $publisher = PublisherFactory::make($platform);

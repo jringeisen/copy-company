@@ -3,7 +3,6 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
-import FeatureEducationBanner from '@/Components/FeatureEducationBanner.vue';
 import { usePermissions } from '@/Composables/usePermissions';
 
 const props = defineProps({
@@ -100,41 +99,6 @@ const getStatusColor = (status) => {
                     </Link>
                 </div>
             </div>
-
-            <!-- Educational Banner (shown when no posts) -->
-            <FeatureEducationBanner
-                v-if="posts.length === 0"
-                title="Your Content Hub"
-                description="Posts are the heart of your content. Write blog posts, then share them as newsletters to subscribers or generate social media content automatically."
-                gradient="from-primary-500 to-blue-600"
-                :cta-text="canCreatePosts ? 'Create First Post' : null"
-                :cta-href="canCreatePosts ? '/posts/create' : null"
-            >
-                <template #extra>
-                    <div class="mt-3 flex flex-wrap items-center gap-4 text-sm text-white/80">
-                        <span class="flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-                            </svg>
-                            Publish to blog
-                        </span>
-                        <span class="flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
-                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
-                            </svg>
-                            Send as newsletter
-                        </span>
-                        <span class="flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z"/>
-                            </svg>
-                            Generate social posts
-                        </span>
-                    </div>
-                </template>
-            </FeatureEducationBanner>
 
             <!-- Posts List -->
             <div v-if="posts.length > 0" class="bg-white rounded-lg shadow overflow-hidden">

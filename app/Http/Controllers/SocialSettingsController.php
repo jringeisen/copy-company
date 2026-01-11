@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\SocialPlatform;
 use App\Http\Controllers\Concerns\HasBrandAuthorization;
 use App\Services\SocialPublishing\FacebookPagesService;
+use App\Services\SocialPublishing\InstagramAccountsService;
 use App\Services\SocialPublishing\PinterestBoardsService;
 use App\Services\SocialPublishing\PublisherFactory;
 use App\Services\SocialPublishing\TokenManager;
@@ -23,6 +24,7 @@ class SocialSettingsController extends Controller
     public function __construct(
         protected TokenManager $tokenManager,
         protected FacebookPagesService $facebookPagesService,
+        protected InstagramAccountsService $instagramAccountsService,
         protected PinterestBoardsService $pinterestBoardsService
     ) {}
 
@@ -63,10 +65,14 @@ class SocialSettingsController extends Controller
             if ($connectionInfo !== null) {
                 if ($identifier === 'facebook' && empty($credentials['page_id'])) {
                     $needsConfiguration = true;
+                } elseif ($identifier === 'instagram' && empty($credentials['instagram_account_id'])) {
+                    $needsConfiguration = true;
                 } elseif ($identifier === 'pinterest' && empty($credentials['board_id'])) {
                     $needsConfiguration = true;
                 } elseif ($identifier === 'facebook' && ! empty($credentials['page_name'])) {
                     $configuredAccount = $credentials['page_name'];
+                } elseif ($identifier === 'instagram' && ! empty($credentials['instagram_username'])) {
+                    $configuredAccount = '@'.$credentials['instagram_username'];
                 } elseif ($identifier === 'pinterest' && ! empty($credentials['board_name'])) {
                     $configuredAccount = $credentials['board_name'];
                 }
@@ -99,16 +105,18 @@ class SocialSettingsController extends Controller
         $scopes = $this->getScopesForPlatform($platform);
 
         try {
-            $driver = Socialite::driver($platform);
+            // Instagram Business API uses Facebook OAuth
+            $driverName = $platform === 'instagram' ? 'facebook' : $platform;
+            $driver = Socialite::driver($driverName);
 
             // Add scopes
             if (! empty($scopes)) {
                 $driver->scopes($scopes);
             }
 
-            // Twitter uses OAuth 2.0 with PKCE
-            if ($platform === 'twitter') {
-                $driver->with(['response_type' => 'code']);
+            // For Instagram, we need to use the Instagram redirect URI
+            if ($platform === 'instagram') {
+                $driver->redirectUrl(url(config('services.instagram.redirect')));
             }
 
             return $driver->redirect();
@@ -134,14 +142,23 @@ class SocialSettingsController extends Controller
         }
 
         try {
-            $socialUser = Socialite::driver($platform)->user();
+            // Instagram Business API uses Facebook OAuth
+            $driverName = $platform === 'instagram' ? 'facebook' : $platform;
+            $driver = Socialite::driver($driverName);
+
+            // For Instagram, set the correct redirect URL for the callback
+            if ($platform === 'instagram') {
+                $driver->redirectUrl(url(config('services.instagram.redirect')));
+            }
+
+            $socialUser = $driver->user();
 
             $credentials = $this->buildCredentials($platform, $socialUser);
 
             $this->tokenManager->storeCredentials($brand, $platform, $credentials);
 
             // Redirect to account selection for platforms that require it
-            if (in_array($platform, ['facebook', 'pinterest'])) {
+            if (in_array($platform, ['facebook', 'instagram', 'pinterest'])) {
                 return redirect()->route('settings.social.select', ['platform' => $platform])
                     ->with('info', 'Please select which account to publish to.');
             }
@@ -179,7 +196,7 @@ class SocialSettingsController extends Controller
 
     public function showAccountSelection(string $platform): Response|RedirectResponse
     {
-        if (! in_array($platform, ['facebook', 'pinterest'])) {
+        if (! in_array($platform, ['facebook', 'instagram', 'pinterest'])) {
             return redirect()->route('settings.social')->with('error', 'Account selection is not required for this platform.');
         }
 
@@ -198,18 +215,28 @@ class SocialSettingsController extends Controller
         $accounts = [];
         $platformName = ucfirst($platform);
         $accountType = '';
+        $currentSelection = null;
 
         if ($platform === 'facebook') {
             $accounts = $this->facebookPagesService->fetchUserPages($credentials['access_token']);
             $accountType = 'page';
+            $currentSelection = $credentials['page_id'] ?? null;
+        } elseif ($platform === 'instagram') {
+            $accounts = $this->instagramAccountsService->fetchInstagramAccounts($credentials['access_token']);
+            $accountType = 'account';
+            $currentSelection = $credentials['instagram_account_id'] ?? null;
         } elseif ($platform === 'pinterest') {
             $accounts = $this->pinterestBoardsService->fetchUserBoards($credentials['access_token']);
             $accountType = 'board';
+            $currentSelection = $credentials['board_id'] ?? null;
         }
 
         if (empty($accounts)) {
-            return redirect()->route('settings.social')
-                ->with('error', "No {$accountType}s found. Please create a {$accountType} on {$platformName} first.");
+            $errorMessage = $platform === 'instagram'
+                ? 'No Instagram Business accounts found. Please make sure you have an Instagram Business or Creator account connected to a Facebook Page.'
+                : "No {$accountType}s found. Please create a {$accountType} on {$platformName} first.";
+
+            return redirect()->route('settings.social')->with('error', $errorMessage);
         }
 
         return Inertia::render('Settings/SocialAccountSelect', [
@@ -217,15 +244,13 @@ class SocialSettingsController extends Controller
             'platformName' => $platformName,
             'accountType' => $accountType,
             'accounts' => $accounts,
-            'currentSelection' => $platform === 'facebook'
-                ? ($credentials['page_id'] ?? null)
-                : ($credentials['board_id'] ?? null),
+            'currentSelection' => $currentSelection,
         ]);
     }
 
     public function storeAccountSelection(Request $request, string $platform): RedirectResponse
     {
-        if (! in_array($platform, ['facebook', 'pinterest'])) {
+        if (! in_array($platform, ['facebook', 'instagram', 'pinterest'])) {
             return redirect()->route('settings.social')->with('error', 'Invalid platform.');
         }
 
@@ -240,7 +265,7 @@ class SocialSettingsController extends Controller
         $validated = $request->validate([
             'account_id' => 'required|string',
             'account_name' => 'required|string',
-            'access_token' => 'nullable|string', // Only for Facebook pages
+            'access_token' => 'nullable|string', // For Facebook pages and Instagram
         ]);
 
         $credentials = $this->tokenManager->getCredentials($brand, $platform);
@@ -254,6 +279,13 @@ class SocialSettingsController extends Controller
             $credentials['page_name'] = $validated['account_name'];
             if (! empty($validated['access_token'])) {
                 $credentials['page_access_token'] = $validated['access_token'];
+            }
+        } elseif ($platform === 'instagram') {
+            $credentials['instagram_account_id'] = $validated['account_id'];
+            $credentials['instagram_username'] = $validated['account_name'];
+            // Use the page access token for Instagram API calls
+            if (! empty($validated['access_token'])) {
+                $credentials['access_token'] = $validated['access_token'];
             }
         } elseif ($platform === 'pinterest') {
             $credentials['board_id'] = $validated['account_id'];

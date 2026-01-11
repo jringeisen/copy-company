@@ -1,0 +1,1045 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/Fortify/CreateNewUser.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:users\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/Fortify/CreateNewUser.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/CalendarController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\:\:confirmed\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>confirmed_subscribers_count" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>drafts_count" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>posts_count" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:published\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Public/BlogController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Settings/AccountInvitationController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Settings/AccountInvitationController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:hasMember\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Settings/AccountInvitationController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:users\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Settings/AccountInvitationController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Settings/TeamSettingsController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$expires_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Settings/TeamSettingsController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/Settings/TeamSettingsController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$inviter\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Settings/TeamSettingsController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Settings/TeamSettingsController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$pivot\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Settings/TeamSettingsController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$role\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Settings/TeamSettingsController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:forPlatform\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/SocialPostController.php
+
+		-
+			message: '#^Access to an undefined property Laravel\\Socialite\\Contracts\\User\:\:\$expiresIn\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/SocialSettingsController.php
+
+		-
+			message: '#^Access to an undefined property Laravel\\Socialite\\Contracts\\User\:\:\$token\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/SocialSettingsController.php
+
+		-
+			message: '#^Call to an undefined method Laravel\\Socialite\\Contracts\\Provider\:\:redirectUrl\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Http/Controllers/SocialSettingsController.php
+
+		-
+			message: '#^Call to an undefined method Laravel\\Socialite\\Contracts\\Provider\:\:scopes\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/SocialSettingsController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\SocialSettingsController\:\:redirect\(\) should return Illuminate\\Http\\RedirectResponse but returns Symfony\\Component\\HttpFoundation\\RedirectResponse\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Http/Controllers/SocialSettingsController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Middleware/HandleInertiaRequests.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Middleware/HandleInertiaRequests.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$primary_color\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Middleware/HandleInertiaRequests.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Middleware/HandleInertiaRequests.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\BrandResource\:\:\$active_subscribers_count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/BrandResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\BrandResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/BrandResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\BrandResource\:\:\$custom_domain\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/BrandResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\BrandResource\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/BrandResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\BrandResource\:\:\$domain_verified\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/BrandResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\BrandResource\:\:\$favicon_path\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/BrandResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\BrandResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/BrandResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\BrandResource\:\:\$industry\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/BrandResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\BrandResource\:\:\$logo_path\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/BrandResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\BrandResource\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/BrandResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\BrandResource\:\:\$newsletter_provider\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/BrandResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\BrandResource\:\:\$primary_color\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/BrandResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\BrandResource\:\:\$secondary_color\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/BrandResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\BrandResource\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/BrandResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\BrandResource\:\:\$tagline\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/BrandResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\BrandResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/BrandResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\BrandResource\:\:\$url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/BrandResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\BrandResource\:\:\$voice_settings\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/BrandResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\BrandResource\:\:relationLoaded\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/BrandResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaFolderResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaFolderResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaFolderResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaFolderResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaFolderResource\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaFolderResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaFolderResource\:\:\$parent_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaFolderResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaFolderResource\:\:\$path\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaFolderResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaFolderResource\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaFolderResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$alt_text\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$dimensions\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$filename\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$folder_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$height\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$human_size\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$mime_type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$size\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$thumbnail_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$width\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NewsletterSendResource\:\:\$click_rate\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NewsletterSendResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NewsletterSendResource\:\:\$clicks\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NewsletterSendResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NewsletterSendResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NewsletterSendResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NewsletterSendResource\:\:\$failed_count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NewsletterSendResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NewsletterSendResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NewsletterSendResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NewsletterSendResource\:\:\$open_rate\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NewsletterSendResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NewsletterSendResource\:\:\$opens\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NewsletterSendResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NewsletterSendResource\:\:\$post\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Resources/NewsletterSendResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NewsletterSendResource\:\:\$preview_text\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NewsletterSendResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NewsletterSendResource\:\:\$recipients_count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NewsletterSendResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NewsletterSendResource\:\:\$scheduled_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NewsletterSendResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NewsletterSendResource\:\:\$sent_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NewsletterSendResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NewsletterSendResource\:\:\$sent_count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NewsletterSendResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NewsletterSendResource\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NewsletterSendResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NewsletterSendResource\:\:\$subject_line\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NewsletterSendResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NewsletterSendResource\:\:\$total_recipients\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NewsletterSendResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NewsletterSendResource\:\:\$unique_clicks\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NewsletterSendResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NewsletterSendResource\:\:\$unique_opens\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NewsletterSendResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NewsletterSendResource\:\:\$unsubscribes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NewsletterSendResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\NewsletterSendResource\:\:relationLoaded\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/NewsletterSendResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$ai_assistance_percentage\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$content\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$content_html\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$email_click_count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$email_open_count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$excerpt\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$featured_image\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$generate_social\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$publish_to_blog\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$published_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$scheduled_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$send_as_newsletter\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$seo_description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$seo_title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$tags\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PostResource\:\:\$view_count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\PostResource\:\:relationLoaded\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/PostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SocialPostResource\:\:\$ai_generated\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SocialPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SocialPostResource\:\:\$analytics\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SocialPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SocialPostResource\:\:\$character_limit\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SocialPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SocialPostResource\:\:\$content\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SocialPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SocialPostResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SocialPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SocialPostResource\:\:\$external_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SocialPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SocialPostResource\:\:\$failure_reason\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SocialPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SocialPostResource\:\:\$format\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SocialPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SocialPostResource\:\:\$hashtags\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SocialPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SocialPostResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SocialPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SocialPostResource\:\:\$link\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SocialPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SocialPostResource\:\:\$platform\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SocialPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SocialPostResource\:\:\$platform_display_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SocialPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SocialPostResource\:\:\$post\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Resources/SocialPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SocialPostResource\:\:\$published_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SocialPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SocialPostResource\:\:\$scheduled_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/SocialPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SocialPostResource\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SocialPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SocialPostResource\:\:\$status_color\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SocialPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SocialPostResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SocialPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SocialPostResource\:\:\$user_edited\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SocialPostResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\SocialPostResource\:\:relationLoaded\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/SocialPostResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SubscriberResource\:\:\$confirmed_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SubscriberResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SubscriberResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SubscriberResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SubscriberResource\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SubscriberResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SubscriberResource\:\:\$first_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SubscriberResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SubscriberResource\:\:\$full_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SubscriberResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SubscriberResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SubscriberResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SubscriberResource\:\:\$last_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SubscriberResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SubscriberResource\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SubscriberResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SubscriberResource\:\:\$source\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SubscriberResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SubscriberResource\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SubscriberResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SubscriberResource\:\:\$subscribed_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SubscriberResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SubscriberResource\:\:\$unsubscribed_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SubscriberResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SubscriberResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SubscriberResource.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:subscribers\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Jobs/ProcessNewsletterSend.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$brand\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Jobs/PublishScheduledPosts.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Jobs/PublishScheduledPosts.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Mail/AccountInvitationMail.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/NewsletterMail.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getEmailFromAddress\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Mail/NewsletterMail.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getEmailFromName\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Mail/NewsletterMail.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Relations\\Pivot\:\:\$role\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Account.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:confirmed\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Models/Brand.php
+
+		-
+			message: '#^Match arm comparison between App\\Enums\\ContentSprintStatus\:\:Failed and App\\Enums\\ContentSprintStatus\:\:Failed is always true\.$#'
+			identifier: match.alwaysTrue
+			count: 1
+			path: app/Models/ContentSprint.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Post.php
+
+		-
+			message: '#^Match arm comparison between App\\Enums\\SocialPostStatus\:\:Failed and App\\Enums\\SocialPostStatus\:\:Failed is always true\.$#'
+			identifier: match.alwaysTrue
+			count: 1
+			path: app/Models/SocialPost.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:currentAccount\(\) should return App\\Models\\Account\|null but returns Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\|\(Illuminate\\Database\\Eloquent\\Model&object\{pivot\: Illuminate\\Database\\Eloquent\\Relations\\Pivot\}\)\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:currentBrand\(\) should return App\\Models\\Brand\|null but returns Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Property App\\Models\\User\:\:\$cachedCurrentAccount \(App\\Models\\Account\|null\) does not accept \(Illuminate\\Database\\Eloquent\\Model&object\{pivot\: Illuminate\\Database\\Eloquent\\Relations\\Pivot\}\)\|null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Property App\\Models\\User\:\:\$cachedCurrentAccount \(App\\Models\\Account\|null\) does not accept Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\|\(Illuminate\\Database\\Eloquent\\Model&object\{pivot\: Illuminate\\Database\\Eloquent\\Relations\\Pivot\}\)\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Property App\\Models\\User\:\:\$cachedCurrentBrand \(App\\Models\\Brand\|null\) does not accept Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Property App\\Models\\User\:\:\$cachedCurrentBrand \(App\\Models\\Brand\|null\) does not accept Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Services\\ContentSprintService\:\:createPostFromIdea\(\) should return App\\Models\\Post but returns Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/ContentSprintService.php
+
+		-
+			message: '#^Method App\\Services\\MediaFolderService\:\:getFlatList\(\) should return Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\MediaFolder\> but returns Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/MediaFolderService.php
+
+		-
+			message: '#^Method App\\Services\\MediaFolderService\:\:getTree\(\) should return Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\MediaFolder\> but returns Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/MediaFolderService.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:confirmed\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Services/Newsletter/BuiltInNewsletterService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$newsletter_provider\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/PostService.php
+
+		-
+			message: '#^Method App\\Services\\PostService\:\:create\(\) should return App\\Models\\Post but returns Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/PostService.php
+
+		-
+			message: '#^Method App\\Services\\PostService\:\:createNewsletterSend\(\) should return App\\Models\\NewsletterSend but returns Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/PostService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Services/SesEventProcessor.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Services/SesEventProcessor.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$soft_bounce_count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/SesEventProcessor.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/SocialPublishing/SocialPublishingService.php

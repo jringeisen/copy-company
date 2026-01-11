@@ -14,7 +14,8 @@
       "Bash(composer require:*)",
       "Bash(vendor/bin/pint:*)",
       "mcp__laravel-boost__tinker",
-      "mcp__laravel-boost__list-routes"
+      "mcp__laravel-boost__list-routes",
+      "Bash(./vendor/bin/phpstan:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

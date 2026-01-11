@@ -41,25 +41,20 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'twitter' => [
-        'client_id' => env('TWITTER_CLIENT_ID'),
-        'client_secret' => env('TWITTER_CLIENT_SECRET'),
-        'redirect' => '/settings/social/twitter/callback',
-        'scopes' => env('TWITTER_SCOPES', 'tweet.read,tweet.write,users.read,offline.access'),
-    ],
-
     'facebook' => [
         'client_id' => env('FACEBOOK_CLIENT_ID'),
         'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
         'redirect' => '/settings/social/facebook/callback',
-        'scopes' => env('FACEBOOK_SCOPES', 'pages_manage_posts,pages_read_engagement,pages_show_list'),
+        'scopes' => env('FACEBOOK_SCOPES', 'pages_manage_posts,pages_read_engagement,pages_show_list,instagram_basic,instagram_content_publish'),
     ],
 
+    // Instagram Business API is accessed via Facebook OAuth - no separate credentials needed
+    // The Instagram Business Account is linked to Facebook Pages
     'instagram' => [
-        'client_id' => env('INSTAGRAM_CLIENT_ID'),
-        'client_secret' => env('INSTAGRAM_CLIENT_SECRET'),
+        'client_id' => env('FACEBOOK_CLIENT_ID'),  // Uses Facebook app credentials
+        'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
         'redirect' => '/settings/social/instagram/callback',
-        'scopes' => env('INSTAGRAM_SCOPES', 'instagram_basic,instagram_content_publish,pages_show_list'),
+        'scopes' => env('INSTAGRAM_SCOPES', 'pages_show_list,instagram_basic,instagram_content_publish'),
     ],
 
     'linkedin' => [

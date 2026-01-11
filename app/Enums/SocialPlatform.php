@@ -9,7 +9,6 @@ enum SocialPlatform: string
     case Pinterest = 'pinterest';
     case LinkedIn = 'linkedin';
     case TikTok = 'tiktok';
-    case Twitter = 'twitter';
 
     public function displayName(): string
     {
@@ -19,7 +18,6 @@ enum SocialPlatform: string
             self::Pinterest => 'Pinterest',
             self::LinkedIn => 'LinkedIn',
             self::TikTok => 'TikTok',
-            self::Twitter => 'X (Twitter)',
         };
     }
 

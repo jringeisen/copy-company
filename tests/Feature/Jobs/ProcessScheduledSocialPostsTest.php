@@ -38,7 +38,7 @@ class ProcessScheduledSocialPostsTest extends TestCase
 
         $duePost = SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Scheduled,
             'scheduled_at' => now()->subMinute(),
         ]);
@@ -57,7 +57,7 @@ class ProcessScheduledSocialPostsTest extends TestCase
 
         SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Scheduled,
             'scheduled_at' => now()->addHour(),
         ]);
@@ -74,19 +74,19 @@ class ProcessScheduledSocialPostsTest extends TestCase
 
         SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Draft,
         ]);
 
         SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Queued,
         ]);
 
         SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Published,
         ]);
 
@@ -102,7 +102,7 @@ class ProcessScheduledSocialPostsTest extends TestCase
 
         $post1 = SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Scheduled,
             'scheduled_at' => now()->subMinutes(5),
         ]);
@@ -136,7 +136,7 @@ class ProcessScheduledSocialPostsTest extends TestCase
 
         SocialPost::factory()->create([
             'brand_id' => $this->brand->id,
-            'platform' => SocialPlatform::Twitter,
+            'platform' => SocialPlatform::Facebook,
             'status' => SocialPostStatus::Scheduled,
             'scheduled_at' => now()->subMinute(),
         ]);

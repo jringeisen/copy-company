@@ -41,10 +41,10 @@ test('queued scope filters queued social posts', function () {
 test('for platform scope filters by platform', function () {
     $brand = Brand::factory()->create();
     SocialPost::factory()->forBrand($brand)->forPlatform(SocialPlatform::Instagram)->count(2)->create();
-    SocialPost::factory()->forBrand($brand)->forPlatform(SocialPlatform::Twitter)->count(3)->create();
+    SocialPost::factory()->forBrand($brand)->forPlatform(SocialPlatform::Facebook)->count(3)->create();
 
     expect(SocialPost::forPlatform(SocialPlatform::Instagram)->count())->toBe(2);
-    expect(SocialPost::forPlatform(SocialPlatform::Twitter)->count())->toBe(3);
+    expect(SocialPost::forPlatform(SocialPlatform::Facebook)->count())->toBe(3);
 });
 
 test('is published returns true for published status', function () {
@@ -66,20 +66,20 @@ test('can publish returns true for draft queued and scheduled statuses', functio
 });
 
 test('character limit returns correct value for each platform', function () {
-    $twitter = SocialPost::factory()->forPlatform(SocialPlatform::Twitter)->create();
+    $facebook = SocialPost::factory()->forPlatform(SocialPlatform::Facebook)->create();
     $instagram = SocialPost::factory()->forPlatform(SocialPlatform::Instagram)->create();
     $linkedin = SocialPost::factory()->forPlatform(SocialPlatform::LinkedIn)->create();
 
-    expect($twitter->character_limit)->toBe(280);
+    expect($facebook->character_limit)->toBe(63206);
     expect($instagram->character_limit)->toBe(2200);
     expect($linkedin->character_limit)->toBe(3000);
 });
 
 test('platform display name returns formatted name', function () {
-    $twitter = SocialPost::factory()->forPlatform(SocialPlatform::Twitter)->create();
+    $facebook = SocialPost::factory()->forPlatform(SocialPlatform::Facebook)->create();
     $linkedin = SocialPost::factory()->forPlatform(SocialPlatform::LinkedIn)->create();
 
-    expect($twitter->platform_display_name)->toBe('X (Twitter)');
+    expect($facebook->platform_display_name)->toBe('Facebook');
     expect($linkedin->platform_display_name)->toBe('LinkedIn');
 });
 

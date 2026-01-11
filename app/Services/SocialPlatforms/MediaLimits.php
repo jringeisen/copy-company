@@ -25,10 +25,6 @@ class MediaLimits
             'story' => 1,
             'reel' => 0, // Video only
         ],
-        'twitter' => [
-            'feed' => 4,
-            'thread' => 4,
-        ],
         'linkedin' => [
             'feed' => 9,
         ],

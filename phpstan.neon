@@ -1,0 +1,25 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - phpstan-baseline.neon
+
+parameters:
+    paths:
+        - app/
+
+    # Level 0-10 (0 = loosest, 10 = strictest)
+    # Start low and gradually increase as you fix errors
+    level: 4
+
+    ignoreErrors:
+        # Add patterns here to ignore specific errors
+        # - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder#'
+
+    excludePaths:
+        # Add paths to exclude from analysis
+        # - app/SomeFile.php
+
+    # Treat phpdoc types as certain
+    treatPhpDocTypesAsCertain: false
+
+    # Laravel-specific settings
+    checkModelProperties: true

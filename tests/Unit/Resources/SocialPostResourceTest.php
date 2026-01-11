@@ -42,12 +42,12 @@ test('social post resource transforms social post correctly', function () {
 test('social post resource includes platform display name', function () {
     $user = User::factory()->create();
     $brand = Brand::factory()->forUser($user)->create();
-    $socialPost = SocialPost::factory()->forBrand($brand)->forPlatform(SocialPlatform::Twitter)->create();
+    $socialPost = SocialPost::factory()->forBrand($brand)->forPlatform(SocialPlatform::Facebook)->create();
 
     $resource = new SocialPostResource($socialPost);
     $array = $resource->toArray(app(Request::class));
 
-    expect($array['platform_display'])->toBe('X (Twitter)');
+    expect($array['platform_display'])->toBe('Facebook');
 });
 
 test('social post resource includes status color', function () {
@@ -64,12 +64,12 @@ test('social post resource includes status color', function () {
 test('social post resource includes character limit', function () {
     $user = User::factory()->create();
     $brand = Brand::factory()->forUser($user)->create();
-    $socialPost = SocialPost::factory()->forBrand($brand)->forPlatform(SocialPlatform::Twitter)->create();
+    $socialPost = SocialPost::factory()->forBrand($brand)->forPlatform(SocialPlatform::Facebook)->create();
 
     $resource = new SocialPostResource($socialPost);
     $array = $resource->toArray(app(Request::class));
 
-    expect($array['character_limit'])->toBe(280);
+    expect($array['character_limit'])->toBe(63206);
 });
 
 test('social post resource converts status to value', function () {

@@ -44,8 +44,7 @@ class ContentSprintService
      */
     protected function createPostFromIdea(Brand $brand, int $userId, array $idea): Post
     {
-        $keyPoints = $idea['key_points'] ?? [];
-        $content = $this->buildTipTapContent($keyPoints);
+        $content = $this->buildTipTapContent($idea);
 
         return $brand->posts()->create([
             'user_id' => $userId,
@@ -58,40 +57,69 @@ class ContentSprintService
     }
 
     /**
-     * Build TipTap JSON content from key points.
+     * Build TipTap JSON content with an AI-friendly prompt from the sprint idea.
      *
-     * @param  array<string>  $keyPoints
+     * @param  array<string, mixed>  $idea
      * @return array<string, mixed>
      */
-    protected function buildTipTapContent(array $keyPoints): array
+    protected function buildTipTapContent(array $idea): array
     {
-        if (empty($keyPoints)) {
-            return [
-                'type' => 'doc',
-                'content' => [],
+        $description = $idea['description'] ?? '';
+        $keyPoints = $idea['key_points'] ?? [];
+        $wordCount = $idea['estimated_words'] ?? 1000;
+
+        $content = [];
+
+        // Add description paragraph
+        if ($description) {
+            $content[] = [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'Description: '],
+                    ['type' => 'text', 'text' => $description],
+                ],
             ];
         }
 
-        $listItems = array_map(fn (string $point): array => [
-            'type' => 'listItem',
-            'content' => [
-                [
-                    'type' => 'paragraph',
-                    'content' => [
-                        ['type' => 'text', 'text' => $point],
+        // Add key points section
+        if (! empty($keyPoints)) {
+            $content[] = [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'Key points to cover:'],
+                ],
+            ];
+
+            $listItems = array_map(fn (string $point): array => [
+                'type' => 'listItem',
+                'content' => [
+                    [
+                        'type' => 'paragraph',
+                        'content' => [
+                            ['type' => 'text', 'text' => $point],
+                        ],
                     ],
                 ],
+            ], $keyPoints);
+
+            $content[] = [
+                'type' => 'bulletList',
+                'content' => $listItems,
+            ];
+        }
+
+        // Add word count target
+        $content[] = [
+            'type' => 'paragraph',
+            'content' => [
+                ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'Target word count: '],
+                ['type' => 'text', 'text' => (string) $wordCount.' words'],
             ],
-        ], $keyPoints);
+        ];
 
         return [
             'type' => 'doc',
-            'content' => [
-                [
-                    'type' => 'bulletList',
-                    'content' => $listItems,
-                ],
-            ],
+            'content' => $content,
         ];
     }
 

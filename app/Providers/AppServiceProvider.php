@@ -8,7 +8,6 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
-use SocialiteProviders\Instagram\InstagramExtendSocialite;
 use SocialiteProviders\Manager\SocialiteWasCalled;
 use SocialiteProviders\Pinterest\PinterestExtendSocialite;
 use SocialiteProviders\TikTok\TikTokExtendSocialite;
@@ -32,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Register Socialite community providers
-        Event::listen(SocialiteWasCalled::class, InstagramExtendSocialite::class.'@handle');
+        // Note: Instagram uses Facebook OAuth (Instagram Business API requires Facebook auth)
         Event::listen(SocialiteWasCalled::class, PinterestExtendSocialite::class.'@handle');
         Event::listen(SocialiteWasCalled::class, TikTokExtendSocialite::class.'@handle');
 
