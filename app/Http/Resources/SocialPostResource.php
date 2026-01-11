@@ -19,7 +19,7 @@ class SocialPostResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $timezone = $this->brand?->timezone ?? 'America/New_York';
+        $timezone = $this->brand->timezone ?? 'America/New_York';
 
         return [
             'id' => $this->id,

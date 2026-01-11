@@ -43,7 +43,7 @@ class CheckSesReputation extends Command
 
             // Calculate rates from last 24 hours
             $dataPoints = collect($stats['SendDataPoints'])
-                ->filter(function ($point) {
+                ->filter(function (array $point): bool {
                     return Carbon::parse($point['Timestamp'])->isAfter(now()->subDay());
                 });
 

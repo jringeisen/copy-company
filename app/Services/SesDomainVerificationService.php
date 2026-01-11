@@ -45,7 +45,7 @@ class SesDomainVerificationService
                 'name' => "_amazonses.{$domain}",
                 'value' => $result['VerificationToken'],
             ],
-            'dkim' => collect($dkimResult['DkimTokens'])->map(fn ($token) => [
+            'dkim' => collect($dkimResult['DkimTokens'])->map(fn (string $token) => [
                 'type' => 'CNAME',
                 'name' => "{$token}._domainkey.{$domain}",
                 'value' => "{$token}.dkim.amazonses.com",

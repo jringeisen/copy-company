@@ -26,7 +26,7 @@ class TeamSettingsController extends Controller
 
         $members = $account->users()
             ->get()
-            ->map(function ($member) use ($user) {
+            ->map(function (User $member) use ($user) {
                 /** @var \Illuminate\Database\Eloquent\Relations\Pivot|null $pivot */
                 $pivot = $member->pivot;
 
