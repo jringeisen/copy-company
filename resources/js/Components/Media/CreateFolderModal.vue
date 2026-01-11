@@ -51,13 +51,13 @@ const submit = () => {
                     <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="emit('close')"></div>
 
                     <!-- Modal -->
-                    <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full">
+                    <div class="relative bg-white rounded-2xl shadow-xl max-w-md w-full">
                         <form @submit.prevent="submit">
                             <div class="p-6">
-                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Create Folder</h3>
+                                <h3 class="text-lg font-semibold text-[#0b1215] mb-4">Create Folder</h3>
 
                                 <div>
-                                    <label for="folder-name" class="block text-sm font-medium text-gray-700 mb-1">
+                                    <label for="folder-name" class="block text-sm font-medium text-[#0b1215] mb-1">
                                         Folder Name
                                     </label>
                                     <input
@@ -65,7 +65,7 @@ const submit = () => {
                                         v-model="form.name"
                                         type="text"
                                         placeholder="e.g., Blog Images"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                        class="w-full px-3 py-2 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                                         autofocus
                                     />
                                     <p v-if="form.errors.name" class="mt-1 text-sm text-red-600">
@@ -75,19 +75,19 @@ const submit = () => {
                             </div>
 
                             <!-- Actions -->
-                            <div class="flex items-center gap-3 p-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+                            <div class="flex items-center gap-3 p-4 border-t border-[#0b1215]/10 bg-[#f7f7f7] rounded-b-2xl">
                                 <button
                                     type="button"
                                     @click="emit('close')"
                                     :disabled="form.processing"
-                                    class="flex-1 px-4 py-2 text-gray-700 font-medium bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
+                                    class="flex-1 px-4 py-2 text-[#0b1215] font-medium bg-white border border-[#0b1215]/20 rounded-xl hover:bg-[#0b1215]/5 transition disabled:opacity-50"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     :disabled="form.processing || !form.name"
-                                    class="flex-1 px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
+                                    class="flex-1 px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50"
                                 >
                                     Create Folder
                                 </button>

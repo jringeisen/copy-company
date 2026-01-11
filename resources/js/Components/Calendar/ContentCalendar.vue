@@ -93,9 +93,9 @@ const getEventsForDay = (date) => {
 
 const getEventClasses = (event) => {
     if (event.type === 'post') {
-        return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
+        return 'bg-[#0b1215]/10 text-[#0b1215] hover:bg-[#0b1215]/20';
     } else if (event.type === 'newsletter') {
-        return 'bg-purple-100 text-purple-800 hover:bg-purple-200';
+        return 'bg-[#a1854f]/20 text-[#a1854f] hover:bg-[#a1854f]/30';
     } else if (event.type === 'social') {
         // Color based on status for social posts
         if (event.status === 'published') {
@@ -105,7 +105,7 @@ const getEventClasses = (event) => {
         }
         return 'bg-pink-100 text-pink-800 hover:bg-pink-200';
     }
-    return 'bg-gray-100 text-gray-800';
+    return 'bg-[#0b1215]/5 text-[#0b1215]/70';
 };
 
 const getStatusIcon = (event) => {
@@ -129,23 +129,23 @@ const goToToday = () => {
 </script>
 
 <template>
-    <div class="bg-white rounded-lg shadow">
+    <div class="bg-white rounded-2xl border border-[#0b1215]/10 overflow-hidden">
         <!-- Header with month navigation -->
-        <div class="flex items-center justify-between p-4 border-b border-gray-200">
+        <div class="flex items-center justify-between p-4 border-b border-[#0b1215]/10">
             <button
                 @click="emit('navigate', 'prev')"
-                class="p-2 rounded-lg hover:bg-gray-100 transition"
+                class="p-2 rounded-xl hover:bg-[#0b1215]/5 transition"
             >
-                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-[#0b1215]/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
             </button>
 
             <div class="flex items-center space-x-4">
-                <h2 class="text-lg font-semibold text-gray-900">{{ monthLabel }}</h2>
+                <h2 class="text-lg font-semibold text-[#0b1215]">{{ monthLabel }}</h2>
                 <button
                     @click="goToToday"
-                    class="px-3 py-1 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                    class="px-3 py-1 text-sm font-medium text-[#0b1215]/70 border border-[#0b1215]/20 rounded-full hover:bg-[#0b1215]/5 transition"
                 >
                     Today
                 </button>
@@ -153,20 +153,20 @@ const goToToday = () => {
 
             <button
                 @click="emit('navigate', 'next')"
-                class="p-2 rounded-lg hover:bg-gray-100 transition"
+                class="p-2 rounded-xl hover:bg-[#0b1215]/5 transition"
             >
-                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-[#0b1215]/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
             </button>
         </div>
 
         <!-- Day headers -->
-        <div class="grid grid-cols-7 border-b border-gray-200">
+        <div class="grid grid-cols-7 border-b border-[#0b1215]/10">
             <div
                 v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']"
                 :key="day"
-                class="p-3 text-center text-sm font-medium text-gray-500 bg-gray-50"
+                class="p-3 text-center text-sm font-medium text-[#0b1215]/50 bg-[#f7f7f7]"
             >
                 {{ day }}
             </div>
@@ -178,16 +178,16 @@ const goToToday = () => {
                 v-for="day in calendarDays"
                 :key="day.date"
                 :class="[
-                    'min-h-28 p-2 border-b border-r border-gray-100',
-                    day.isCurrentMonth ? 'bg-white' : 'bg-gray-50',
-                    day.isToday && 'bg-blue-50'
+                    'min-h-28 p-2 border-b border-r border-[#0b1215]/5',
+                    day.isCurrentMonth ? 'bg-white' : 'bg-[#f7f7f7]',
+                    day.isToday && 'bg-[#a1854f]/10'
                 ]"
             >
                 <!-- Day number -->
                 <div
                     :class="[
                         'text-sm mb-1',
-                        day.isToday ? 'font-bold text-blue-600' : day.isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
+                        day.isToday ? 'font-bold text-[#a1854f]' : day.isCurrentMonth ? 'text-[#0b1215]' : 'text-[#0b1215]/40'
                     ]"
                 >
                     {{ day.dayNumber }}
@@ -200,7 +200,7 @@ const goToToday = () => {
                         :key="event.id"
                         @click="emit('selectEvent', event)"
                         :class="getEventClasses(event)"
-                        class="text-xs px-2 py-1 rounded truncate cursor-pointer transition flex items-center gap-1"
+                        class="text-xs px-2 py-1 rounded-lg truncate cursor-pointer transition flex items-center gap-1"
                     >
                         <!-- Status icon for social posts -->
                         <svg v-if="getStatusIcon(event) === 'check'" class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -216,7 +216,7 @@ const goToToday = () => {
                     </div>
                     <div
                         v-if="getEventsForDay(day.date).length > 3"
-                        class="text-xs text-gray-500 px-2"
+                        class="text-xs text-[#0b1215]/50 px-2"
                     >
                         +{{ getEventsForDay(day.date).length - 3 }} more
                     </div>

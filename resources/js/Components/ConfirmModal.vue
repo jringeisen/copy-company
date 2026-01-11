@@ -39,16 +39,16 @@ const confirmButton = ref(null);
 
 const variantStyles = {
     danger: {
-        icon: 'text-red-600 bg-red-100',
+        icon: 'text-red-600 bg-red-50',
         button: 'bg-red-600 hover:bg-red-700 focus:ring-red-500',
     },
     warning: {
-        icon: 'text-yellow-600 bg-yellow-100',
-        button: 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500',
+        icon: 'text-[#a1854f] bg-[#a1854f]/10',
+        button: 'bg-[#a1854f] hover:bg-[#a1854f]/90 focus:ring-[#a1854f]/50',
     },
     info: {
-        icon: 'text-blue-600 bg-blue-100',
-        button: 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500',
+        icon: 'text-[#0b1215] bg-[#0b1215]/10',
+        button: 'bg-[#0b1215] hover:bg-[#0b1215]/90 focus:ring-[#0b1215]/50',
     },
 };
 
@@ -111,14 +111,14 @@ watch(() => props.show, (newVal) => {
                     >
                         <div
                             v-if="show"
-                            class="relative bg-white rounded-xl shadow-xl max-w-md w-full transform transition-all"
+                            class="relative bg-white rounded-2xl shadow-xl max-w-md w-full transform transition-all"
                         >
                             <div class="p-6">
                                 <!-- Icon -->
                                 <div class="flex items-center justify-center mb-4">
                                     <div
                                         :class="currentStyle.icon"
-                                        class="w-12 h-12 rounded-full flex items-center justify-center"
+                                        class="w-12 h-12 rounded-xl flex items-center justify-center"
                                     >
                                         <!-- Danger/Warning icon -->
                                         <svg
@@ -154,23 +154,23 @@ watch(() => props.show, (newVal) => {
                                 </div>
 
                                 <!-- Title -->
-                                <h3 class="text-lg font-semibold text-gray-900 text-center mb-2">
+                                <h3 class="text-lg font-semibold text-[#0b1215] text-center mb-2">
                                     {{ title }}
                                 </h3>
 
                                 <!-- Message -->
-                                <p class="text-gray-600 text-center">
+                                <p class="text-[#0b1215]/60 text-center">
                                     {{ message }}
                                 </p>
                             </div>
 
                             <!-- Actions -->
-                            <div class="flex items-center gap-3 p-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+                            <div class="flex items-center gap-3 p-4 border-t border-[#0b1215]/10 bg-[#f7f7f7] rounded-b-2xl">
                                 <button
                                     type="button"
                                     @click="emit('cancel')"
                                     :disabled="processing"
-                                    class="flex-1 px-4 py-2 text-gray-700 font-medium bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition disabled:opacity-50"
+                                    class="flex-1 px-4 py-2.5 text-[#0b1215] font-medium bg-white border border-[#0b1215]/20 rounded-xl hover:bg-[#0b1215]/5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0b1215]/20 transition disabled:opacity-50"
                                 >
                                     {{ cancelText }}
                                 </button>
@@ -180,7 +180,7 @@ watch(() => props.show, (newVal) => {
                                     @click="emit('confirm')"
                                     :disabled="processing"
                                     :class="currentStyle.button"
-                                    class="flex-1 px-4 py-2 text-white font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition disabled:opacity-50"
+                                    class="flex-1 px-4 py-2.5 text-white font-medium rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 transition disabled:opacity-50"
                                 >
                                     <span v-if="processing" class="flex items-center justify-center">
                                         <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">

@@ -118,14 +118,14 @@ const save = () => {
         <div class="flex min-h-screen items-center justify-center p-4">
             <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="emit('close')"></div>
 
-            <div class="relative bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="relative bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 <!-- Header -->
-                <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+                <div class="sticky top-0 bg-white border-b border-[#0b1215]/10 px-6 py-4 flex items-center justify-between">
                     <div>
-                        <h2 class="text-xl font-semibold text-gray-900">Edit Social Post</h2>
-                        <p class="text-sm text-gray-500">{{ platformDisplayNames[socialPost.platform] }}</p>
+                        <h2 class="text-xl font-semibold text-[#0b1215]">Edit Social Post</h2>
+                        <p class="text-sm text-[#0b1215]/50">{{ platformDisplayNames[socialPost.platform] }}</p>
                     </div>
-                    <button @click="emit('close')" class="text-gray-400 hover:text-gray-600">
+                    <button @click="emit('close')" class="text-[#0b1215]/40 hover:text-[#0b1215]/60">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -136,10 +136,10 @@ const save = () => {
                 <div class="p-6 space-y-6">
                     <!-- Format -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Format</label>
+                        <label class="block text-sm font-medium text-[#0b1215] mb-2">Format</label>
                         <select
                             v-model="form.format"
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-primary-500 focus:border-primary-500"
+                            class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                         >
                             <option
                                 v-for="formatOption in formatOptions[socialPost.platform]"
@@ -154,8 +154,8 @@ const save = () => {
                     <!-- Media -->
                     <div v-if="allowsMedia">
                         <div class="flex items-center justify-between mb-2">
-                            <label class="block text-sm font-medium text-gray-700">Media</label>
-                            <span class="text-sm text-gray-500">
+                            <label class="block text-sm font-medium text-[#0b1215]">Media</label>
+                            <span class="text-sm text-[#0b1215]/50">
                                 {{ form.media.length }} / {{ mediaLimit }}
                             </span>
                         </div>
@@ -165,7 +165,7 @@ const save = () => {
                             <div
                                 v-for="(item, index) in form.media"
                                 :key="item.id"
-                                class="relative aspect-square bg-gray-100 rounded-lg overflow-hidden group"
+                                class="relative aspect-square bg-[#f7f7f7] rounded-xl overflow-hidden group"
                             >
                                 <img
                                     :src="item.thumbnail_url || item.url"
@@ -188,7 +188,7 @@ const save = () => {
                             v-if="canAddMoreMedia"
                             type="button"
                             @click="showMediaPicker = true"
-                            class="flex items-center gap-2 px-3 py-2 border border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-700 transition"
+                            class="flex items-center gap-2 px-3 py-2 border border-dashed border-[#0b1215]/20 rounded-xl text-[#0b1215]/60 hover:border-[#0b1215]/40 hover:text-[#0b1215]/80 transition"
                         >
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -196,8 +196,8 @@ const save = () => {
                             Add Media
                         </button>
                     </div>
-                    <div v-else class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                        <p class="text-sm text-yellow-800">
+                    <div v-else class="bg-[#a1854f]/10 border border-[#a1854f]/20 rounded-xl p-3">
+                        <p class="text-sm text-[#0b1215]/60">
                             This format does not support images (video only or not applicable).
                         </p>
                     </div>
@@ -205,11 +205,11 @@ const save = () => {
                     <!-- Content -->
                     <div>
                         <div class="flex items-center justify-between mb-2">
-                            <label class="block text-sm font-medium text-gray-700">Content</label>
+                            <label class="block text-sm font-medium text-[#0b1215]">Content</label>
                             <span
                                 :class="[
                                     'text-sm',
-                                    isOverLimit ? 'text-red-600' : 'text-gray-500'
+                                    isOverLimit ? 'text-red-600' : 'text-[#0b1215]/50'
                                 ]"
                             >
                                 {{ characterCount }} / {{ characterLimit }}
@@ -219,8 +219,8 @@ const save = () => {
                             v-model="form.content"
                             rows="8"
                             :class="[
-                                'w-full border rounded-lg px-3 py-2 focus:ring-primary-500 focus:border-primary-500',
-                                isOverLimit ? 'border-red-300' : 'border-gray-300'
+                                'w-full border rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40',
+                                isOverLimit ? 'border-red-300' : 'border-[#0b1215]/20'
                             ]"
                             placeholder="Write your social post content..."
                         ></textarea>
@@ -231,17 +231,17 @@ const save = () => {
 
                     <!-- Hashtags -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Hashtags</label>
+                        <label class="block text-sm font-medium text-[#0b1215] mb-2">Hashtags</label>
                         <div class="flex flex-wrap gap-2 mb-2">
                             <span
                                 v-for="(tag, index) in form.hashtags"
                                 :key="index"
-                                class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-primary-100 text-primary-700"
+                                class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-[#a1854f]/10 text-[#a1854f]"
                             >
                                 #{{ tag }}
                                 <button
                                     @click="removeHashtag(index)"
-                                    class="ml-2 text-primary-500 hover:text-primary-700"
+                                    class="ml-2 text-[#a1854f]/70 hover:text-[#a1854f]"
                                 >
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -255,12 +255,12 @@ const save = () => {
                                 @keyup.enter="addHashtag"
                                 type="text"
                                 placeholder="Add hashtag..."
-                                class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-primary-500 focus:border-primary-500"
+                                class="flex-1 border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                             />
                             <button
                                 @click="addHashtag"
                                 type="button"
-                                class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+                                class="px-4 py-2 bg-[#0b1215]/5 text-[#0b1215] rounded-xl hover:bg-[#0b1215]/10 transition"
                             >
                                 Add
                             </button>
@@ -269,28 +269,28 @@ const save = () => {
 
                     <!-- Link -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Link (optional)</label>
+                        <label class="block text-sm font-medium text-[#0b1215] mb-2">Link (optional)</label>
                         <input
                             v-model="form.link"
                             type="url"
                             placeholder="https://..."
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-primary-500 focus:border-primary-500"
+                            class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                         />
                     </div>
                 </div>
 
                 <!-- Footer -->
-                <div class="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end space-x-3">
+                <div class="sticky bottom-0 bg-[#f7f7f7] border-t border-[#0b1215]/10 px-6 py-4 flex justify-end space-x-3">
                     <button
                         @click="emit('close')"
-                        class="px-4 py-2 text-gray-700 font-medium hover:bg-gray-100 rounded-lg transition"
+                        class="px-4 py-2 text-[#0b1215] font-medium hover:bg-[#0b1215]/5 rounded-xl transition"
                     >
                         Cancel
                     </button>
                     <button
                         @click="save"
                         :disabled="form.processing || isOverLimit"
-                        class="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
+                        class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50"
                     >
                         {{ form.processing ? 'Saving...' : 'Save Changes' }}
                     </button>

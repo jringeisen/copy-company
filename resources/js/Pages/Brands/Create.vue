@@ -51,23 +51,23 @@ const submit = () => {
 <template>
     <Head title="Create Your Brand" />
 
-    <div class="min-h-screen bg-gray-50 py-12">
+    <div class="min-h-screen bg-[#fcfbf8] py-12">
         <div class="max-w-2xl mx-auto px-4">
             <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-gray-900">Create Your Brand</h1>
-                <p class="mt-2 text-gray-600">Set up your brand identity to start publishing content.</p>
+                <h1 class="text-3xl font-bold text-[#0b1215]">Create Your Brand</h1>
+                <p class="mt-2 text-[#0b1215]/60">Set up your brand identity to start publishing content.</p>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm p-8">
+            <div class="bg-white rounded-2xl border border-[#0b1215]/10 p-8">
                 <form @submit.prevent="submit" class="space-y-6">
                     <!-- Brand Name -->
                     <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700">Brand Name *</label>
+                        <label for="name" class="block text-sm font-medium text-[#0b1215]">Brand Name *</label>
                         <input
                             id="name"
                             v-model="form.name"
                             type="text"
-                            class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                            class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                             placeholder="My Awesome Brand"
                             required
                         />
@@ -76,9 +76,9 @@ const submit = () => {
 
                     <!-- Slug -->
                     <div>
-                        <label for="slug" class="block text-sm font-medium text-gray-700">URL Slug *</label>
-                        <div class="mt-1 flex rounded-lg shadow-sm">
-                            <span class="inline-flex items-center px-4 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                        <label for="slug" class="block text-sm font-medium text-[#0b1215]">URL Slug *</label>
+                        <div class="mt-1 flex rounded-xl overflow-hidden border border-[#0b1215]/20">
+                            <span class="inline-flex items-center px-4 bg-[#f7f7f7] text-[#0b1215]/50 text-sm border-r border-[#0b1215]/20">
                                 {{ $page.props.appUrl || 'yoursite.com' }}/@
                             </span>
                             <input
@@ -86,23 +86,23 @@ const submit = () => {
                                 v-model="form.slug"
                                 @input="onSlugInput"
                                 type="text"
-                                class="flex-1 block w-full px-4 py-3 border border-gray-300 rounded-r-lg focus:ring-primary-500 focus:border-primary-500"
+                                class="flex-1 block w-full px-4 py-3 border-0 focus:ring-[#0b1215]/20"
                                 placeholder="my-brand"
                                 required
                             />
                         </div>
-                        <p class="mt-1 text-sm text-gray-500">This will be your public URL. Only lowercase letters, numbers, and hyphens.</p>
+                        <p class="mt-1 text-sm text-[#0b1215]/50">This will be your public URL. Only lowercase letters, numbers, and hyphens.</p>
                         <p v-if="form.errors.slug" class="mt-1 text-sm text-red-600">{{ form.errors.slug }}</p>
                     </div>
 
                     <!-- Tagline -->
                     <div>
-                        <label for="tagline" class="block text-sm font-medium text-gray-700">Tagline</label>
+                        <label for="tagline" class="block text-sm font-medium text-[#0b1215]">Tagline</label>
                         <input
                             id="tagline"
                             v-model="form.tagline"
                             type="text"
-                            class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                            class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                             placeholder="A brief description of what you do"
                         />
                         <p v-if="form.errors.tagline" class="mt-1 text-sm text-red-600">{{ form.errors.tagline }}</p>
@@ -110,12 +110,12 @@ const submit = () => {
 
                     <!-- Description -->
                     <div>
-                        <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                        <label for="description" class="block text-sm font-medium text-[#0b1215]">Description</label>
                         <textarea
                             id="description"
                             v-model="form.description"
                             rows="3"
-                            class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                            class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                             placeholder="Tell your audience what your brand is about..."
                         ></textarea>
                         <p v-if="form.errors.description" class="mt-1 text-sm text-red-600">{{ form.errors.description }}</p>
@@ -123,35 +123,35 @@ const submit = () => {
 
                     <!-- Industry -->
                     <div>
-                        <label for="industry" class="block text-sm font-medium text-gray-700">Industry</label>
+                        <label for="industry" class="block text-sm font-medium text-[#0b1215]">Industry</label>
                         <select
                             id="industry"
                             v-model="form.industry"
-                            class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                            class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                         >
                             <option value="">Select an industry (optional)</option>
                             <option v-for="industry in industries" :key="industry" :value="industry">
                                 {{ industry }}
                             </option>
                         </select>
-                        <p class="mt-1 text-sm text-gray-500">Helps AI understand your content context better.</p>
+                        <p class="mt-1 text-sm text-[#0b1215]/50">Helps AI understand your content context better.</p>
                         <p v-if="form.errors.industry" class="mt-1 text-sm text-red-600">{{ form.errors.industry }}</p>
                     </div>
 
                     <!-- Primary Color -->
                     <div>
-                        <label for="primary_color" class="block text-sm font-medium text-gray-700">Brand Color</label>
+                        <label for="primary_color" class="block text-sm font-medium text-[#0b1215]">Brand Color</label>
                         <div class="mt-1 flex items-center gap-3">
                             <input
                                 id="primary_color"
                                 v-model="form.primary_color"
                                 type="color"
-                                class="h-10 w-16 rounded border border-gray-300 cursor-pointer"
+                                class="h-10 w-16 rounded-xl border border-[#0b1215]/20 cursor-pointer"
                             />
                             <input
                                 v-model="form.primary_color"
                                 type="text"
-                                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                                class="flex-1 px-4 py-2 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                                 placeholder="#6366f1"
                             />
                         </div>
@@ -160,12 +160,12 @@ const submit = () => {
 
                     <!-- Submit -->
                     <div class="flex items-center justify-between pt-4">
-                        <Link href="/dashboard" class="text-gray-600 hover:text-gray-900">
+                        <Link href="/dashboard" class="text-[#0b1215]/60 hover:text-[#0b1215] transition-colors">
                             Cancel
                         </Link>
                         <button
                             type="submit"
-                            class="px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition"
+                            class="px-6 py-3 bg-[#0b1215] text-white font-semibold rounded-full hover:bg-[#0b1215]/90 focus:outline-none focus:ring-2 focus:ring-[#0b1215]/20 focus:ring-offset-2 transition"
                             :class="{ 'opacity-50': form.processing }"
                             :disabled="form.processing"
                         >

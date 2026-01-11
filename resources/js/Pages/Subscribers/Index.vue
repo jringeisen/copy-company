@@ -95,13 +95,13 @@ const onFileChange = (e) => {
             <!-- Header -->
             <div class="flex justify-between items-center mb-8">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900">Subscribers</h1>
-                    <p class="text-gray-600 mt-1">Manage your newsletter subscribers</p>
+                    <h1 class="text-2xl font-bold text-[#0b1215]">Subscribers</h1>
+                    <p class="text-[#0b1215]/60 mt-1">Manage your newsletter subscribers</p>
                 </div>
                 <div v-if="canExportSubscribers" class="flex space-x-3">
                     <a
                         href="/subscribers/export"
-                        class="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition"
+                        class="px-4 py-2 border border-[#0b1215]/20 text-[#0b1215] font-medium rounded-full hover:bg-[#0b1215]/5 transition"
                     >
                         Export CSV
                     </a>
@@ -110,35 +110,35 @@ const onFileChange = (e) => {
 
             <!-- Stats -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                <div class="bg-white rounded-lg shadow-sm p-6">
-                    <div class="text-sm text-gray-500">Total Subscribers</div>
-                    <div class="text-3xl font-bold text-gray-900">{{ stats.total }}</div>
+                <div class="bg-white rounded-2xl border border-[#0b1215]/10 p-6">
+                    <div class="text-sm text-[#0b1215]/50">Total Subscribers</div>
+                    <div class="text-3xl font-bold text-[#0b1215]">{{ stats.total }}</div>
                 </div>
-                <div class="bg-white rounded-lg shadow-sm p-6">
-                    <div class="text-sm text-gray-500">Confirmed</div>
+                <div class="bg-white rounded-2xl border border-[#0b1215]/10 p-6">
+                    <div class="text-sm text-[#0b1215]/50">Confirmed</div>
                     <div class="text-3xl font-bold text-green-600">{{ stats.confirmed }}</div>
                 </div>
-                <div class="bg-white rounded-lg shadow-sm p-6">
-                    <div class="text-sm text-gray-500">Unsubscribed</div>
-                    <div class="text-3xl font-bold text-gray-400">{{ stats.unsubscribed }}</div>
+                <div class="bg-white rounded-2xl border border-[#0b1215]/10 p-6">
+                    <div class="text-sm text-[#0b1215]/50">Unsubscribed</div>
+                    <div class="text-3xl font-bold text-[#0b1215]/40">{{ stats.unsubscribed }}</div>
                 </div>
             </div>
 
             <!-- Import -->
-            <div v-if="canExportSubscribers" class="bg-white rounded-lg shadow-sm p-6 mb-8">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Import Subscribers</h2>
-                <p class="text-sm text-gray-600 mb-4">Upload a CSV file with columns: email, name (optional)</p>
+            <div v-if="canExportSubscribers" class="bg-white rounded-2xl border border-[#0b1215]/10 p-6 mb-8">
+                <h2 class="text-lg font-semibold text-[#0b1215] mb-4">Import Subscribers</h2>
+                <p class="text-sm text-[#0b1215]/60 mb-4">Upload a CSV file with columns: email, name (optional)</p>
                 <div class="flex items-center space-x-4">
                     <input
                         type="file"
                         accept=".csv,.txt"
                         @change="onFileChange"
-                        class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+                        class="text-sm text-[#0b1215]/50 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-[#a1854f]/10 file:text-[#a1854f] hover:file:bg-[#a1854f]/20"
                     />
                     <button
                         @click="handleImport"
                         :disabled="!importFile || isImporting"
-                        class="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
+                        class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50"
                     >
                         {{ isImporting ? 'Importing...' : 'Import' }}
                     </button>
@@ -146,33 +146,33 @@ const onFileChange = (e) => {
             </div>
 
             <!-- Subscribers Table -->
-            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+            <div class="bg-white rounded-2xl border border-[#0b1215]/10 overflow-hidden">
+                <table class="min-w-full divide-y divide-[#0b1215]/10">
+                    <thead class="bg-[#f7f7f7]">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th class="px-6 py-3 text-left text-xs font-medium text-[#0b1215]/50 uppercase tracking-wider">
                                 Email
                             </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th class="px-6 py-3 text-left text-xs font-medium text-[#0b1215]/50 uppercase tracking-wider">
                                 Name
                             </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th class="px-6 py-3 text-left text-xs font-medium text-[#0b1215]/50 uppercase tracking-wider">
                                 Status
                             </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th class="px-6 py-3 text-left text-xs font-medium text-[#0b1215]/50 uppercase tracking-wider">
                                 Subscribed
                             </th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th class="px-6 py-3 text-right text-xs font-medium text-[#0b1215]/50 uppercase tracking-wider">
                                 Actions
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="bg-white divide-y divide-[#0b1215]/10">
                         <tr v-for="subscriber in subscribers.data" :key="subscriber.id">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-[#0b1215]">
                                 {{ subscriber.email }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-[#0b1215]/50">
                                 {{ subscriber.name || '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -180,21 +180,21 @@ const onFileChange = (e) => {
                                     class="px-2 py-1 text-xs font-medium rounded-full"
                                     :class="{
                                         'bg-green-100 text-green-800': subscriber.status === 'confirmed',
-                                        'bg-yellow-100 text-yellow-800': subscriber.status === 'pending',
-                                        'bg-gray-100 text-gray-800': subscriber.status === 'unsubscribed',
+                                        'bg-[#a1854f]/20 text-[#a1854f]': subscriber.status === 'pending',
+                                        'bg-[#0b1215]/10 text-[#0b1215]/60': subscriber.status === 'unsubscribed',
                                     }"
                                 >
                                     {{ subscriber.status }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-[#0b1215]/50">
                                 {{ new Date(subscriber.created_at).toLocaleDateString() }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-3">
                                 <button
                                     v-if="canDeleteSubscribers"
                                     @click="editSubscriber(subscriber)"
-                                    class="text-primary-600 hover:text-primary-800"
+                                    class="text-[#a1854f] hover:text-[#a1854f]/80"
                                 >
                                     Edit
                                 </button>
@@ -208,7 +208,7 @@ const onFileChange = (e) => {
                             </td>
                         </tr>
                         <tr v-if="subscribers.data.length === 0">
-                            <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                            <td colspan="5" class="px-6 py-12 text-center text-[#0b1215]/50">
                                 No subscribers yet. Share your blog to start growing your list!
                             </td>
                         </tr>
@@ -216,23 +216,23 @@ const onFileChange = (e) => {
                 </table>
 
                 <!-- Pagination -->
-                <div v-if="subscribers.last_page > 1" class="px-6 py-4 border-t border-gray-200">
+                <div v-if="subscribers.last_page > 1" class="px-6 py-4 border-t border-[#0b1215]/10">
                     <div class="flex justify-between items-center">
-                        <span class="text-sm text-gray-700">
+                        <span class="text-sm text-[#0b1215]/70">
                             Showing {{ subscribers.from }} to {{ subscribers.to }} of {{ subscribers.total }} subscribers
                         </span>
                         <div class="flex space-x-2">
                             <Link
                                 v-if="subscribers.prev_page_url"
                                 :href="subscribers.prev_page_url"
-                                class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50"
+                                class="px-3 py-1 border border-[#0b1215]/20 rounded-lg text-sm hover:bg-[#0b1215]/5"
                             >
                                 Previous
                             </Link>
                             <Link
                                 v-if="subscribers.next_page_url"
                                 :href="subscribers.next_page_url"
-                                class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50"
+                                class="px-3 py-1 border border-[#0b1215]/20 rounded-lg text-sm hover:bg-[#0b1215]/5"
                             >
                                 Next
                             </Link>
@@ -264,24 +264,24 @@ const onFileChange = (e) => {
             >
                 <div v-if="showEditModal" class="fixed inset-0 z-50 overflow-y-auto">
                     <div class="flex min-h-screen items-center justify-center p-4">
-                        <div class="fixed inset-0 bg-black/50" @click="cancelEdit"></div>
+                        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="cancelEdit"></div>
 
-                        <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Edit Subscriber</h3>
+                        <div class="relative bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+                            <h3 class="text-lg font-semibold text-[#0b1215] mb-4">Edit Subscriber</h3>
 
                             <form @submit.prevent="saveSubscriber">
                                 <div class="mb-4">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                    <p class="text-sm text-gray-600">{{ subscriberToEdit?.email }}</p>
+                                    <label class="block text-sm font-medium text-[#0b1215] mb-1">Email</label>
+                                    <p class="text-sm text-[#0b1215]/60">{{ subscriberToEdit?.email }}</p>
                                 </div>
 
                                 <div class="mb-6">
-                                    <label for="edit-name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                    <label for="edit-name" class="block text-sm font-medium text-[#0b1215] mb-1">Name</label>
                                     <input
                                         id="edit-name"
                                         v-model="editForm.name"
                                         type="text"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                        class="w-full px-4 py-2 border border-[#0b1215]/20 rounded-xl focus:ring-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                                         placeholder="Enter subscriber name"
                                     />
                                     <p v-if="editForm.errors.name" class="mt-1 text-sm text-red-600">{{ editForm.errors.name }}</p>
@@ -291,14 +291,14 @@ const onFileChange = (e) => {
                                     <button
                                         type="button"
                                         @click="cancelEdit"
-                                        class="px-4 py-2 text-gray-700 font-medium bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                                        class="px-4 py-2 text-[#0b1215] font-medium bg-white border border-[#0b1215]/20 rounded-xl hover:bg-[#0b1215]/5 transition"
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="submit"
                                         :disabled="editForm.processing"
-                                        class="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
+                                        class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50"
                                     >
                                         {{ editForm.processing ? 'Saving...' : 'Save' }}
                                     </button>

@@ -63,13 +63,13 @@ const resendInvitation = (invitation) => {
 const getRoleBadgeClass = (role) => {
     switch (role) {
         case 'admin':
-            return 'bg-purple-100 text-purple-800';
+            return 'bg-[#a1854f]/20 text-[#a1854f]';
         case 'member':
-            return 'bg-blue-100 text-blue-800';
+            return 'bg-[#0b1215]/10 text-[#0b1215]/80';
         case 'viewer':
-            return 'bg-gray-100 text-gray-800';
+            return 'bg-[#0b1215]/5 text-[#0b1215]/60';
         default:
-            return 'bg-gray-100 text-gray-800';
+            return 'bg-[#0b1215]/5 text-[#0b1215]/60';
     }
 };
 </script>
@@ -81,39 +81,39 @@ const getRoleBadgeClass = (role) => {
         <div class="max-w-3xl mx-auto">
             <div class="mb-8 flex items-center justify-between">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900">Team Settings</h1>
-                    <p class="text-gray-600 mt-1">Manage who has access to {{ account.name }}</p>
+                    <h1 class="text-2xl font-bold text-[#0b1215]">Team Settings</h1>
+                    <p class="text-[#0b1215]/60 mt-1">Manage who has access to {{ account.name }}</p>
                 </div>
                 <button
                     v-if="isAdmin"
                     @click="showInviteModal = true"
-                    class="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition"
+                    class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 focus:outline-none focus:ring-2 focus:ring-[#0b1215]/20 focus:ring-offset-2 transition"
                 >
                     Invite Member
                 </button>
             </div>
 
             <!-- Team Members -->
-            <div class="bg-white rounded-xl shadow-sm">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h2 class="text-lg font-semibold text-gray-900">Team Members</h2>
+            <div class="bg-white rounded-2xl border border-[#0b1215]/10">
+                <div class="px-6 py-4 border-b border-[#0b1215]/10">
+                    <h2 class="text-lg font-semibold text-[#0b1215]">Team Members</h2>
                 </div>
-                <ul class="divide-y divide-gray-200">
+                <ul class="divide-y divide-[#0b1215]/10">
                     <li
                         v-for="member in members"
                         :key="member.id"
                         class="px-6 py-4 flex items-center justify-between"
                     >
                         <div class="flex items-center">
-                            <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
-                                <span class="text-primary-700 font-medium">{{ member.name.charAt(0).toUpperCase() }}</span>
+                            <div class="w-10 h-10 bg-[#a1854f]/10 rounded-full flex items-center justify-center">
+                                <span class="text-[#a1854f] font-medium">{{ member.name.charAt(0).toUpperCase() }}</span>
                             </div>
                             <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-900">
+                                <p class="text-sm font-medium text-[#0b1215]">
                                     {{ member.name }}
-                                    <span v-if="member.is_current_user" class="text-gray-500">(You)</span>
+                                    <span v-if="member.is_current_user" class="text-[#0b1215]/50">(You)</span>
                                 </p>
-                                <p class="text-sm text-gray-500">{{ member.email }}</p>
+                                <p class="text-sm text-[#0b1215]/50">{{ member.email }}</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-3">
@@ -121,7 +121,7 @@ const getRoleBadgeClass = (role) => {
                                 v-if="isAdmin && !member.is_current_user"
                                 :value="member.role"
                                 @change="updateRole(member.id, $event.target.value)"
-                                class="text-sm border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
+                                class="text-sm border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                             >
                                 <option v-for="role in roles" :key="role.value" :value="role.value">
                                     {{ role.label }}
@@ -137,7 +137,7 @@ const getRoleBadgeClass = (role) => {
                             <button
                                 v-if="isAdmin && !member.is_current_user"
                                 @click="removeMember(member)"
-                                class="p-1 text-gray-400 hover:text-red-500 transition"
+                                class="p-1 text-[#0b1215]/40 hover:text-red-500 transition"
                                 title="Remove member"
                             >
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,35 +150,35 @@ const getRoleBadgeClass = (role) => {
             </div>
 
             <!-- Pending Invitations -->
-            <div v-if="pendingInvitations.length > 0" class="mt-8 bg-white rounded-xl shadow-sm">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h2 class="text-lg font-semibold text-gray-900">Pending Invitations</h2>
+            <div v-if="pendingInvitations.length > 0" class="mt-8 bg-white rounded-2xl border border-[#0b1215]/10">
+                <div class="px-6 py-4 border-b border-[#0b1215]/10">
+                    <h2 class="text-lg font-semibold text-[#0b1215]">Pending Invitations</h2>
                 </div>
-                <ul class="divide-y divide-gray-200">
+                <ul class="divide-y divide-[#0b1215]/10">
                     <li
                         v-for="invitation in pendingInvitations"
                         :key="invitation.id"
                         class="px-6 py-4 flex items-center justify-between"
                     >
                         <div>
-                            <p class="text-sm font-medium text-gray-900">{{ invitation.email }}</p>
-                            <p class="text-sm text-gray-500">
+                            <p class="text-sm font-medium text-[#0b1215]">{{ invitation.email }}</p>
+                            <p class="text-sm text-[#0b1215]/50">
                                 Invited as {{ invitation.role }} by {{ invitation.invited_by }}
                             </p>
-                            <p class="text-xs text-gray-400 mt-1">
+                            <p class="text-xs text-[#0b1215]/40 mt-1">
                                 Expires {{ new Date(invitation.expires_at).toLocaleDateString() }}
                             </p>
                         </div>
                         <div v-if="isAdmin" class="flex items-center gap-2">
                             <button
                                 @click="resendInvitation(invitation)"
-                                class="px-3 py-1.5 text-sm font-medium text-primary-600 bg-primary-50 rounded-lg hover:bg-primary-100 transition"
+                                class="px-3 py-1.5 text-sm font-medium text-[#a1854f] bg-[#a1854f]/10 rounded-xl hover:bg-[#a1854f]/20 transition"
                             >
                                 Resend
                             </button>
                             <button
                                 @click="cancelInvitation(invitation)"
-                                class="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition"
+                                class="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition"
                             >
                                 Cancel
                             </button>
@@ -188,13 +188,13 @@ const getRoleBadgeClass = (role) => {
             </div>
 
             <!-- Empty state for no pending invitations -->
-            <div v-else-if="isAdmin" class="mt-8 bg-white rounded-xl shadow-sm p-6">
+            <div v-else-if="isAdmin" class="mt-8 bg-white rounded-2xl border border-[#0b1215]/10 p-6">
                 <div class="text-center">
-                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="mx-auto h-12 w-12 text-[#0b1215]/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">No pending invitations</h3>
-                    <p class="mt-1 text-sm text-gray-500">Invite team members to collaborate on your brands.</p>
+                    <h3 class="mt-2 text-sm font-medium text-[#0b1215]">No pending invitations</h3>
+                    <p class="mt-1 text-sm text-[#0b1215]/50">Invite team members to collaborate on your brands.</p>
                 </div>
             </div>
         </div>
@@ -203,19 +203,19 @@ const getRoleBadgeClass = (role) => {
         <Teleport to="body">
         <div v-if="showInviteModal" class="fixed inset-0 z-50 overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen px-4">
-                <div class="fixed inset-0 bg-black opacity-30" @click="showInviteModal = false"></div>
+                <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showInviteModal = false"></div>
 
-                <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Invite Team Member</h3>
+                <div class="relative bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+                    <h3 class="text-lg font-semibold text-[#0b1215] mb-4">Invite Team Member</h3>
 
                     <form @submit.prevent="submitInvite" class="space-y-4">
                         <div>
-                            <label for="invite_email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                            <label for="invite_email" class="block text-sm font-medium text-[#0b1215]">Email Address</label>
                             <input
                                 id="invite_email"
                                 v-model="inviteForm.email"
                                 type="email"
-                                class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                                class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                                 placeholder="colleague@example.com"
                                 required
                             />
@@ -223,11 +223,11 @@ const getRoleBadgeClass = (role) => {
                         </div>
 
                         <div>
-                            <label for="invite_role" class="block text-sm font-medium text-gray-700">Role</label>
+                            <label for="invite_role" class="block text-sm font-medium text-[#0b1215]">Role</label>
                             <select
                                 id="invite_role"
                                 v-model="inviteForm.role"
-                                class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                                class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                             >
                                 <option v-for="role in roles" :key="role.value" :value="role.value">
                                     {{ role.label }}
@@ -240,13 +240,13 @@ const getRoleBadgeClass = (role) => {
                             <button
                                 type="button"
                                 @click="showInviteModal = false"
-                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+                                class="px-4 py-2 text-sm font-medium text-[#0b1215] bg-white border border-[#0b1215]/20 rounded-xl hover:bg-[#0b1215]/5 transition"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
-                                class="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition"
+                                class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 focus:outline-none focus:ring-2 focus:ring-[#0b1215]/20 focus:ring-offset-2 transition"
                                 :class="{ 'opacity-50': inviteForm.processing }"
                                 :disabled="inviteForm.processing"
                             >

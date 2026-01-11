@@ -176,9 +176,9 @@ const saveStatusClass = computed(() => {
         return 'text-red-500';
     }
     if (hasUnsavedChanges.value) {
-        return 'text-amber-500';
+        return 'text-[#a1854f]';
     }
-    return 'text-gray-500';
+    return 'text-[#0b1215]/50';
 });
 
 const publish = () => {
@@ -206,23 +206,23 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
 <template>
     <Head :title="post.title || 'Edit Post'" />
 
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-[#fcfbf8]">
         <!-- Navigation -->
-        <nav class="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <nav class="bg-white border-b border-[#0b1215]/10 sticky top-0 z-10">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
                     <div class="flex items-center space-x-4">
-                        <Link href="/posts" :preserve-state="false" class="text-gray-500 hover:text-gray-700">
+                        <Link href="/posts" :preserve-state="false" class="text-[#0b1215]/50 hover:text-[#0b1215] transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                             </svg>
                         </Link>
-                        <span class="text-gray-400">|</span>
-                        <span class="text-gray-600 truncate max-w-xs">{{ post.title || 'Untitled' }}</span>
-                        <span v-if="isPublished" class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                        <span class="text-[#0b1215]/20">|</span>
+                        <span class="text-[#0b1215]/70 truncate max-w-xs">{{ post.title || 'Untitled' }}</span>
+                        <span v-if="isPublished" class="px-2.5 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
                             Published
                         </span>
-                        <span v-else-if="isScheduled" class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                        <span v-else-if="isScheduled" class="px-2.5 py-1 text-xs font-medium bg-[#a1854f]/20 text-[#a1854f] rounded-full">
                             Scheduled
                         </span>
                     </div>
@@ -234,7 +234,7 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
                         <button
                             @click="save"
                             :disabled="form.processing || autosaveStatus === 'saving'"
-                            class="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
+                            class="px-4 py-2 border border-[#0b1215]/20 text-[#0b1215] font-medium rounded-full hover:bg-[#0b1215]/5 transition disabled:opacity-50 text-sm"
                         >
                             Save
                         </button>
@@ -242,7 +242,7 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
                         <button
                             v-if="!isPublished && !isScheduled"
                             @click="showPublishModal = true"
-                            class="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition"
+                            class="px-5 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition text-sm"
                         >
                             Publish
                         </button>
@@ -255,14 +255,14 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
             <!-- Main Editor Area -->
             <main class="flex-1 overflow-y-auto py-8 px-4">
                 <div class="max-w-4xl mx-auto">
-                    <div class="bg-white rounded-xl shadow-sm p-8">
+                    <div class="bg-white rounded-2xl border border-[#0b1215]/10 p-8">
                         <!-- Title -->
                         <div class="mb-6">
                             <input
                                 v-model="form.title"
                                 type="text"
                                 placeholder="Post title..."
-                                class="w-full text-4xl font-bold text-gray-900 border-0 border-b-2 border-transparent focus:border-primary-500 focus:ring-0 pb-2 placeholder-gray-300"
+                                class="w-full text-4xl font-bold text-[#0b1215] border-0 border-b-2 border-transparent focus:border-[#a1854f] focus:ring-0 pb-2 placeholder-[#0b1215]/30"
                             />
                             <p v-if="form.errors.title" class="mt-1 text-sm text-red-600">{{ form.errors.title }}</p>
                         </div>
@@ -273,12 +273,12 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
                                 v-model="form.excerpt"
                                 placeholder="Write a brief excerpt or summary (optional)..."
                                 rows="2"
-                                class="w-full text-gray-600 border-0 focus:ring-0 resize-none placeholder-gray-400"
+                                class="w-full text-[#0b1215]/70 border-0 focus:ring-0 resize-none placeholder-[#0b1215]/30"
                                 maxlength="500"
                             ></textarea>
                             <div class="flex justify-between items-center mt-1">
                                 <p v-if="form.errors.excerpt" class="text-sm text-red-600">{{ form.errors.excerpt }}</p>
-                                <span class="text-xs text-gray-400">{{ form.excerpt?.length || 0 }}/500</span>
+                                <span class="text-xs text-[#0b1215]/40">{{ form.excerpt?.length || 0 }}/500</span>
                             </div>
                         </div>
 
@@ -295,19 +295,19 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
                         </div>
 
                         <!-- Featured Image -->
-                        <div class="border-t border-gray-200 pt-6 mt-6">
-                            <h3 class="text-sm font-medium text-gray-900 mb-4">Featured Image</h3>
+                        <div class="border-t border-[#0b1215]/10 pt-6 mt-6">
+                            <h3 class="text-sm font-medium text-[#0b1215] mb-4">Featured Image</h3>
                             <div v-if="form.featured_image" class="relative inline-block">
                                 <img
                                     :src="form.featured_image"
                                     alt="Featured image"
-                                    class="w-48 h-32 object-cover rounded-lg border border-gray-200"
+                                    class="w-48 h-32 object-cover rounded-xl border border-[#0b1215]/10"
                                 />
                                 <div class="absolute top-2 right-2 flex gap-1">
                                     <button
                                         type="button"
                                         @click="showFeaturedImagePicker = true"
-                                        class="p-1.5 bg-white/90 text-gray-600 rounded-lg hover:bg-white transition shadow-sm"
+                                        class="p-1.5 bg-white/90 text-[#0b1215]/60 rounded-lg hover:bg-white hover:text-[#0b1215] transition shadow-sm"
                                         title="Change image"
                                     >
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -330,54 +330,54 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
                                 v-else
                                 type="button"
                                 @click="showFeaturedImagePicker = true"
-                                class="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-700 transition"
+                                class="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-[#0b1215]/20 rounded-xl text-[#0b1215]/60 hover:border-[#a1854f] hover:text-[#a1854f] transition"
                             >
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                 </svg>
                                 Add Featured Image
                             </button>
-                            <p class="mt-2 text-xs text-gray-500">
+                            <p class="mt-2 text-xs text-[#0b1215]/50">
                                 This image will appear at the top of your post and in social shares.
                             </p>
                         </div>
 
                         <!-- Distribution Options -->
-                        <div class="border-t border-gray-200 pt-6 mt-6">
-                            <h3 class="text-sm font-medium text-gray-900 mb-4">Distribution Options</h3>
+                        <div class="border-t border-[#0b1215]/10 pt-6 mt-6">
+                            <h3 class="text-sm font-medium text-[#0b1215] mb-4">Distribution Options</h3>
                             <div class="space-y-3">
                                 <label class="flex items-center">
                                     <input
                                         v-model="form.publish_to_blog"
                                         type="checkbox"
-                                        class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                                        class="rounded border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
                                     />
-                                    <span class="ml-2 text-sm text-gray-700">Publish to blog</span>
+                                    <span class="ml-2 text-sm text-[#0b1215]/70">Publish to blog</span>
                                 </label>
                                 <label class="flex items-center">
                                     <input
                                         v-model="form.send_as_newsletter"
                                         type="checkbox"
-                                        class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                                        class="rounded border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
                                     />
-                                    <span class="ml-2 text-sm text-gray-700">Send as newsletter</span>
+                                    <span class="ml-2 text-sm text-[#0b1215]/70">Send as newsletter</span>
                                 </label>
                                 <label class="flex items-center">
                                     <input
                                         v-model="form.generate_social"
                                         type="checkbox"
-                                        class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                                        class="rounded border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
                                     />
-                                    <span class="ml-2 text-sm text-gray-700">Generate social posts</span>
+                                    <span class="ml-2 text-sm text-[#0b1215]/70">Generate social posts</span>
                                 </label>
                             </div>
                         </div>
 
                         <!-- Delete -->
-                        <div class="border-t border-gray-200 pt-6 mt-6">
+                        <div class="border-t border-[#0b1215]/10 pt-6 mt-6">
                             <button
                                 @click="showDeleteModal = true"
-                                class="text-sm text-red-600 hover:text-red-800"
+                                class="text-sm text-red-600 hover:text-red-700 transition-colors"
                             >
                                 Delete this post
                             </button>
@@ -402,8 +402,8 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
             <div class="flex min-h-screen items-center justify-center p-4">
                 <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showPublishModal = false"></div>
 
-                <div class="relative bg-white rounded-xl shadow-xl max-w-lg w-full p-6">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">
+                <div class="relative bg-white rounded-2xl shadow-xl max-w-lg w-full p-6">
+                    <h2 class="text-xl font-semibold text-[#0b1215] mb-4">
                         Publish "{{ post.title }}"
                     </h2>
 
@@ -413,11 +413,11 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
                             <input
                                 v-model="publishForm.publish_to_blog"
                                 type="checkbox"
-                                class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                                class="rounded border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
                             />
-                            <span class="ml-2 font-medium text-gray-900">Publish to your blog</span>
+                            <span class="ml-2 font-medium text-[#0b1215]">Publish to your blog</span>
                         </label>
-                        <p class="ml-6 text-sm text-gray-500">
+                        <p class="ml-6 text-sm text-[#0b1215]/50">
                             {{ brand.url }}/{{ post.slug }}
                         </p>
                     </div>
@@ -428,62 +428,62 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
                             <input
                                 v-model="publishForm.send_as_newsletter"
                                 type="checkbox"
-                                class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                                class="rounded border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
                             />
-                            <span class="ml-2 font-medium text-gray-900">Send as newsletter</span>
+                            <span class="ml-2 font-medium text-[#0b1215]">Send as newsletter</span>
                         </label>
 
                         <div v-if="publishForm.send_as_newsletter" class="ml-6 mt-3 space-y-3">
                             <div>
-                                <label class="block text-sm text-gray-700 mb-1">Subject line</label>
+                                <label class="block text-sm text-[#0b1215]/70 mb-1">Subject line</label>
                                 <input
                                     v-model="publishForm.subject_line"
                                     type="text"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
+                                    class="w-full px-3 py-2 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                                 />
                             </div>
                             <div>
-                                <label class="block text-sm text-gray-700 mb-1">Preview text</label>
+                                <label class="block text-sm text-[#0b1215]/70 mb-1">Preview text</label>
                                 <input
                                     v-model="publishForm.preview_text"
                                     type="text"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
+                                    class="w-full px-3 py-2 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                                 />
                             </div>
                         </div>
                     </div>
 
                     <!-- Schedule Options -->
-                    <div class="mb-6 border-t border-gray-200 pt-6">
-                        <label class="block text-sm font-medium text-gray-900 mb-3">When to publish?</label>
+                    <div class="mb-6 border-t border-[#0b1215]/10 pt-6">
+                        <label class="block text-sm font-medium text-[#0b1215] mb-3">When to publish?</label>
                         <div class="space-y-3">
                             <label class="flex items-center">
                                 <input
                                     v-model="publishForm.schedule_mode"
                                     type="radio"
                                     value="now"
-                                    class="border-gray-300 text-primary-600 focus:ring-primary-500"
+                                    class="border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
                                 />
-                                <span class="ml-2 text-gray-700">Publish immediately</span>
+                                <span class="ml-2 text-[#0b1215]/70">Publish immediately</span>
                             </label>
                             <label class="flex items-center">
                                 <input
                                     v-model="publishForm.schedule_mode"
                                     type="radio"
                                     value="scheduled"
-                                    class="border-gray-300 text-primary-600 focus:ring-primary-500"
+                                    class="border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
                                 />
-                                <span class="ml-2 text-gray-700">Schedule for later</span>
+                                <span class="ml-2 text-[#0b1215]/70">Schedule for later</span>
                             </label>
                         </div>
 
                         <div v-if="publishForm.schedule_mode === 'scheduled'" class="mt-3 ml-6">
-                            <label class="block text-sm text-gray-700 mb-1">Schedule date and time</label>
+                            <label class="block text-sm text-[#0b1215]/70 mb-1">Schedule date and time</label>
                             <input
                                 v-model="publishForm.scheduled_at"
                                 type="datetime-local"
                                 :min="minDateTime"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
+                                class="w-full px-3 py-2 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                             />
                             <p v-if="publishForm.errors.scheduled_at" class="mt-1 text-sm text-red-600">
                                 {{ publishForm.errors.scheduled_at }}
@@ -492,17 +492,17 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
                     </div>
 
                     <!-- Actions -->
-                    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                    <div class="flex justify-end space-x-3 pt-4 border-t border-[#0b1215]/10">
                         <button
                             @click="showPublishModal = false"
-                            class="px-4 py-2 text-gray-700 font-medium hover:bg-gray-100 rounded-lg transition"
+                            class="px-4 py-2 text-[#0b1215]/70 font-medium hover:bg-[#0b1215]/5 rounded-full transition"
                         >
                             Cancel
                         </button>
                         <button
                             @click="publish"
                             :disabled="publishForm.processing || (publishForm.schedule_mode === 'scheduled' && !publishForm.scheduled_at)"
-                            class="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
+                            class="px-5 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50 text-sm"
                         >
                             {{ publishForm.schedule_mode === 'scheduled' ? 'Schedule' : 'Publish Now' }}
                         </button>

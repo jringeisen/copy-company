@@ -159,20 +159,20 @@ const onUploadComplete = () => {
                     <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="emit('close')"></div>
 
                     <!-- Modal -->
-                    <div class="relative bg-white rounded-xl shadow-xl w-full max-w-4xl h-[80vh] flex flex-col">
+                    <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-4xl h-[80vh] flex flex-col">
                         <!-- Header -->
-                        <div class="flex items-center justify-between p-4 border-b border-gray-200">
-                            <h3 class="text-lg font-semibold text-gray-900">
+                        <div class="flex items-center justify-between p-4 border-b border-[#0b1215]/10">
+                            <h3 class="text-lg font-semibold text-[#0b1215]">
                                 {{ multiple ? `Select Images (${selectedItems.length}/${maxItems})` : 'Select Image' }}
                             </h3>
                             <div class="flex items-center gap-3">
                                 <button
                                     @click="showUploader = true"
-                                    class="px-3 py-1.5 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"
+                                    class="px-3 py-1.5 text-sm bg-[#0b1215] text-white rounded-full hover:bg-[#0b1215]/90 transition"
                                 >
                                     Upload New
                                 </button>
-                                <button @click="emit('close')" class="text-gray-400 hover:text-gray-600">
+                                <button @click="emit('close')" class="text-[#0b1215]/40 hover:text-[#0b1215]/60">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
@@ -181,15 +181,15 @@ const onUploadComplete = () => {
                         </div>
 
                         <!-- Search & Filters -->
-                        <div class="px-4 py-3 border-b border-gray-200 flex items-center gap-4">
+                        <div class="px-4 py-3 border-b border-[#0b1215]/10 flex items-center gap-4">
                             <div class="relative grow">
                                 <input
                                     v-model="search"
                                     type="text"
                                     placeholder="Search images..."
-                                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                    class="w-full pl-10 pr-4 py-2 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                                 />
-                                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0b1215]/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                 </svg>
                             </div>
@@ -197,7 +197,7 @@ const onUploadComplete = () => {
                             <!-- Folder Filter -->
                             <select
                                 v-model="currentFolderId"
-                                class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                class="px-3 py-2 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                             >
                                 <option :value="null">All Folders</option>
                                 <option v-for="folder in folders" :key="folder.id" :value="folder.id">
@@ -210,7 +210,7 @@ const onUploadComplete = () => {
                         <div class="grow overflow-y-auto p-4">
                             <!-- Loading -->
                             <div v-if="isLoading" class="flex items-center justify-center h-full">
-                                <svg class="animate-spin h-8 w-8 text-primary-600" viewBox="0 0 24 24">
+                                <svg class="animate-spin h-8 w-8 text-[#0b1215]" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
                                 </svg>
@@ -218,13 +218,13 @@ const onUploadComplete = () => {
 
                             <!-- Empty State -->
                             <div v-else-if="media.length === 0" class="flex flex-col items-center justify-center h-full text-center">
-                                <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-16 h-16 text-[#0b1215]/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                 </svg>
-                                <p class="mt-4 text-gray-600">No images found</p>
+                                <p class="mt-4 text-[#0b1215]/60">No images found</p>
                                 <button
                                     @click="showUploader = true"
-                                    class="mt-2 text-primary-600 hover:text-primary-700"
+                                    class="mt-2 text-[#a1854f] hover:text-[#a1854f]/80"
                                 >
                                     Upload images
                                 </button>
@@ -237,10 +237,10 @@ const onUploadComplete = () => {
                                     :key="item.id"
                                     @click="selectItem(item)"
                                     :class="[
-                                        'relative aspect-square bg-gray-100 rounded-lg overflow-hidden transition border-2',
+                                        'relative aspect-square bg-[#f7f7f7] rounded-xl overflow-hidden transition border-2',
                                         isSelected(item)
-                                            ? 'border-primary-500 ring-2 ring-primary-200 cursor-pointer'
-                                            : 'border-transparent hover:border-gray-300 cursor-pointer',
+                                            ? 'border-[#a1854f] ring-2 ring-[#a1854f]/20 cursor-pointer'
+                                            : 'border-transparent hover:border-[#0b1215]/20 cursor-pointer',
                                         !canSelectMore && !isSelected(item)
                                             ? 'opacity-50 cursor-not-allowed pointer-events-none'
                                             : ''
@@ -254,7 +254,7 @@ const onUploadComplete = () => {
                                     />
                                     <div
                                         v-if="isSelected(item)"
-                                        class="absolute top-2 left-2 w-6 h-6 bg-primary-600 text-white rounded-full flex items-center justify-center"
+                                        class="absolute top-2 left-2 w-6 h-6 bg-[#a1854f] text-white rounded-full flex items-center justify-center"
                                     >
                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
@@ -265,14 +265,14 @@ const onUploadComplete = () => {
                         </div>
 
                         <!-- Footer -->
-                        <div class="flex items-center justify-between p-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
-                            <div class="text-sm text-gray-600">
+                        <div class="flex items-center justify-between p-4 border-t border-[#0b1215]/10 bg-[#f7f7f7] rounded-b-2xl">
+                            <div class="text-sm text-[#0b1215]/60">
                                 {{ selectedItems.length }} selected
                             </div>
                             <div class="flex items-center gap-3">
                                 <button
                                     @click="emit('close')"
-                                    class="px-4 py-2 text-gray-700 font-medium bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                                    class="px-4 py-2 text-[#0b1215] font-medium bg-white border border-[#0b1215]/20 rounded-xl hover:bg-[#0b1215]/5 transition"
                                 >
                                     Cancel
                                 </button>
@@ -280,7 +280,7 @@ const onUploadComplete = () => {
                                     v-if="multiple"
                                     @click="confirmSelection"
                                     :disabled="selectedItems.length === 0"
-                                    class="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
+                                    class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50"
                                 >
                                     Select {{ selectedItems.length }} Image{{ selectedItems.length !== 1 ? 's' : '' }}
                                 </button>

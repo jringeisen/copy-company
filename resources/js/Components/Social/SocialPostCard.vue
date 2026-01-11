@@ -43,9 +43,9 @@ const platformColors = {
 };
 
 const statusColors = {
-    draft: 'bg-gray-100 text-gray-700',
-    queued: 'bg-yellow-100 text-yellow-700',
-    scheduled: 'bg-blue-100 text-blue-700',
+    draft: 'bg-[#0b1215]/10 text-[#0b1215]/70',
+    queued: 'bg-[#a1854f]/20 text-[#a1854f]',
+    scheduled: 'bg-[#0b1215]/10 text-[#0b1215]/80',
     published: 'bg-green-100 text-green-700',
     failed: 'bg-red-100 text-red-700',
 };
@@ -93,9 +93,9 @@ const handleRetry = () => {
 </script>
 
 <template>
-    <div class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+    <div class="bg-white rounded-2xl border border-[#0b1215]/10 hover:border-[#0b1215]/20 transition">
         <!-- Header -->
-        <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <div class="flex items-center justify-between p-4 border-b border-[#0b1215]/10">
             <div class="flex items-center space-x-3">
                 <!-- Platform Icon -->
                 <div
@@ -107,8 +107,8 @@ const handleRetry = () => {
                     </svg>
                 </div>
                 <div>
-                    <div class="font-medium text-gray-900">{{ socialPost.platform_display }}</div>
-                    <div class="text-xs text-gray-500">{{ socialPost.format }}</div>
+                    <div class="font-medium text-[#0b1215]">{{ socialPost.platform_display }}</div>
+                    <div class="text-xs text-[#0b1215]/50">{{ socialPost.format }}</div>
                 </div>
             </div>
 
@@ -134,25 +134,25 @@ const handleRetry = () => {
 
         <!-- Content Preview -->
         <div class="p-4">
-            <p class="text-sm text-gray-700 whitespace-pre-wrap">{{ truncatedContent }}</p>
+            <p class="text-sm text-[#0b1215]/70 whitespace-pre-wrap">{{ truncatedContent }}</p>
 
             <!-- Hashtags -->
             <div v-if="socialPost.hashtags && socialPost.hashtags.length > 0" class="mt-3 flex flex-wrap gap-1">
                 <span
                     v-for="hashtag in socialPost.hashtags.slice(0, 5)"
                     :key="hashtag"
-                    class="text-xs text-primary-600 bg-primary-50 px-2 py-0.5 rounded"
+                    class="text-xs text-[#a1854f] bg-[#a1854f]/10 px-2 py-0.5 rounded"
                 >
                     #{{ hashtag }}
                 </span>
-                <span v-if="socialPost.hashtags.length > 5" class="text-xs text-gray-500">
+                <span v-if="socialPost.hashtags.length > 5" class="text-xs text-[#0b1215]/50">
                     +{{ socialPost.hashtags.length - 5 }} more
                 </span>
             </div>
 
             <!-- Source Post -->
-            <div v-if="socialPost.post" class="mt-3 pt-3 border-t border-gray-100">
-                <div class="flex items-center text-xs text-gray-500">
+            <div v-if="socialPost.post" class="mt-3 pt-3 border-t border-[#0b1215]/10">
+                <div class="flex items-center text-xs text-[#0b1215]/50">
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                     </svg>
@@ -161,8 +161,8 @@ const handleRetry = () => {
             </div>
 
             <!-- AI Badge -->
-            <div v-if="socialPost.ai_generated" class="mt-2 flex items-center text-xs text-gray-500">
-                <svg class="w-4 h-4 mr-1 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div v-if="socialPost.ai_generated" class="mt-2 flex items-center text-xs text-[#0b1215]/50">
+                <svg class="w-4 h-4 mr-1 text-[#a1854f]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
                 AI Generated{{ socialPost.user_edited ? ' (edited)' : '' }}
@@ -171,7 +171,7 @@ const handleRetry = () => {
 
         <!-- Schedule Info -->
         <div v-if="socialPost.scheduled_at" class="px-4 pb-3">
-            <div class="flex items-center text-xs text-blue-600">
+            <div class="flex items-center text-xs text-[#a1854f]">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -190,11 +190,11 @@ const handleRetry = () => {
         </div>
 
         <!-- Actions -->
-        <div class="flex items-center justify-between p-4 border-t border-gray-100 bg-gray-50 rounded-b-lg">
+        <div class="flex items-center justify-between p-4 border-t border-[#0b1215]/10 bg-[#f7f7f7] rounded-b-2xl">
             <div class="flex items-center space-x-2">
                 <button
                     @click="emit('edit', socialPost)"
-                    class="text-sm text-gray-600 hover:text-gray-900 flex items-center"
+                    class="text-sm text-[#0b1215]/60 hover:text-[#0b1215] flex items-center"
                     :disabled="isPublishing"
                 >
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -206,7 +206,7 @@ const handleRetry = () => {
                 <button
                     v-if="socialPost.status === 'draft'"
                     @click="handleQueue"
-                    class="text-sm text-yellow-600 hover:text-yellow-700 flex items-center"
+                    class="text-sm text-[#a1854f] hover:text-[#a1854f]/80 flex items-center"
                     :disabled="isPublishing"
                 >
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -218,7 +218,7 @@ const handleRetry = () => {
                 <button
                     v-if="['draft', 'queued'].includes(socialPost.status)"
                     @click="emit('schedule', socialPost)"
-                    class="text-sm text-blue-600 hover:text-blue-700 flex items-center"
+                    class="text-sm text-[#0b1215]/60 hover:text-[#0b1215] flex items-center"
                     :disabled="isPublishing"
                 >
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -99,35 +99,35 @@ const deleteMessage = computed(() => {
             <!-- Header -->
             <div class="flex justify-between items-center mb-8">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900">Media Library</h1>
-                    <p class="text-gray-600">Manage your images and files</p>
+                    <h1 class="text-2xl font-bold text-[#0b1215]">Media Library</h1>
+                    <p class="text-[#0b1215]/60">Manage your images and files</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <button
                         v-if="canUploadMedia && selectedIds.length > 0"
                         @click="openMoveModal"
-                        class="px-4 py-2 bg-gray-600 text-white font-medium rounded-lg hover:bg-gray-700 transition"
+                        class="px-4 py-2.5 bg-[#0b1215]/10 text-[#0b1215] font-medium rounded-full hover:bg-[#0b1215]/20 transition text-sm"
                     >
                         Move ({{ selectedIds.length }})
                     </button>
                     <button
                         v-if="canDeleteMedia && selectedIds.length > 0"
                         @click="showDeleteModal = true"
-                        class="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition"
+                        class="px-4 py-2.5 bg-red-600 text-white font-medium rounded-full hover:bg-red-700 transition text-sm"
                     >
                         Delete ({{ selectedIds.length }})
                     </button>
                     <button
                         v-if="canUploadMedia"
                         @click="showCreateFolderModal = true"
-                        class="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition"
+                        class="px-4 py-2.5 border border-[#0b1215]/20 text-[#0b1215] font-medium rounded-full hover:bg-[#0b1215]/5 transition text-sm"
                     >
                         New Folder
                     </button>
                     <button
                         v-if="canUploadMedia"
                         @click="showUploader = true"
-                        class="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition"
+                        class="px-5 py-2.5 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition text-sm"
                     >
                         Upload Images
                     </button>
@@ -148,27 +148,27 @@ const deleteMessage = computed(() => {
                 <!-- Main Content -->
                 <div class="grow">
                     <!-- Breadcrumb -->
-                    <div v-if="currentFolder" class="mb-4 flex items-center gap-2 text-sm text-gray-600">
-                        <button @click="navigateToRoot" class="hover:text-primary-600">
+                    <div v-if="currentFolder" class="mb-4 flex items-center gap-2 text-sm text-[#0b1215]/60">
+                        <button @click="navigateToRoot" class="hover:text-[#a1854f] transition-colors">
                             All Media
                         </button>
                         <span>/</span>
-                        <span class="text-gray-900 font-medium">{{ currentFolder.name }}</span>
+                        <span class="text-[#0b1215] font-medium">{{ currentFolder.name }}</span>
                     </div>
 
                     <!-- Selection header -->
                     <div v-if="media.data?.length > 0" class="mb-4 flex items-center gap-4">
-                        <label v-if="canDeleteMedia" class="flex items-center gap-2 text-sm text-gray-600">
+                        <label v-if="canDeleteMedia" class="flex items-center gap-2 text-sm text-[#0b1215]/60">
                             <input
                                 type="checkbox"
                                 :checked="allSelected"
                                 :indeterminate="someSelected"
                                 @change="toggleAll"
-                                class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                                class="rounded border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
                             />
                             Select all
                         </label>
-                        <span class="text-sm text-gray-500">
+                        <span class="text-sm text-[#0b1215]/50">
                             {{ media.data.length }} image{{ media.data.length !== 1 ? 's' : '' }}
                         </span>
                     </div>
@@ -183,18 +183,18 @@ const deleteMessage = computed(() => {
                     />
 
                     <!-- Empty State -->
-                    <div v-else class="bg-white rounded-lg shadow p-12 text-center">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    <div v-else class="bg-white rounded-2xl border border-[#0b1215]/10 p-12 text-center">
+                        <svg class="mx-auto h-12 w-12 text-[#0b1215]/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        <h3 class="mt-4 text-lg font-medium text-gray-900">No images yet</h3>
-                        <p class="mt-2 text-gray-500">
+                        <h3 class="mt-4 text-lg font-medium text-[#0b1215]">No images yet</h3>
+                        <p class="mt-2 text-[#0b1215]/50">
                             {{ currentFolder ? 'This folder is empty.' : (canUploadMedia ? 'Upload your first image to get started.' : 'No images have been uploaded yet.') }}
                         </p>
                         <button
                             v-if="canUploadMedia"
                             @click="showUploader = true"
-                            class="mt-4 inline-flex items-center px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition"
+                            class="mt-6 inline-flex items-center px-5 py-2.5 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition text-sm"
                         >
                             Upload Images
                         </button>
@@ -207,16 +207,16 @@ const deleteMessage = computed(() => {
                                 v-if="link.url"
                                 @click="router.get(link.url)"
                                 :class="[
-                                    'px-3 py-2 text-sm rounded',
+                                    'px-3 py-2 text-sm rounded-lg transition-colors',
                                     link.active
-                                        ? 'bg-primary-600 text-white'
-                                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                                        ? 'bg-[#0b1215] text-white'
+                                        : 'bg-white text-[#0b1215] hover:bg-[#0b1215]/5 border border-[#0b1215]/20'
                                 ]"
                                 v-html="link.label"
                             />
                             <span
                                 v-else
-                                class="px-3 py-2 text-sm text-gray-400"
+                                class="px-3 py-2 text-sm text-[#0b1215]/30"
                                 v-html="link.label"
                             />
                         </template>

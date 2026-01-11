@@ -120,9 +120,9 @@ const formatFileSize = (bytes) => {
                     <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="close"></div>
 
                     <!-- Modal -->
-                    <div class="relative bg-white rounded-xl shadow-xl max-w-2xl w-full">
+                    <div class="relative bg-white rounded-2xl shadow-xl max-w-2xl w-full">
                         <div class="p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Upload Images</h3>
+                            <h3 class="text-lg font-semibold text-[#0b1215] mb-4">Upload Images</h3>
 
                             <!-- Drop Zone -->
                             <div
@@ -131,17 +131,17 @@ const formatFileSize = (bytes) => {
                                 @drop.prevent="handleDrop"
                                 @click="fileInput.click()"
                                 :class="[
-                                    'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition',
-                                    dragOver ? 'border-primary-500 bg-primary-50' : 'border-gray-300 hover:border-gray-400'
+                                    'border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition',
+                                    dragOver ? 'border-[#a1854f] bg-[#a1854f]/5' : 'border-[#0b1215]/20 hover:border-[#0b1215]/40'
                                 ]"
                             >
-                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="mx-auto h-12 w-12 text-[#0b1215]/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                <p class="mt-2 text-sm text-gray-600">
+                                <p class="mt-2 text-sm text-[#0b1215]/60">
                                     Drag and drop images here, or click to browse
                                 </p>
-                                <p class="mt-1 text-xs text-gray-500">
+                                <p class="mt-1 text-xs text-[#0b1215]/50">
                                     JPG, PNG, GIF, WebP up to 10MB each
                                 </p>
                                 <input
@@ -156,26 +156,26 @@ const formatFileSize = (bytes) => {
 
                             <!-- Selected Files -->
                             <div v-if="form.images.length > 0" class="mt-4">
-                                <h4 class="text-sm font-medium text-gray-700 mb-2">
+                                <h4 class="text-sm font-medium text-[#0b1215] mb-2">
                                     Selected ({{ form.images.length }})
                                 </h4>
                                 <div class="space-y-2 max-h-48 overflow-y-auto">
                                     <div
                                         v-for="(file, index) in form.images"
                                         :key="index"
-                                        class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg"
+                                        class="flex items-center gap-3 p-2 bg-[#f7f7f7] rounded-xl"
                                     >
                                         <img
                                             :src="getPreviewUrl(file)"
-                                            class="w-10 h-10 object-cover rounded"
+                                            class="w-10 h-10 object-cover rounded-lg"
                                         />
                                         <div class="grow min-w-0">
-                                            <p class="text-sm text-gray-900 truncate">{{ file.name }}</p>
-                                            <p class="text-xs text-gray-500">{{ formatFileSize(file.size) }}</p>
+                                            <p class="text-sm text-[#0b1215] truncate">{{ file.name }}</p>
+                                            <p class="text-xs text-[#0b1215]/50">{{ formatFileSize(file.size) }}</p>
                                         </div>
                                         <button
                                             @click="removeFile(index)"
-                                            class="text-gray-400 hover:text-red-500 transition"
+                                            class="text-[#0b1215]/40 hover:text-red-500 transition"
                                         >
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -192,18 +192,18 @@ const formatFileSize = (bytes) => {
                         </div>
 
                         <!-- Actions -->
-                        <div class="flex items-center gap-3 p-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+                        <div class="flex items-center gap-3 p-4 border-t border-[#0b1215]/10 bg-[#f7f7f7] rounded-b-2xl">
                             <button
                                 @click="close"
                                 :disabled="form.processing"
-                                class="flex-1 px-4 py-2 text-gray-700 font-medium bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
+                                class="flex-1 px-4 py-2 text-[#0b1215] font-medium bg-white border border-[#0b1215]/20 rounded-xl hover:bg-[#0b1215]/5 transition disabled:opacity-50"
                             >
                                 Cancel
                             </button>
                             <button
                                 @click="upload"
                                 :disabled="form.processing || form.images.length === 0"
-                                class="flex-1 px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
+                                class="flex-1 px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50"
                             >
                                 <span v-if="form.processing" class="flex items-center justify-center gap-2">
                                     <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24">

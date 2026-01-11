@@ -79,22 +79,22 @@ const submitBulkSchedule = () => {
             <!-- Page Header -->
             <div class="flex justify-between items-center mb-6">
                 <div class="flex items-center gap-3">
-                    <h1 class="text-2xl font-bold text-gray-900">Queue</h1>
-                    <span class="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full text-sm font-medium">
+                    <h1 class="text-2xl font-bold text-[#0b1215]">Queue</h1>
+                    <span class="bg-[#a1854f]/20 text-[#a1854f] px-2 py-0.5 rounded-full text-sm font-medium">
                         {{ queuedPosts.length }} posts
                     </span>
                 </div>
                 <div class="flex items-center space-x-3">
                     <Link
                         href="/social-posts"
-                        class="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition"
+                        class="px-4 py-2 border border-[#0b1215]/20 text-[#0b1215] font-medium rounded-full hover:bg-[#0b1215]/5 transition"
                     >
                         Back to Social Posts
                     </Link>
                     <button
                         v-if="selectedPosts.length > 0"
                         @click="openBulkSchedule"
-                        class="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition"
+                        class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition"
                     >
                         Schedule {{ selectedPosts.length }} Selected
                     </button>
@@ -107,9 +107,9 @@ const submitBulkSchedule = () => {
                         type="checkbox"
                         :checked="selectedPosts.length === queuedPosts.length"
                         @change="selectAll"
-                        class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                        class="rounded border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
                     />
-                    <span class="ml-2 text-sm text-gray-700">Select all</span>
+                    <span class="ml-2 text-sm text-[#0b1215]/70">Select all</span>
                 </label>
             </div>
 
@@ -118,7 +118,7 @@ const submitBulkSchedule = () => {
                 <div
                     v-for="(post, index) in queuedPosts"
                     :key="post.id"
-                    class="bg-white rounded-lg border border-gray-200 shadow-sm"
+                    class="bg-white rounded-2xl border border-[#0b1215]/10"
                 >
                     <div class="flex items-start p-4">
                         <!-- Checkbox -->
@@ -127,12 +127,12 @@ const submitBulkSchedule = () => {
                                 type="checkbox"
                                 :checked="selectedPosts.includes(post.id)"
                                 @change="toggleSelect(post.id)"
-                                class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                                class="rounded border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
                             />
                         </div>
 
                         <!-- Order Number -->
-                        <div class="flex items-center justify-center w-8 h-8 bg-gray-100 rounded-full text-sm font-medium text-gray-600 mr-4">
+                        <div class="flex items-center justify-center w-8 h-8 bg-[#0b1215]/5 rounded-full text-sm font-medium text-[#0b1215]/60 mr-4">
                             {{ index + 1 }}
                         </div>
 
@@ -149,11 +149,11 @@ const submitBulkSchedule = () => {
                         <!-- Content -->
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center space-x-2 mb-1">
-                                <span class="font-medium text-gray-900">{{ post.platform_display }}</span>
-                                <span class="text-xs text-gray-500">{{ post.format }}</span>
+                                <span class="font-medium text-[#0b1215]">{{ post.platform_display }}</span>
+                                <span class="text-xs text-[#0b1215]/50">{{ post.format }}</span>
                             </div>
-                            <p class="text-sm text-gray-600 line-clamp-2">{{ post.content }}</p>
-                            <div v-if="post.post" class="mt-2 text-xs text-gray-500">
+                            <p class="text-sm text-[#0b1215]/60 line-clamp-2">{{ post.content }}</p>
+                            <div v-if="post.post" class="mt-2 text-xs text-[#0b1215]/50">
                                 From: {{ post.post.title }}
                             </div>
                         </div>
@@ -175,17 +175,17 @@ const submitBulkSchedule = () => {
             </div>
 
             <!-- Empty State -->
-            <div v-else class="text-center py-12">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div v-else class="text-center py-12 bg-white rounded-2xl border border-[#0b1215]/10">
+                <svg class="mx-auto h-12 w-12 text-[#0b1215]/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                 </svg>
-                <h3 class="mt-4 text-lg font-medium text-gray-900">Queue is empty</h3>
-                <p class="mt-2 text-sm text-gray-500">
+                <h3 class="mt-4 text-lg font-medium text-[#0b1215]">Queue is empty</h3>
+                <p class="mt-2 text-sm text-[#0b1215]/50">
                     Add social posts to your queue to schedule them for publishing.
                 </p>
                 <Link
                     href="/social-posts"
-                    class="mt-4 inline-block px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition"
+                    class="mt-4 inline-block px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition"
                 >
                     View All Social Posts
                 </Link>
@@ -197,40 +197,40 @@ const submitBulkSchedule = () => {
             <div class="flex min-h-screen items-center justify-center p-4">
                 <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showBulkScheduleModal = false"></div>
 
-                <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">
+                <div class="relative bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+                    <h2 class="text-xl font-semibold text-[#0b1215] mb-4">
                         Schedule {{ bulkScheduleForm.social_post_ids.length }} Posts
                     </h2>
 
                     <div class="space-y-4">
                         <!-- Validation Errors -->
-                        <div v-if="Object.keys(bulkScheduleForm.errors).length > 0" class="bg-red-50 border border-red-200 rounded-lg p-3">
+                        <div v-if="Object.keys(bulkScheduleForm.errors).length > 0" class="bg-red-50 border border-red-200 rounded-xl p-3">
                             <ul class="text-sm text-red-600 list-disc list-inside">
                                 <li v-for="(error, key) in bulkScheduleForm.errors" :key="key">{{ error }}</li>
                             </ul>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Start date and time</label>
+                            <label class="block text-sm font-medium text-[#0b1215] mb-2">Start date and time</label>
                             <input
                                 v-model="bulkScheduleForm.scheduled_at"
                                 type="datetime-local"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-primary-500 focus:border-primary-500"
+                                class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                                 :class="{ 'border-red-500': bulkScheduleForm.errors.scheduled_at }"
                             />
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <label class="block text-sm font-medium text-[#0b1215] mb-2">
                                 Interval between posts (minutes)
                             </label>
                             <input
                                 v-model.number="bulkScheduleForm.interval_minutes"
                                 type="number"
                                 min="0"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-primary-500 focus:border-primary-500"
+                                class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                             />
-                            <p class="mt-1 text-sm text-gray-500">
+                            <p class="mt-1 text-sm text-[#0b1215]/50">
                                 Posts will be scheduled {{ bulkScheduleForm.interval_minutes }} minutes apart.
                             </p>
                         </div>
@@ -239,14 +239,14 @@ const submitBulkSchedule = () => {
                     <div class="mt-6 flex justify-end space-x-3">
                         <button
                             @click="showBulkScheduleModal = false"
-                            class="px-4 py-2 text-gray-700 font-medium hover:bg-gray-100 rounded-lg transition"
+                            class="px-4 py-2 text-[#0b1215] font-medium hover:bg-[#0b1215]/5 rounded-xl transition"
                         >
                             Cancel
                         </button>
                         <button
                             @click="submitBulkSchedule"
                             :disabled="!bulkScheduleForm.scheduled_at || bulkScheduleForm.processing"
-                            class="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
+                            class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50"
                         >
                             {{ bulkScheduleForm.processing ? 'Scheduling...' : 'Schedule All' }}
                         </button>

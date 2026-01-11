@@ -62,9 +62,9 @@ const flattenFolders = (folders, level = 0) => {
                     <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="emit('close')"></div>
 
                     <!-- Modal -->
-                    <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full">
+                    <div class="relative bg-white rounded-2xl shadow-xl max-w-md w-full">
                         <div class="p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                            <h3 class="text-lg font-semibold text-[#0b1215] mb-4">
                                 Move {{ selectedIds.length }} Image{{ selectedIds.length !== 1 ? 's' : '' }}
                             </h3>
 
@@ -73,8 +73,8 @@ const flattenFolders = (folders, level = 0) => {
                                 <button
                                     @click="selectedFolderId = null"
                                     :class="[
-                                        'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition text-left',
-                                        selectedFolderId === null ? 'bg-primary-50 text-primary-700 ring-2 ring-primary-500' : 'text-gray-700 hover:bg-gray-100'
+                                        'w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm transition text-left',
+                                        selectedFolderId === null ? 'bg-[#a1854f]/10 text-[#a1854f] ring-2 ring-[#a1854f]' : 'text-[#0b1215]/70 hover:bg-[#0b1215]/5'
                                     ]"
                                 >
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -90,8 +90,8 @@ const flattenFolders = (folders, level = 0) => {
                                     @click="selectedFolderId = folder.id"
                                     :style="{ paddingLeft: `${(folder.level + 1) * 12 + 12}px` }"
                                     :class="[
-                                        'w-full flex items-center gap-2 py-2 pr-3 rounded-lg text-sm transition text-left',
-                                        selectedFolderId === folder.id ? 'bg-primary-50 text-primary-700 ring-2 ring-primary-500' : 'text-gray-700 hover:bg-gray-100'
+                                        'w-full flex items-center gap-2 py-2 pr-3 rounded-xl text-sm transition text-left',
+                                        selectedFolderId === folder.id ? 'bg-[#a1854f]/10 text-[#a1854f] ring-2 ring-[#a1854f]' : 'text-[#0b1215]/70 hover:bg-[#0b1215]/5'
                                     ]"
                                 >
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -103,19 +103,19 @@ const flattenFolders = (folders, level = 0) => {
                         </div>
 
                         <!-- Actions -->
-                        <div class="flex items-center gap-3 p-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+                        <div class="flex items-center gap-3 p-4 border-t border-[#0b1215]/10 bg-[#f7f7f7] rounded-b-2xl">
                             <button
                                 type="button"
                                 @click="emit('close')"
                                 :disabled="isMoving"
-                                class="flex-1 px-4 py-2 text-gray-700 font-medium bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
+                                class="flex-1 px-4 py-2 text-[#0b1215] font-medium bg-white border border-[#0b1215]/20 rounded-xl hover:bg-[#0b1215]/5 transition disabled:opacity-50"
                             >
                                 Cancel
                             </button>
                             <button
                                 @click="move"
                                 :disabled="isMoving"
-                                class="flex-1 px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
+                                class="flex-1 px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50"
                             >
                                 Move Here
                             </button>

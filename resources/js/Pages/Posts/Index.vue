@@ -62,10 +62,10 @@ const deleteMessage = computed(() => {
 
 const getStatusColor = (status) => {
     const colors = {
-        draft: 'bg-gray-100 text-gray-800',
-        scheduled: 'bg-yellow-100 text-yellow-800',
-        published: 'bg-green-100 text-green-800',
-        archived: 'bg-red-100 text-red-800',
+        draft: 'bg-[#0b1215]/10 text-[#0b1215]',
+        scheduled: 'bg-[#a1854f]/20 text-[#a1854f]',
+        published: 'bg-green-100 text-green-700',
+        archived: 'bg-red-100 text-red-700',
     };
     return colors[status] || colors.draft;
 };
@@ -79,21 +79,21 @@ const getStatusColor = (status) => {
             <!-- Header -->
             <div class="flex justify-between items-center mb-8">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900">Posts</h1>
-                    <p class="text-gray-600">Manage your blog posts and newsletters</p>
+                    <h1 class="text-2xl font-bold text-[#0b1215]">Posts</h1>
+                    <p class="text-[#0b1215]/60">Manage your blog posts and newsletters</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <button
                         v-if="canDeletePosts && selectedIds.length > 0"
                         @click="showDeleteModal = true"
-                        class="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition"
+                        class="px-4 py-2.5 bg-red-600 text-white font-medium rounded-full hover:bg-red-700 transition text-sm"
                     >
                         Delete ({{ selectedIds.length }})
                     </button>
                     <Link
                         v-if="canCreatePosts"
                         href="/posts/create"
-                        class="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition"
+                        class="px-5 py-2.5 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition text-sm"
                     >
                         New Post
                     </Link>
@@ -101,67 +101,67 @@ const getStatusColor = (status) => {
             </div>
 
             <!-- Posts List -->
-            <div v-if="posts.length > 0" class="bg-white rounded-lg shadow overflow-hidden">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+            <div v-if="posts.length > 0" class="bg-white rounded-2xl border border-[#0b1215]/10 overflow-hidden">
+                <table class="min-w-full divide-y divide-[#0b1215]/10">
+                    <thead class="bg-[#0b1215]/[0.03]">
                         <tr>
-                            <th v-if="canDeletePosts" class="px-6 py-3 text-left">
+                            <th v-if="canDeletePosts" class="px-6 py-4 text-left">
                                 <input
                                     type="checkbox"
                                     :checked="allSelected"
                                     :indeterminate="someSelected"
                                     @change="toggleAll"
-                                    class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                                    class="rounded border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
                                 />
                             </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th class="px-6 py-4 text-left text-xs font-medium text-[#0b1215]/50 uppercase tracking-wider">
                                 Title
                             </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th class="px-6 py-4 text-left text-xs font-medium text-[#0b1215]/50 uppercase tracking-wider">
                                 Status
                             </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th class="px-6 py-4 text-left text-xs font-medium text-[#0b1215]/50 uppercase tracking-wider">
                                 Views
                             </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th class="px-6 py-4 text-left text-xs font-medium text-[#0b1215]/50 uppercase tracking-wider">
                                 Updated
                             </th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th class="px-6 py-4 text-right text-xs font-medium text-[#0b1215]/50 uppercase tracking-wider">
                                 Actions
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="post in posts" :key="post.id" class="hover:bg-gray-50">
+                    <tbody class="bg-white divide-y divide-[#0b1215]/5">
+                        <tr v-for="post in posts" :key="post.id" class="hover:bg-[#0b1215]/[0.02] transition-colors">
                             <td v-if="canDeletePosts" class="px-6 py-4">
                                 <input
                                     type="checkbox"
                                     :checked="selectedIds.includes(post.id)"
                                     @change="togglePost(post.id)"
-                                    class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                                    class="rounded border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
                                 />
                             </td>
                             <td class="px-6 py-4">
-                                <Link :href="`/posts/${post.id}/edit`" class="font-medium text-gray-900 hover:text-primary-600">
+                                <Link :href="`/posts/${post.id}/edit`" class="font-medium text-[#0b1215] hover:text-[#a1854f] transition-colors">
                                     {{ post.title }}
                                 </Link>
-                                <p v-if="post.excerpt" class="text-sm text-gray-500 truncate max-w-md">
+                                <p v-if="post.excerpt" class="text-sm text-[#0b1215]/50 truncate max-w-md">
                                     {{ post.excerpt }}
                                 </p>
                             </td>
                             <td class="px-6 py-4">
-                                <span :class="getStatusColor(post.status)" class="px-2 py-1 text-xs font-medium rounded-full capitalize">
+                                <span :class="getStatusColor(post.status)" class="px-2.5 py-1 text-xs font-medium rounded-full capitalize">
                                     {{ post.status }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-500">
+                            <td class="px-6 py-4 text-sm text-[#0b1215]/50">
                                 {{ post.view_count }}
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-500">
+                            <td class="px-6 py-4 text-sm text-[#0b1215]/50">
                                 {{ post.updated_at }}
                             </td>
                             <td class="px-6 py-4 text-right text-sm">
-                                <Link :href="`/posts/${post.id}/edit`" class="text-primary-600 hover:text-primary-900">
+                                <Link :href="`/posts/${post.id}/edit`" class="text-[#a1854f] hover:text-[#0b1215] font-medium transition-colors">
                                     Edit
                                 </Link>
                             </td>
@@ -171,18 +171,18 @@ const getStatusColor = (status) => {
             </div>
 
             <!-- Empty State -->
-            <div v-else class="bg-white rounded-lg shadow p-12 text-center">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            <div v-else class="bg-white rounded-2xl border border-[#0b1215]/10 p-12 text-center">
+                <svg class="mx-auto h-12 w-12 text-[#0b1215]/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <h3 class="mt-4 text-lg font-medium text-gray-900">No posts yet</h3>
-                <p class="mt-2 text-gray-500">
+                <h3 class="mt-4 text-lg font-medium text-[#0b1215]">No posts yet</h3>
+                <p class="mt-2 text-[#0b1215]/50">
                     {{ canCreatePosts ? 'Get started by creating your first post.' : 'No posts have been created yet.' }}
                 </p>
                 <Link
                     v-if="canCreatePosts"
                     href="/posts/create"
-                    class="mt-4 inline-flex items-center px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition"
+                    class="mt-6 inline-flex items-center px-5 py-2.5 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition text-sm"
                 >
                     Create Your First Post
                 </Link>

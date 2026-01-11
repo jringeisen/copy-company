@@ -114,31 +114,31 @@ const deleteSprint = () => {
 
     <AppLayout current-page="sprints">
         <!-- Page Header -->
-        <div class="bg-white border-b border-gray-200 -mt-8 -mx-4 sm:-mx-6 lg:-mx-8 mb-8 px-4 sm:px-6 lg:px-8">
+        <div class="bg-white border-b border-[#0b1215]/10 -mt-8 -mx-4 sm:-mx-6 lg:-mx-8 mb-8 px-4 sm:px-6 lg:px-8">
             <div class="max-w-7xl mx-auto py-4">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-4">
-                        <Link href="/content-sprints" class="text-gray-500 hover:text-gray-700">
+                        <Link href="/content-sprints" class="text-[#0b1215]/50 hover:text-[#0b1215]/70">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                             </svg>
                         </Link>
-                        <span class="text-gray-400">|</span>
-                        <h1 class="text-lg font-semibold text-gray-900">{{ sprint.title }}</h1>
+                        <span class="text-[#0b1215]/30">|</span>
+                        <h1 class="text-lg font-semibold text-[#0b1215]">{{ sprint.title }}</h1>
                     </div>
                     <div class="flex items-center gap-3">
                         <button
                             v-if="canManageSprints && isCompleted && selectedIdeas.length > 0"
                             @click="createPosts"
                             :disabled="acceptForm.processing"
-                            class="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
+                            class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50"
                         >
                             Create {{ selectedIdeas.length }} Posts
                         </button>
                         <button
                             v-if="canManageSprints"
                             @click="showDeleteModal = true"
-                            class="p-2 text-gray-400 hover:text-red-600 transition"
+                            class="p-2 text-[#0b1215]/40 hover:text-red-600 transition"
                             title="Delete sprint"
                         >
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,26 +153,26 @@ const deleteSprint = () => {
         <div class="max-w-4xl mx-auto">
             <!-- Generating State -->
             <div v-if="isGenerating" class="text-center py-16">
-                <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 rounded-full mb-6">
-                    <svg class="animate-spin h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-[#a1854f]/20 rounded-full mb-6">
+                    <svg class="animate-spin h-8 w-8 text-[#a1854f]" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                 </div>
-                <h2 class="text-xl font-semibold text-gray-900 mb-2">Generating Your Content Ideas</h2>
-                <p class="text-gray-500 mb-4">
+                <h2 class="text-xl font-semibold text-[#0b1215] mb-2">Generating Your Content Ideas</h2>
+                <p class="text-[#0b1215]/60 mb-4">
                     Our AI is brainstorming {{ sprint.inputs?.content_count || 20 }} blog post ideas for you...
                 </p>
                 <div class="flex flex-wrap justify-center gap-2">
                     <span
                         v-for="topic in sprint.inputs?.topics"
                         :key="topic"
-                        class="px-3 py-1 bg-indigo-100 text-indigo-700 text-sm rounded-full"
+                        class="px-3 py-1 bg-[#a1854f]/10 text-[#a1854f] text-sm rounded-full"
                     >
                         {{ topic }}
                     </span>
                 </div>
-                <p class="mt-6 text-sm text-gray-400">
+                <p class="mt-6 text-sm text-[#0b1215]/40">
                     This usually takes 30-60 seconds...
                 </p>
             </div>
@@ -184,14 +184,14 @@ const deleteSprint = () => {
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-semibold text-gray-900 mb-2">Generation Failed</h2>
-                <p class="text-gray-500 mb-6">
+                <h2 class="text-xl font-semibold text-[#0b1215] mb-2">Generation Failed</h2>
+                <p class="text-[#0b1215]/60 mb-6">
                     Something went wrong while generating your content ideas. Please try again.
                 </p>
                 <button
                     v-if="canManageSprints"
                     @click="retry"
-                    class="px-6 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition"
+                    class="px-6 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition"
                 >
                     Try Again
                 </button>
@@ -202,13 +202,13 @@ const deleteSprint = () => {
                 <!-- Header -->
                 <div class="mb-6 flex items-center justify-between">
                     <div>
-                        <h2 class="text-xl font-semibold text-gray-900">
+                        <h2 class="text-xl font-semibold text-[#0b1215]">
                             {{ sprint.ideas_count }} Ideas Generated
-                            <span v-if="sprint.converted_indices?.length > 0" class="text-gray-500 font-normal">
+                            <span v-if="sprint.converted_indices?.length > 0" class="text-[#0b1215]/50 font-normal">
                                 ({{ sprint.unconverted_ideas_count }} remaining)
                             </span>
                         </h2>
-                        <p class="text-sm text-gray-500">
+                        <p class="text-sm text-[#0b1215]/60">
                             <template v-if="unconvertedIndices.length > 0">
                                 Select the ideas you want to turn into draft posts
                             </template>
@@ -220,7 +220,7 @@ const deleteSprint = () => {
                     <button
                         v-if="canManageSprints && unconvertedIndices.length > 0"
                         @click="selectAll"
-                        class="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                        class="text-sm text-[#a1854f] hover:text-[#a1854f]/80 font-medium"
                     >
                         {{ allUnconvertedSelected ? 'Deselect All' : 'Select All' }}
                     </button>
@@ -233,12 +233,12 @@ const deleteSprint = () => {
                         :key="index"
                         @click="toggleIdea(index)"
                         :class="[
-                            'bg-white rounded-lg border-2 p-5 transition relative',
+                            'bg-white rounded-2xl border-2 p-5 transition relative',
                             isConverted(index)
                                 ? 'border-green-200 bg-green-50/50 cursor-default opacity-75'
                                 : selectedIdeas.includes(index)
-                                    ? 'border-primary-500 bg-primary-50 cursor-pointer'
-                                    : 'border-gray-200 hover:border-gray-300 cursor-pointer'
+                                    ? 'border-[#a1854f] bg-[#a1854f]/5 cursor-pointer'
+                                    : 'border-[#0b1215]/10 hover:border-[#0b1215]/30 cursor-pointer'
                         ]"
                     >
                         <!-- Created Badge -->
@@ -259,8 +259,8 @@ const deleteSprint = () => {
                                 :class="[
                                     'w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-1',
                                     selectedIdeas.includes(index)
-                                        ? 'border-primary-500 bg-primary-500'
-                                        : 'border-gray-300'
+                                        ? 'border-[#a1854f] bg-[#a1854f]'
+                                        : 'border-[#0b1215]/30'
                                 ]"
                             >
                                 <svg
@@ -278,10 +278,10 @@ const deleteSprint = () => {
 
                             <!-- Content -->
                             <div class="flex-1">
-                                <h3 :class="['font-semibold text-lg', isConverted(index) ? 'text-gray-500' : 'text-gray-900']">
+                                <h3 :class="['font-semibold text-lg', isConverted(index) ? 'text-[#0b1215]/50' : 'text-[#0b1215]']">
                                     {{ idea.title }}
                                 </h3>
-                                <p :class="['mt-1', isConverted(index) ? 'text-gray-400' : 'text-gray-600']">
+                                <p :class="['mt-1', isConverted(index) ? 'text-[#0b1215]/40' : 'text-[#0b1215]/60']">
                                     {{ idea.description }}
                                 </p>
                                 <div class="mt-3 flex flex-wrap gap-2">
@@ -289,14 +289,14 @@ const deleteSprint = () => {
                                         v-for="point in idea.key_points"
                                         :key="point"
                                         :class="[
-                                            'px-2 py-1 text-xs rounded',
-                                            isConverted(index) ? 'bg-gray-100 text-gray-400' : 'bg-gray-100 text-gray-600'
+                                            'px-2 py-1 text-xs rounded-lg',
+                                            isConverted(index) ? 'bg-[#0b1215]/5 text-[#0b1215]/40' : 'bg-[#0b1215]/5 text-[#0b1215]/60'
                                         ]"
                                     >
                                         {{ point }}
                                     </span>
                                 </div>
-                                <div :class="['mt-3 text-sm', isConverted(index) ? 'text-gray-400' : 'text-gray-500']">
+                                <div :class="['mt-3 text-sm', isConverted(index) ? 'text-[#0b1215]/40' : 'text-[#0b1215]/50']">
                                     ~{{ idea.estimated_words }} words
                                 </div>
                             </div>
@@ -305,15 +305,15 @@ const deleteSprint = () => {
                 </div>
 
                 <!-- Fixed Bottom Bar -->
-                <div v-if="canManageSprints && selectedIdeas.length > 0" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
+                <div v-if="canManageSprints && selectedIdeas.length > 0" class="fixed bottom-0 left-0 right-0 bg-white border-t border-[#0b1215]/10 p-4 shadow-lg">
                     <div class="max-w-4xl mx-auto flex items-center justify-between">
-                        <span class="text-gray-600">
+                        <span class="text-[#0b1215]/60">
                             {{ selectedIdeas.length }} of {{ unconvertedIndices.length }} available ideas selected
                         </span>
                         <button
                             @click="createPosts"
                             :disabled="acceptForm.processing"
-                            class="px-6 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
+                            class="px-6 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50"
                         >
                             {{ acceptForm.processing ? 'Creating...' : `Create ${selectedIdeas.length} Draft Posts` }}
                         </button>

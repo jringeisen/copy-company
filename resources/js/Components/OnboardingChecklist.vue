@@ -56,16 +56,16 @@ const dismissChecklist = () => {
 </script>
 
 <template>
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div class="bg-white rounded-2xl border border-[#0b1215]/10 overflow-hidden">
         <!-- Header -->
         <div
-            class="p-4 bg-gradient-to-r from-primary-600 to-indigo-600 text-white cursor-pointer"
+            class="p-4 bg-[#0b1215] text-white cursor-pointer"
             @click="isMinimized = !isMinimized"
         >
             <div class="flex items-center justify-between">
                 <div>
                     <h2 class="text-lg font-semibold">Getting Started</h2>
-                    <p class="text-primary-100 text-sm mt-0.5">
+                    <p class="text-white/70 text-sm mt-0.5">
                         {{ onboarding.completed }} of {{ onboarding.total }} steps complete
                     </p>
                 </div>
@@ -89,7 +89,7 @@ const dismissChecklist = () => {
                                 stroke="currentColor"
                                 stroke-width="4"
                                 fill="none"
-                                class="text-white"
+                                class="text-[#a1854f]"
                                 :stroke-dasharray="`${onboarding.percentage * 1.256} 125.6`"
                             />
                         </svg>
@@ -112,19 +112,19 @@ const dismissChecklist = () => {
         </div>
 
         <!-- Steps List -->
-        <div v-show="!isMinimized" class="divide-y divide-gray-100">
+        <div v-show="!isMinimized" class="divide-y divide-[#0b1215]/5">
             <Link
                 v-for="(step, index) in steps"
                 :key="step.key"
                 :href="step.href"
-                class="flex items-center gap-4 p-4 hover:bg-gray-50 transition"
+                class="flex items-center gap-4 p-4 hover:bg-[#0b1215]/[0.02] transition"
             >
                 <!-- Completion indicator -->
                 <div
                     class="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
                     :class="step.completed
                         ? 'bg-green-100 text-green-600'
-                        : 'bg-gray-100 text-gray-400'"
+                        : 'bg-[#0b1215]/5 text-[#0b1215]/40'"
                 >
                     <svg v-if="step.completed" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
@@ -137,32 +137,32 @@ const dismissChecklist = () => {
                     <div class="flex items-center gap-2">
                         <span
                             class="font-medium"
-                            :class="step.completed ? 'text-gray-500 line-through' : 'text-gray-900'"
+                            :class="step.completed ? 'text-[#0b1215]/50 line-through' : 'text-[#0b1215]'"
                         >
                             {{ step.title }}
                         </span>
                         <span
                             v-if="step.optional"
-                            class="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-500 rounded"
+                            class="px-2 py-0.5 text-xs font-medium bg-[#0b1215]/5 text-[#0b1215]/50 rounded-full"
                         >
                             Optional
                         </span>
                     </div>
-                    <p class="text-sm text-gray-500">{{ step.description }}</p>
+                    <p class="text-sm text-[#0b1215]/50">{{ step.description }}</p>
                 </div>
 
                 <!-- Arrow -->
-                <svg v-if="!step.completed" class="w-5 h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg v-if="!step.completed" class="w-5 h-5 text-[#0b1215]/40 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
             </Link>
         </div>
 
         <!-- Footer -->
-        <div v-show="!isMinimized" class="p-4 bg-gray-50 border-t border-gray-100">
+        <div v-show="!isMinimized" class="p-4 bg-[#f7f7f7] border-t border-[#0b1215]/5">
             <button
                 @click.prevent="dismissChecklist"
-                class="text-sm text-gray-500 hover:text-gray-700"
+                class="text-sm text-[#0b1215]/50 hover:text-[#0b1215]/70"
             >
                 Dismiss checklist
             </button>

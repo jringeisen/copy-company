@@ -77,20 +77,20 @@ const submit = () => {
     <AppLayout current-page="brand-settings">
         <div class="max-w-3xl mx-auto">
             <div class="mb-8">
-                <h1 class="text-2xl font-bold text-gray-900">Brand Settings</h1>
-                <p class="text-gray-600 mt-1">Update your brand identity and preferences</p>
+                <h1 class="text-2xl font-bold text-[#0b1215]">Brand Settings</h1>
+                <p class="text-[#0b1215]/60 mt-1">Update your brand identity and preferences</p>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm p-8">
+            <div class="bg-white rounded-2xl border border-[#0b1215]/10 p-8">
                 <form @submit.prevent="submit" class="space-y-6">
                     <!-- Brand Name -->
                     <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700">Brand Name</label>
+                        <label for="name" class="block text-sm font-medium text-[#0b1215]">Brand Name</label>
                         <input
                             id="name"
                             v-model="form.name"
                             type="text"
-                            class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                            class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                             required
                         />
                         <p v-if="form.errors.name" class="mt-1 text-sm text-red-600">{{ form.errors.name }}</p>
@@ -98,25 +98,25 @@ const submit = () => {
 
                     <!-- Slug -->
                     <div>
-                        <label for="slug" class="block text-sm font-medium text-gray-700">URL Slug</label>
-                        <div class="mt-1 flex rounded-lg shadow-sm">
-                            <span class="inline-flex items-center px-4 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                        <label for="slug" class="block text-sm font-medium text-[#0b1215]">URL Slug</label>
+                        <div class="mt-1 flex rounded-xl overflow-hidden border border-[#0b1215]/20">
+                            <span class="inline-flex items-center px-4 bg-[#f7f7f7] text-[#0b1215]/50 text-sm border-r border-[#0b1215]/20">
                                 /@
                             </span>
                             <input
                                 id="slug"
                                 v-model="form.slug"
                                 type="text"
-                                class="flex-1 block w-full px-4 py-3 border border-gray-300 rounded-r-lg focus:ring-primary-500 focus:border-primary-500"
+                                class="flex-1 block w-full px-4 py-3 border-0 focus:ring-[#0b1215]/20"
                                 required
                             />
                         </div>
-                        <p class="mt-1 text-sm text-gray-500">
+                        <p class="mt-1 text-sm text-[#0b1215]/50">
                             Your public blog URL:
                             <a
                                 :href="`/@${form.slug}`"
                                 target="_blank"
-                                class="text-primary-600 hover:text-primary-700 hover:underline"
+                                class="text-[#a1854f] hover:text-[#a1854f]/80 hover:underline"
                             >
                                 /@{{ form.slug }}
                                 <svg class="inline-block w-3 h-3 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -129,12 +129,12 @@ const submit = () => {
 
                     <!-- Tagline -->
                     <div>
-                        <label for="tagline" class="block text-sm font-medium text-gray-700">Tagline</label>
+                        <label for="tagline" class="block text-sm font-medium text-[#0b1215]">Tagline</label>
                         <input
                             id="tagline"
                             v-model="form.tagline"
                             type="text"
-                            class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                            class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                             placeholder="A brief description of what you do"
                         />
                         <p v-if="form.errors.tagline" class="mt-1 text-sm text-red-600">{{ form.errors.tagline }}</p>
@@ -142,12 +142,12 @@ const submit = () => {
 
                     <!-- Description -->
                     <div>
-                        <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                        <label for="description" class="block text-sm font-medium text-[#0b1215]">Description</label>
                         <textarea
                             id="description"
                             v-model="form.description"
                             rows="3"
-                            class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                            class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                             placeholder="Tell your audience what your brand is about..."
                         ></textarea>
                         <p v-if="form.errors.description" class="mt-1 text-sm text-red-600">{{ form.errors.description }}</p>
@@ -155,54 +155,54 @@ const submit = () => {
 
                     <!-- Industry -->
                     <div>
-                        <label for="industry" class="block text-sm font-medium text-gray-700">Industry</label>
+                        <label for="industry" class="block text-sm font-medium text-[#0b1215]">Industry</label>
                         <select
                             id="industry"
                             v-model="form.industry"
-                            class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                            class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                         >
                             <option value="">Select an industry</option>
                             <option v-for="industry in industries" :key="industry" :value="industry">
                                 {{ industry }}
                             </option>
                         </select>
-                        <p class="mt-1 text-sm text-gray-500">Helps AI understand your content context better.</p>
+                        <p class="mt-1 text-sm text-[#0b1215]/50">Helps AI understand your content context better.</p>
                         <p v-if="form.errors.industry" class="mt-1 text-sm text-red-600">{{ form.errors.industry }}</p>
                     </div>
 
                     <!-- Colors -->
                     <div class="grid grid-cols-2 gap-6">
                         <div>
-                            <label for="primary_color" class="block text-sm font-medium text-gray-700">Primary Color</label>
+                            <label for="primary_color" class="block text-sm font-medium text-[#0b1215]">Primary Color</label>
                             <div class="mt-1 flex items-center gap-3">
                                 <input
                                     id="primary_color"
                                     v-model="form.primary_color"
                                     type="color"
-                                    class="h-10 w-16 rounded border border-gray-300 cursor-pointer"
+                                    class="h-10 w-16 rounded-xl border border-[#0b1215]/20 cursor-pointer"
                                 />
                                 <input
                                     v-model="form.primary_color"
                                     type="text"
-                                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                                    class="flex-1 px-4 py-2 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                                 />
                             </div>
                             <p v-if="form.errors.primary_color" class="mt-1 text-sm text-red-600">{{ form.errors.primary_color }}</p>
                         </div>
 
                         <div>
-                            <label for="secondary_color" class="block text-sm font-medium text-gray-700">Secondary Color</label>
+                            <label for="secondary_color" class="block text-sm font-medium text-[#0b1215]">Secondary Color</label>
                             <div class="mt-1 flex items-center gap-3">
                                 <input
                                     id="secondary_color"
                                     v-model="form.secondary_color"
                                     type="color"
-                                    class="h-10 w-16 rounded border border-gray-300 cursor-pointer"
+                                    class="h-10 w-16 rounded-xl border border-[#0b1215]/20 cursor-pointer"
                                 />
                                 <input
                                     v-model="form.secondary_color"
                                     type="text"
-                                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                                    class="flex-1 px-4 py-2 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                                 />
                             </div>
                             <p v-if="form.errors.secondary_color" class="mt-1 text-sm text-red-600">{{ form.errors.secondary_color }}</p>
@@ -210,19 +210,19 @@ const submit = () => {
                     </div>
 
                     <!-- AI Voice Settings -->
-                    <div class="border-t border-gray-200 pt-6 mt-6">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4">AI Voice Settings</h3>
-                        <p class="text-sm text-gray-500 mb-6">Customize how the AI writes content for your brand. These settings help the AI match your unique voice and style.</p>
+                    <div class="border-t border-[#0b1215]/10 pt-6 mt-6">
+                        <h3 class="text-lg font-medium text-[#0b1215] mb-4">AI Voice Settings</h3>
+                        <p class="text-sm text-[#0b1215]/50 mb-6">Customize how the AI writes content for your brand. These settings help the AI match your unique voice and style.</p>
 
                         <!-- Tone -->
                         <div class="mb-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-3">Writing Tone</label>
+                            <label class="block text-sm font-medium text-[#0b1215] mb-3">Writing Tone</label>
                             <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                                 <label
                                     v-for="tone in tones"
                                     :key="tone.value"
-                                    class="relative flex cursor-pointer rounded-lg border p-4 focus:outline-none"
-                                    :class="form.voice_settings.tone === tone.value ? 'border-primary-500 bg-primary-50' : 'border-gray-300 hover:border-gray-400'"
+                                    class="relative flex cursor-pointer rounded-xl border p-4 focus:outline-none transition"
+                                    :class="form.voice_settings.tone === tone.value ? 'border-[#a1854f] bg-[#a1854f]/10' : 'border-[#0b1215]/20 hover:border-[#0b1215]/40'"
                                 >
                                     <input
                                         type="radio"
@@ -231,10 +231,10 @@ const submit = () => {
                                         class="sr-only"
                                     />
                                     <div class="flex flex-col">
-                                        <span class="block text-sm font-medium" :class="form.voice_settings.tone === tone.value ? 'text-primary-900' : 'text-gray-900'">
+                                        <span class="block text-sm font-medium" :class="form.voice_settings.tone === tone.value ? 'text-[#a1854f]' : 'text-[#0b1215]'">
                                             {{ tone.label }}
                                         </span>
-                                        <span class="mt-1 text-xs" :class="form.voice_settings.tone === tone.value ? 'text-primary-700' : 'text-gray-500'">
+                                        <span class="mt-1 text-xs" :class="form.voice_settings.tone === tone.value ? 'text-[#a1854f]/70' : 'text-[#0b1215]/50'">
                                             {{ tone.description }}
                                         </span>
                                     </div>
@@ -244,13 +244,13 @@ const submit = () => {
 
                         <!-- Style -->
                         <div class="mb-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-3">Writing Style</label>
+                            <label class="block text-sm font-medium text-[#0b1215] mb-3">Writing Style</label>
                             <div class="grid grid-cols-2 gap-3">
                                 <label
                                     v-for="style in styles"
                                     :key="style.value"
-                                    class="relative flex cursor-pointer rounded-lg border p-4 focus:outline-none"
-                                    :class="form.voice_settings.style === style.value ? 'border-primary-500 bg-primary-50' : 'border-gray-300 hover:border-gray-400'"
+                                    class="relative flex cursor-pointer rounded-xl border p-4 focus:outline-none transition"
+                                    :class="form.voice_settings.style === style.value ? 'border-[#a1854f] bg-[#a1854f]/10' : 'border-[#0b1215]/20 hover:border-[#0b1215]/40'"
                                 >
                                     <input
                                         type="radio"
@@ -259,10 +259,10 @@ const submit = () => {
                                         class="sr-only"
                                     />
                                     <div class="flex flex-col">
-                                        <span class="block text-sm font-medium" :class="form.voice_settings.style === style.value ? 'text-primary-900' : 'text-gray-900'">
+                                        <span class="block text-sm font-medium" :class="form.voice_settings.style === style.value ? 'text-[#a1854f]' : 'text-[#0b1215]'">
                                             {{ style.label }}
                                         </span>
-                                        <span class="mt-1 text-xs" :class="form.voice_settings.style === style.value ? 'text-primary-700' : 'text-gray-500'">
+                                        <span class="mt-1 text-xs" :class="form.voice_settings.style === style.value ? 'text-[#a1854f]/70' : 'text-[#0b1215]/50'">
                                             {{ style.description }}
                                         </span>
                                     </div>
@@ -272,21 +272,21 @@ const submit = () => {
 
                         <!-- Sample Texts -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Sample Writing (Optional)</label>
-                            <p class="text-sm text-gray-500 mb-3">Add up to 3 examples of your writing style. The AI will learn from these to better match your voice.</p>
+                            <label class="block text-sm font-medium text-[#0b1215] mb-2">Sample Writing (Optional)</label>
+                            <p class="text-sm text-[#0b1215]/50 mb-3">Add up to 3 examples of your writing style. The AI will learn from these to better match your voice.</p>
 
                             <!-- Existing samples -->
                             <div v-if="form.voice_settings.sample_texts.length > 0" class="space-y-3 mb-4">
                                 <div
                                     v-for="(sample, index) in form.voice_settings.sample_texts"
                                     :key="index"
-                                    class="relative bg-gray-50 rounded-lg p-4 pr-12"
+                                    class="relative bg-[#f7f7f7] rounded-xl p-4 pr-12"
                                 >
-                                    <p class="text-sm text-gray-700 whitespace-pre-wrap">{{ sample }}</p>
+                                    <p class="text-sm text-[#0b1215]/70 whitespace-pre-wrap">{{ sample }}</p>
                                     <button
                                         type="button"
                                         @click="removeSampleText(index)"
-                                        class="absolute top-2 right-2 text-gray-400 hover:text-red-500"
+                                        class="absolute top-2 right-2 text-[#0b1215]/40 hover:text-red-500"
                                     >
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -300,27 +300,27 @@ const submit = () => {
                                 <textarea
                                     v-model="newSampleText"
                                     rows="3"
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                                    class="w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                                     placeholder="Paste a paragraph from your blog, newsletter, or social media that represents your writing style..."
                                 ></textarea>
                                 <button
                                     type="button"
                                     @click="addSampleText"
                                     :disabled="!newSampleText.trim()"
-                                    class="mt-2 px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-700 disabled:text-gray-400 disabled:cursor-not-allowed"
+                                    class="mt-2 px-4 py-2 text-sm font-medium text-[#a1854f] hover:text-[#a1854f]/80 disabled:text-[#0b1215]/30 disabled:cursor-not-allowed"
                                 >
                                     + Add Sample
                                 </button>
                             </div>
-                            <p v-else class="text-sm text-gray-500">Maximum of 3 samples added.</p>
+                            <p v-else class="text-sm text-[#0b1215]/50">Maximum of 3 samples added.</p>
                         </div>
                     </div>
 
                     <!-- Submit -->
-                    <div class="flex justify-end pt-4 border-t border-gray-200">
+                    <div class="flex justify-end pt-4 border-t border-[#0b1215]/10">
                         <button
                             type="submit"
-                            class="px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition"
+                            class="px-6 py-3 bg-[#0b1215] text-white font-semibold rounded-full hover:bg-[#0b1215]/90 focus:outline-none focus:ring-2 focus:ring-[#0b1215]/20 focus:ring-offset-2 transition"
                             :class="{ 'opacity-50': form.processing }"
                             :disabled="form.processing"
                         >

@@ -31,20 +31,20 @@ const platformLabel = computed(() => {
 });
 
 const typeColor = computed(() => {
-    if (props.event.type === 'post') return 'bg-blue-100 text-blue-800';
-    if (props.event.type === 'newsletter') return 'bg-purple-100 text-purple-800';
+    if (props.event.type === 'post') return 'bg-[#0b1215]/10 text-[#0b1215]';
+    if (props.event.type === 'newsletter') return 'bg-[#a1854f]/20 text-[#a1854f]';
     if (props.event.type === 'social') return 'bg-pink-100 text-pink-800';
-    return 'bg-gray-100 text-gray-800';
+    return 'bg-[#0b1215]/5 text-[#0b1215]/70';
 });
 
 const statusColor = computed(() => {
     const colors = {
-        scheduled: 'bg-yellow-100 text-yellow-800',
+        scheduled: 'bg-[#a1854f]/20 text-[#a1854f]',
         published: 'bg-green-100 text-green-800',
         sent: 'bg-green-100 text-green-800',
-        draft: 'bg-gray-100 text-gray-800',
+        draft: 'bg-[#0b1215]/10 text-[#0b1215]/70',
     };
-    return colors[props.event.status] || 'bg-gray-100 text-gray-800';
+    return colors[props.event.status] || 'bg-[#0b1215]/5 text-[#0b1215]/70';
 });
 
 const platformIcon = computed(() => {
@@ -65,9 +65,9 @@ const platformIcon = computed(() => {
         <div class="flex min-h-screen items-center justify-center p-4">
             <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="emit('close')"></div>
 
-            <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full">
+            <div class="relative bg-white rounded-2xl shadow-xl max-w-md w-full">
                 <!-- Header -->
-                <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                <div class="flex items-center justify-between p-4 border-b border-[#0b1215]/10">
                     <div class="flex items-center space-x-3">
                         <!-- Type badge -->
                         <span
@@ -84,7 +84,7 @@ const platformIcon = computed(() => {
                             {{ event.status }}
                         </span>
                     </div>
-                    <button @click="emit('close')" class="text-gray-400 hover:text-gray-600">
+                    <button @click="emit('close')" class="text-[#0b1215]/40 hover:text-[#0b1215]">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -95,17 +95,17 @@ const platformIcon = computed(() => {
                 <div class="p-4 space-y-4">
                     <!-- Platform icon for social posts -->
                     <div v-if="event.type === 'social' && platformIcon" class="flex items-center space-x-2">
-                        <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-[#0b1215]/60" fill="currentColor" viewBox="0 0 24 24">
                             <path :d="platformIcon" />
                         </svg>
-                        <span class="text-sm text-gray-600">{{ platformLabel }}</span>
+                        <span class="text-sm text-[#0b1215]/60">{{ platformLabel }}</span>
                     </div>
 
                     <!-- Title -->
-                    <h3 class="text-lg font-semibold text-gray-900">{{ event.title }}</h3>
+                    <h3 class="text-lg font-semibold text-[#0b1215]">{{ event.title }}</h3>
 
                     <!-- Time -->
-                    <div class="flex items-center text-sm text-gray-600">
+                    <div class="flex items-center text-sm text-[#0b1215]/60">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -113,7 +113,7 @@ const platformIcon = computed(() => {
                     </div>
 
                     <!-- Source post for social/newsletter -->
-                    <div v-if="event.post_title" class="flex items-center text-sm text-gray-600">
+                    <div v-if="event.post_title" class="flex items-center text-sm text-[#0b1215]/60">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                         </svg>
@@ -121,7 +121,7 @@ const platformIcon = computed(() => {
                     </div>
 
                     <!-- Recipients for newsletter -->
-                    <div v-if="event.type === 'newsletter' && event.recipients" class="flex items-center text-sm text-gray-600">
+                    <div v-if="event.type === 'newsletter' && event.recipients" class="flex items-center text-sm text-[#0b1215]/60">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
@@ -130,24 +130,24 @@ const platformIcon = computed(() => {
                 </div>
 
                 <!-- Actions -->
-                <div class="flex items-center justify-end gap-3 p-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+                <div class="flex items-center justify-end gap-3 p-4 border-t border-[#0b1215]/10 bg-[#f7f7f7] rounded-b-2xl">
                     <button
                         @click="emit('close')"
-                        class="px-4 py-2 text-gray-700 font-medium hover:bg-gray-100 rounded-lg transition"
+                        class="px-4 py-2 text-[#0b1215] font-medium hover:bg-[#0b1215]/5 rounded-xl transition"
                     >
                         Close
                     </button>
                     <Link
                         v-if="event.type === 'post' && event.url"
                         :href="event.url"
-                        class="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition"
+                        class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition"
                     >
                         Edit Post
                     </Link>
                     <Link
                         v-else-if="event.type === 'social'"
                         href="/social-posts"
-                        class="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition"
+                        class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition"
                     >
                         View Social Posts
                     </Link>

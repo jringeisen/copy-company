@@ -51,8 +51,8 @@ const formatDate = (dateString) => {
     <AppLayout current-page="social-settings">
         <div class="max-w-4xl mx-auto">
             <div class="mb-8">
-                <h1 class="text-2xl font-bold text-gray-900">Social Connections</h1>
-                <p class="text-gray-600 mt-1">Connect your social media accounts to publish content directly from the platform.</p>
+                <h1 class="text-2xl font-bold text-[#0b1215]">Social Connections</h1>
+                <p class="text-[#0b1215]/60 mt-1">Connect your social media accounts to publish content directly from the platform.</p>
             </div>
 
             <!-- Platform Grid -->
@@ -60,8 +60,17 @@ const formatDate = (dateString) => {
                 <div
                     v-for="platform in platforms"
                     :key="platform.identifier"
-                    class="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
+                    class="bg-white rounded-2xl border border-[#0b1215]/10 p-6 relative"
+                    :class="{ 'opacity-50': platform.identifier === 'tiktok' }"
                 >
+                    <!-- Coming Soon Badge for TikTok -->
+                    <span
+                        v-if="platform.identifier === 'tiktok'"
+                        class="absolute top-3 right-3 px-2 py-1 text-xs font-medium bg-[#a1854f] text-white rounded-full"
+                    >
+                        Coming Soon
+                    </span>
+
                     <div class="flex items-start justify-between">
                         <div class="flex items-center gap-4">
                             <!-- Platform Icon -->
@@ -71,7 +80,7 @@ const formatDate = (dateString) => {
                                 v-html="platformIcons[platform.identifier]"
                             ></div>
                             <div>
-                                <h3 class="font-semibold text-gray-900">{{ platform.name }}</h3>
+                                <h3 class="font-semibold text-[#0b1215]">{{ platform.name }}</h3>
                                 <div v-if="platform.connected" class="mt-1">
                                     <!-- Needs configuration warning -->
                                     <div v-if="platform.needs_configuration" class="flex items-center gap-1 text-sm text-amber-600">
@@ -88,23 +97,23 @@ const formatDate = (dateString) => {
                                             </svg>
                                             Connected
                                         </span>
-                                        <span v-if="platform.account_name" class="text-sm text-gray-500">
+                                        <span v-if="platform.account_name" class="text-sm text-[#0b1215]/50">
                                             as {{ platform.account_name }}
                                         </span>
                                     </div>
                                     <!-- Publishing target info -->
-                                    <p v-if="platform.configured_account" class="text-xs text-gray-500 mt-1">
+                                    <p v-if="platform.configured_account" class="text-xs text-[#0b1215]/50 mt-1">
                                         Publishing to: {{ platform.configured_account }}
                                     </p>
                                 </div>
-                                <p v-else class="text-sm text-gray-500 mt-1">Not connected</p>
+                                <p v-else class="text-sm text-[#0b1215]/50 mt-1">Not connected</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Connection Info -->
-                    <div v-if="platform.connected && platform.connected_at" class="mt-4 pt-4 border-t border-gray-100">
-                        <p class="text-xs text-gray-500">
+                    <div v-if="platform.connected && platform.connected_at" class="mt-4 pt-4 border-t border-[#0b1215]/10">
+                        <p class="text-xs text-[#0b1215]/50">
                             Connected {{ formatDate(platform.connected_at) }}
                         </p>
                     </div>
@@ -116,42 +125,42 @@ const formatDate = (dateString) => {
                             <Link
                                 v-if="platform.needs_configuration"
                                 :href="`/settings/social/${platform.identifier}/select`"
-                                class="flex-1 px-4 py-2 text-sm font-medium text-white bg-amber-500 hover:bg-amber-600 rounded-lg transition text-center"
+                                class="flex-1 px-4 py-2 text-sm font-medium text-white bg-amber-500 hover:bg-amber-600 rounded-xl transition text-center"
                             >
                                 Configure
                             </Link>
                             <Link
                                 v-else-if="platform.configured_account"
                                 :href="`/settings/social/${platform.identifier}/select`"
-                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
+                                class="px-4 py-2 text-sm font-medium text-[#0b1215] bg-[#0b1215]/5 hover:bg-[#0b1215]/10 rounded-xl transition"
                             >
                                 Change
                             </Link>
                             <button
                                 v-if="!platform.needs_configuration"
                                 @click="connect(platform.identifier)"
-                                class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
+                                class="flex-1 px-4 py-2 text-sm font-medium text-[#0b1215] bg-[#0b1215]/5 hover:bg-[#0b1215]/10 rounded-xl transition"
                             >
                                 Reconnect
                             </button>
                             <button
                                 @click="disconnect(platform.identifier)"
-                                class="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition"
+                                class="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl transition"
                             >
                                 Disconnect
                             </button>
                         </template>
                         <template v-else>
                             <button
-                                v-if="platform.supported"
+                                v-if="platform.supported && platform.identifier !== 'tiktok'"
                                 @click="connect(platform.identifier)"
-                                class="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition"
+                                class="flex-1 px-4 py-2 text-sm font-medium text-white bg-[#0b1215] hover:bg-[#0b1215]/90 rounded-full transition"
                             >
                                 Connect {{ platform.name }}
                             </button>
                             <span
                                 v-else
-                                class="flex-1 px-4 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-lg text-center cursor-not-allowed"
+                                class="flex-1 px-4 py-2 text-sm font-medium text-[#0b1215]/40 bg-[#0b1215]/5 rounded-xl text-center cursor-not-allowed"
                             >
                                 Coming Soon
                             </span>
@@ -161,14 +170,14 @@ const formatDate = (dateString) => {
             </div>
 
             <!-- Help Text -->
-            <div class="mt-8 p-4 bg-blue-50 rounded-lg">
+            <div class="mt-8 p-4 bg-[#a1854f]/10 rounded-2xl">
                 <div class="flex gap-3">
-                    <svg class="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <svg class="w-5 h-5 text-[#a1854f] shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                     </svg>
                     <div>
-                        <h4 class="text-sm font-medium text-blue-800">About Social Connections</h4>
-                        <p class="text-sm text-blue-700 mt-1">
+                        <h4 class="text-sm font-medium text-[#a1854f]">About Social Connections</h4>
+                        <p class="text-sm text-[#0b1215]/60 mt-1">
                             Connecting your accounts allows you to publish content directly to each platform.
                             We only request the permissions needed to publish on your behalf and never post without your approval.
                         </p>

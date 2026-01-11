@@ -43,10 +43,10 @@ const submit = () => {
 
     <AppLayout current-page="sprints">
         <div class="max-w-2xl mx-auto">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+            <div class="bg-white rounded-2xl border border-[#0b1215]/10 p-8">
                 <div class="mb-6">
-                    <h2 class="text-xl font-semibold text-gray-900">Let's brainstorm your content</h2>
-                    <p class="mt-1 text-sm text-gray-500">
+                    <h2 class="text-xl font-semibold text-[#0b1215]">Let's brainstorm your content</h2>
+                    <p class="mt-1 text-sm text-[#0b1215]/60">
                         Tell us about your topics and goals, and we'll generate blog post ideas for you.
                     </p>
                 </div>
@@ -54,7 +54,7 @@ const submit = () => {
                 <form @submit.prevent="submit" class="space-y-6">
                     <!-- Topics -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <label class="block text-sm font-medium text-[#0b1215] mb-2">
                             Topics to cover
                         </label>
                         <div class="space-y-3">
@@ -67,13 +67,13 @@ const submit = () => {
                                     v-model="form.topics[index]"
                                     type="text"
                                     placeholder="e.g., productivity, remote work, leadership"
-                                    class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-primary-500 focus:border-primary-500"
+                                    class="flex-1 border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                                 />
                                 <button
                                     v-if="form.topics.length > 1"
                                     type="button"
                                     @click="removeTopic(index)"
-                                    class="p-2 text-gray-400 hover:text-red-500"
+                                    class="p-2 text-[#0b1215]/40 hover:text-red-500"
                                 >
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -85,7 +85,7 @@ const submit = () => {
                             v-if="form.topics.length < 10"
                             type="button"
                             @click="addTopic"
-                            class="mt-2 text-sm text-primary-600 hover:text-primary-700 font-medium"
+                            class="mt-2 text-sm text-[#a1854f] hover:text-[#a1854f]/80 font-medium"
                         >
                             + Add another topic
                         </button>
@@ -96,14 +96,14 @@ const submit = () => {
 
                     <!-- Goals -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <label class="block text-sm font-medium text-[#0b1215] mb-2">
                             Content goals (optional)
                         </label>
                         <textarea
                             v-model="form.goals"
                             rows="3"
                             placeholder="e.g., Establish thought leadership in my industry, drive newsletter signups, educate readers about..."
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-primary-500 focus:border-primary-500"
+                            class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
                         ></textarea>
                         <p v-if="form.errors.goals" class="mt-1 text-sm text-red-600">
                             {{ form.errors.goals }}
@@ -112,7 +112,7 @@ const submit = () => {
 
                     <!-- Content Count -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <label class="block text-sm font-medium text-[#0b1215] mb-2">
                             Number of ideas to generate
                         </label>
                         <div class="flex items-center gap-4">
@@ -122,13 +122,13 @@ const submit = () => {
                                 min="5"
                                 max="30"
                                 step="5"
-                                class="flex-1"
+                                class="flex-1 accent-[#a1854f]"
                             />
-                            <span class="text-lg font-semibold text-gray-900 w-12 text-center">
+                            <span class="text-lg font-semibold text-[#0b1215] w-12 text-center">
                                 {{ form.content_count }}
                             </span>
                         </div>
-                        <p class="mt-1 text-sm text-gray-500">
+                        <p class="mt-1 text-sm text-[#0b1215]/50">
                             More ideas = longer generation time
                         </p>
                     </div>
@@ -137,14 +137,14 @@ const submit = () => {
                     <div class="flex justify-end gap-3 pt-4">
                         <Link
                             href="/content-sprints"
-                            class="px-4 py-2 text-gray-700 font-medium hover:bg-gray-100 rounded-lg transition"
+                            class="px-4 py-2 text-[#0b1215] font-medium hover:bg-[#0b1215]/5 rounded-xl transition"
                         >
                             Cancel
                         </Link>
                         <button
                             type="submit"
                             :disabled="form.processing"
-                            class="px-6 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition disabled:opacity-50 flex items-center"
+                            class="px-6 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50 flex items-center"
                         >
                             <svg v-if="form.processing" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
