@@ -1,10 +1,9 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, InfiniteScroll } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({
-    newsletters: Array,
-    pagination: Object,
+    newsletters: Object,
 });
 
 const statusColors = {
@@ -33,9 +32,9 @@ const formatNumber = (num) => {
             </div>
 
             <!-- Newsletter List -->
-            <div v-if="newsletters.length > 0" class="space-y-4">
+            <InfiniteScroll v-if="newsletters.data.length > 0" data="newsletters" only-next class="space-y-4">
                 <Link
-                    v-for="newsletter in newsletters"
+                    v-for="newsletter in newsletters.data"
                     :key="newsletter.id"
                     :href="`/newsletters/${newsletter.id}`"
                     class="block bg-white rounded-2xl border border-[#0b1215]/10 p-6 hover:border-[#0b1215]/30 transition"
@@ -95,7 +94,7 @@ const formatNumber = (num) => {
                         </div>
                     </div>
                 </Link>
-            </div>
+            </InfiniteScroll>
 
             <!-- Empty State -->
             <div v-else class="text-center py-16 bg-white rounded-2xl border border-[#0b1215]/10">
@@ -114,28 +113,6 @@ const formatNumber = (num) => {
                 </Link>
             </div>
 
-            <!-- Pagination -->
-            <div v-if="pagination && pagination.last_page > 1" class="mt-6 flex justify-between items-center">
-                <span class="text-sm text-[#0b1215]/70">
-                    Page {{ pagination.current_page }} of {{ pagination.last_page }}
-                </span>
-                <div class="flex gap-2">
-                    <Link
-                        v-if="pagination.current_page > 1"
-                        :href="`/newsletters?page=${pagination.current_page - 1}`"
-                        class="px-3 py-1 border border-[#0b1215]/20 rounded-lg text-sm hover:bg-[#0b1215]/5 text-[#0b1215]/70"
-                    >
-                        Previous
-                    </Link>
-                    <Link
-                        v-if="pagination.current_page < pagination.last_page"
-                        :href="`/newsletters?page=${pagination.current_page + 1}`"
-                        class="px-3 py-1 border border-[#0b1215]/20 rounded-lg text-sm hover:bg-[#0b1215]/5 text-[#0b1215]/70"
-                    >
-                        Next
-                    </Link>
-                </div>
-            </div>
         </div>
     </AppLayout>
 </template>

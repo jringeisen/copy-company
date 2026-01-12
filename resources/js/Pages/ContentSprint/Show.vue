@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, InfiniteScroll } from '@inertiajs/vue3';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
@@ -9,6 +9,7 @@ const { canManageSprints } = usePermissions();
 
 const props = defineProps({
     sprint: Object,
+    ideas: Object,
     brand: Object,
 });
 
@@ -25,15 +26,13 @@ const isConverted = (index) => {
     return (props.sprint.converted_indices || []).includes(index);
 };
 
-const unconvertedIndices = computed(() => {
-    return (props.sprint.generated_content || [])
-        .map((_, i) => i)
-        .filter(i => !isConverted(i));
+const unconvertedIdeas = computed(() => {
+    return (props.ideas?.data || []).filter(idea => !isConverted(idea.original_index));
 });
 
 const allUnconvertedSelected = computed(() => {
-    return unconvertedIndices.value.length > 0 &&
-        unconvertedIndices.value.every(i => selectedIdeas.value.includes(i));
+    return unconvertedIdeas.value.length > 0 &&
+        unconvertedIdeas.value.every(idea => selectedIdeas.value.includes(idea.original_index));
 });
 
 const acceptForm = useForm({
@@ -81,11 +80,11 @@ const toggleIdea = (index) => {
 };
 
 const selectAll = () => {
-    // Only select/deselect unconverted ideas
+    // Only select/deselect unconverted ideas from currently loaded items
     if (allUnconvertedSelected.value) {
         selectedIdeas.value = [];
     } else {
-        selectedIdeas.value = [...unconvertedIndices.value];
+        selectedIdeas.value = unconvertedIdeas.value.map(idea => idea.original_index);
     }
 };
 
@@ -209,7 +208,7 @@ const deleteSprint = () => {
                             </span>
                         </h2>
                         <p class="text-sm text-[#0b1215]/60">
-                            <template v-if="unconvertedIndices.length > 0">
+                            <template v-if="sprint.unconverted_ideas_count > 0">
                                 Select the ideas you want to turn into draft posts
                             </template>
                             <template v-else>
@@ -218,7 +217,7 @@ const deleteSprint = () => {
                         </p>
                     </div>
                     <button
-                        v-if="canManageSprints && unconvertedIndices.length > 0"
+                        v-if="canManageSprints && unconvertedIdeas.length > 0"
                         @click="selectAll"
                         class="text-sm text-[#a1854f] hover:text-[#a1854f]/80 font-medium"
                     >
@@ -226,24 +225,24 @@ const deleteSprint = () => {
                     </button>
                 </div>
 
-                <!-- Ideas Grid -->
-                <div class="space-y-4">
+                <!-- Ideas Grid with Infinite Scroll -->
+                <InfiniteScroll data="ideas" only-next class="space-y-4">
                     <div
-                        v-for="(idea, index) in sprint.generated_content"
-                        :key="index"
-                        @click="toggleIdea(index)"
+                        v-for="idea in ideas.data"
+                        :key="idea.original_index"
+                        @click="toggleIdea(idea.original_index)"
                         :class="[
                             'bg-white rounded-2xl border-2 p-5 transition relative',
-                            isConverted(index)
+                            isConverted(idea.original_index)
                                 ? 'border-green-200 bg-green-50/50 cursor-default opacity-75'
-                                : selectedIdeas.includes(index)
+                                : selectedIdeas.includes(idea.original_index)
                                     ? 'border-[#a1854f] bg-[#a1854f]/5 cursor-pointer'
                                     : 'border-[#0b1215]/10 hover:border-[#0b1215]/30 cursor-pointer'
                         ]"
                     >
                         <!-- Created Badge -->
                         <div
-                            v-if="isConverted(index)"
+                            v-if="isConverted(idea.original_index)"
                             class="absolute top-3 right-3 px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full flex items-center gap-1"
                         >
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -255,16 +254,16 @@ const deleteSprint = () => {
                         <div class="flex items-start gap-4">
                             <!-- Checkbox -->
                             <div
-                                v-if="!isConverted(index)"
+                                v-if="!isConverted(idea.original_index)"
                                 :class="[
                                     'w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-1',
-                                    selectedIdeas.includes(index)
+                                    selectedIdeas.includes(idea.original_index)
                                         ? 'border-[#a1854f] bg-[#a1854f]'
                                         : 'border-[#0b1215]/30'
                                 ]"
                             >
                                 <svg
-                                    v-if="selectedIdeas.includes(index)"
+                                    v-if="selectedIdeas.includes(idea.original_index)"
                                     class="w-4 h-4 text-white"
                                     fill="none"
                                     stroke="currentColor"
@@ -278,10 +277,10 @@ const deleteSprint = () => {
 
                             <!-- Content -->
                             <div class="flex-1">
-                                <h3 :class="['font-semibold text-lg', isConverted(index) ? 'text-[#0b1215]/50' : 'text-[#0b1215]']">
+                                <h3 :class="['font-semibold text-lg', isConverted(idea.original_index) ? 'text-[#0b1215]/50' : 'text-[#0b1215]']">
                                     {{ idea.title }}
                                 </h3>
-                                <p :class="['mt-1', isConverted(index) ? 'text-[#0b1215]/40' : 'text-[#0b1215]/60']">
+                                <p :class="['mt-1', isConverted(idea.original_index) ? 'text-[#0b1215]/40' : 'text-[#0b1215]/60']">
                                     {{ idea.description }}
                                 </p>
                                 <div class="mt-3 flex flex-wrap gap-2">
@@ -290,25 +289,25 @@ const deleteSprint = () => {
                                         :key="point"
                                         :class="[
                                             'px-2 py-1 text-xs rounded-lg',
-                                            isConverted(index) ? 'bg-[#0b1215]/5 text-[#0b1215]/40' : 'bg-[#0b1215]/5 text-[#0b1215]/60'
+                                            isConverted(idea.original_index) ? 'bg-[#0b1215]/5 text-[#0b1215]/40' : 'bg-[#0b1215]/5 text-[#0b1215]/60'
                                         ]"
                                     >
                                         {{ point }}
                                     </span>
                                 </div>
-                                <div :class="['mt-3 text-sm', isConverted(index) ? 'text-[#0b1215]/40' : 'text-[#0b1215]/50']">
+                                <div :class="['mt-3 text-sm', isConverted(idea.original_index) ? 'text-[#0b1215]/40' : 'text-[#0b1215]/50']">
                                     ~{{ idea.estimated_words }} words
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </InfiniteScroll>
 
                 <!-- Fixed Bottom Bar -->
                 <div v-if="canManageSprints && selectedIdeas.length > 0" class="fixed bottom-0 left-0 right-0 bg-white border-t border-[#0b1215]/10 p-4 shadow-lg">
                     <div class="max-w-4xl mx-auto flex items-center justify-between">
                         <span class="text-[#0b1215]/60">
-                            {{ selectedIdeas.length }} of {{ unconvertedIndices.length }} available ideas selected
+                            {{ selectedIdeas.length }} idea{{ selectedIdeas.length !== 1 ? 's' : '' }} selected
                         </span>
                         <button
                             @click="createPosts"

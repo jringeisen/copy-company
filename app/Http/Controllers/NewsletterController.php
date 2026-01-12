@@ -13,20 +13,14 @@ class NewsletterController extends Controller
 {
     public function index(Request $request): Response
     {
-        $newsletters = $request->user()->currentBrand()
-            ->newsletterSends()
-            ->with('post:id,title,slug')
-            ->latest()
-            ->paginate(15);
-
         return Inertia::render('Newsletters/Index', [
-            'newsletters' => NewsletterSendResource::collection($newsletters)->resolve(),
-            'pagination' => [
-                'current_page' => $newsletters->currentPage(),
-                'last_page' => $newsletters->lastPage(),
-                'per_page' => $newsletters->perPage(),
-                'total' => $newsletters->total(),
-            ],
+            'newsletters' => Inertia::scroll(fn () => NewsletterSendResource::collection(
+                $request->user()->currentBrand()
+                    ->newsletterSends()
+                    ->with('post:id,title,slug')
+                    ->latest()
+                    ->paginate(15)
+            )),
         ]);
     }
 

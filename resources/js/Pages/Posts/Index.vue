@@ -6,7 +6,7 @@ import ConfirmModal from '@/Components/ConfirmModal.vue';
 import { usePermissions } from '@/Composables/usePermissions';
 
 const props = defineProps({
-    posts: Array,
+    posts: Object,
     brand: Object,
 });
 
@@ -17,18 +17,18 @@ const isDeleting = ref(false);
 const showDeleteModal = ref(false);
 
 const allSelected = computed(() => {
-    return props.posts.length > 0 && selectedIds.value.length === props.posts.length;
+    return props.posts.data.length > 0 && selectedIds.value.length === props.posts.data.length;
 });
 
 const someSelected = computed(() => {
-    return selectedIds.value.length > 0 && selectedIds.value.length < props.posts.length;
+    return selectedIds.value.length > 0 && selectedIds.value.length < props.posts.data.length;
 });
 
 const toggleAll = () => {
     if (allSelected.value) {
         selectedIds.value = [];
     } else {
-        selectedIds.value = props.posts.map(post => post.id);
+        selectedIds.value = props.posts.data.map(post => post.id);
     }
 };
 
@@ -101,7 +101,7 @@ const getStatusColor = (status) => {
             </div>
 
             <!-- Posts List -->
-            <div v-if="posts.length > 0" class="bg-white rounded-2xl border border-[#0b1215]/10 overflow-hidden">
+            <div v-if="posts.data.length > 0" class="bg-white rounded-2xl border border-[#0b1215]/10 overflow-hidden">
                 <table class="min-w-full divide-y divide-[#0b1215]/10">
                     <thead class="bg-[#0b1215]/[0.03]">
                         <tr>
@@ -132,7 +132,7 @@ const getStatusColor = (status) => {
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-[#0b1215]/5">
-                        <tr v-for="post in posts" :key="post.id" class="hover:bg-[#0b1215]/[0.02] transition-colors">
+                        <tr v-for="post in posts.data" :key="post.id" class="hover:bg-[#0b1215]/[0.02] transition-colors">
                             <td v-if="canDeletePosts" class="px-6 py-4">
                                 <input
                                     type="checkbox"
@@ -168,6 +168,31 @@ const getStatusColor = (status) => {
                         </tr>
                     </tbody>
                 </table>
+
+                <!-- Pagination -->
+                <div v-if="posts.last_page > 1" class="px-6 py-4 border-t border-[#0b1215]/10">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-[#0b1215]/70">
+                            Showing {{ posts.from }} to {{ posts.to }} of {{ posts.total }} posts
+                        </span>
+                        <div class="flex space-x-2">
+                            <Link
+                                v-if="posts.prev_page_url"
+                                :href="posts.prev_page_url"
+                                class="px-3 py-1 border border-[#0b1215]/20 rounded-lg text-sm hover:bg-[#0b1215]/5"
+                            >
+                                Previous
+                            </Link>
+                            <Link
+                                v-if="posts.next_page_url"
+                                :href="posts.next_page_url"
+                                class="px-3 py-1 border border-[#0b1215]/20 rounded-lg text-sm hover:bg-[#0b1215]/5"
+                            >
+                                Next
+                            </Link>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Empty State -->

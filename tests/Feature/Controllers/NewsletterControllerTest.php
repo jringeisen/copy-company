@@ -37,8 +37,7 @@ test('users with brand can view newsletters index', function () {
     $response->assertStatus(200);
     $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('Newsletters/Index')
-        ->has('newsletters', 3)
-        ->has('pagination')
+        ->has('newsletters.data', 3)
     );
 });
 
@@ -55,7 +54,7 @@ test('newsletters index shows empty state when no newsletters', function () {
     $response->assertStatus(200);
     $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('Newsletters/Index')
-        ->has('newsletters', 0)
+        ->has('newsletters.data', 0)
     );
 });
 
@@ -88,7 +87,7 @@ test('newsletters index only shows newsletters for current brand', function () {
     $response->assertStatus(200);
     $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('Newsletters/Index')
-        ->has('newsletters', 2)
+        ->has('newsletters.data', 2)
     );
 });
 
@@ -232,8 +231,6 @@ test('newsletters index is paginated', function () {
     $response->assertStatus(200);
     $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('Newsletters/Index')
-        ->has('newsletters', 15) // Default pagination is 15
-        ->where('pagination.total', 20)
-        ->where('pagination.last_page', 2)
+        ->has('newsletters.data', 15) // Uses Inertia::scroll() with pagination
     );
 });

@@ -24,7 +24,6 @@ class LoopItemFactory extends Factory
             'social_post_id' => null,
             'position' => 0,
             'content' => fake()->paragraph(),
-            'platform' => null,
             'format' => 'feed',
             'hashtags' => fake()->words(5),
             'link' => fake()->optional()->url(),
@@ -57,5 +56,17 @@ class LoopItemFactory extends Factory
             'times_posted' => $count,
             'last_posted_at' => now(),
         ]);
+    }
+
+    public function withMedia(): static
+    {
+        return $this->state(fn () => [
+            'media' => [1, 2], // Media IDs
+        ]);
+    }
+
+    public function withContent(string $content): static
+    {
+        return $this->state(fn () => ['content' => $content]);
     }
 }

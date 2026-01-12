@@ -62,7 +62,7 @@ test('users with brand can view posts index', function () {
     $response->assertStatus(200);
     $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('Posts/Index')
-        ->has('posts', 3)
+        ->has('posts.data', 3)
         ->has('brand')
     );
 });

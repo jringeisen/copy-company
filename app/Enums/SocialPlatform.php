@@ -72,7 +72,7 @@ enum SocialPlatform: string
     /**
      * Get the maximum character limit for this platform.
      */
-    public function maxCharacters(): ?int
+    public function maxCharacters(): int
     {
         return match ($this) {
             self::Instagram => 2200,

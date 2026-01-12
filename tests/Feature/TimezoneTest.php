@@ -194,6 +194,8 @@ test('social post resource converts scheduled_at to brand timezone', function ()
         'scheduled_at' => $utcTime,
     ]);
 
+    // Load brand relationship so resource can access timezone
+    $socialPost->load('brand');
     $resource = (new SocialPostResource($socialPost))->resolve();
 
     // 10:00 PM UTC = 3:00 PM Pacific (during PDT)
@@ -217,6 +219,8 @@ test('social post resource handles different timezones correctly', function () {
         'scheduled_at' => $utcTime,
     ]);
 
+    // Load brand relationship so resource can access timezone
+    $socialPost->load('brand');
     $resource = (new SocialPostResource($socialPost))->resolve();
 
     // 12:00 PM UTC = 9:00 PM Tokyo (UTC+9)

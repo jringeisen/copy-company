@@ -10,6 +10,8 @@ use App\Jobs\GenerateContentSprint;
 use App\Models\ContentSprint;
 use App\Services\ContentSprintService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -83,11 +85,30 @@ class ContentSprintController extends Controller
         return redirect()->route('content-sprints.show', $sprint);
     }
 
-    public function show(ContentSprint $contentSprint): Response|RedirectResponse
+    public function show(Request $request, ContentSprint $contentSprint): Response|RedirectResponse
     {
         $this->authorize('view', $contentSprint);
 
         $brand = $this->currentBrand();
+
+        // Paginate the generated content array for infinite scroll
+        $generatedContent = $contentSprint->generated_content ?? [];
+        $page = $request->input('page', 1);
+        $perPage = 5;
+
+        // Add original index to each idea for tracking conversions
+        $ideasWithIndex = collect($generatedContent)->map(fn (array $idea, int $index): array => [
+            ...$idea,
+            'original_index' => $index,
+        ]);
+
+        $paginatedIdeas = new LengthAwarePaginator(
+            $ideasWithIndex->forPage($page, $perPage)->values(),
+            $ideasWithIndex->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url()]
+        );
 
         return Inertia::render('ContentSprint/Show', [
             'sprint' => [
@@ -96,13 +117,13 @@ class ContentSprintController extends Controller
                 'status' => $contentSprint->status->value,
                 'status_color' => $contentSprint->status_color,
                 'inputs' => $contentSprint->inputs,
-                'generated_content' => $contentSprint->generated_content,
                 'converted_indices' => $contentSprint->converted_indices ?? [],
                 'ideas_count' => $contentSprint->ideas_count,
                 'unconverted_ideas_count' => $contentSprint->unconverted_ideas_count,
                 'created_at' => $contentSprint->created_at->format('M d, Y \a\t g:i A'),
                 'completed_at' => $contentSprint->completed_at?->format('M d, Y \a\t g:i A'),
             ],
+            'ideas' => Inertia::scroll(fn () => $paginatedIdeas),
             'brand' => $brand,
         ]);
     }

@@ -15,6 +15,7 @@ use App\Http\Resources\LoopResource;
 use App\Http\Resources\SocialPostResource;
 use App\Models\Loop;
 use App\Models\LoopItem;
+use App\Models\SocialPost;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -38,7 +39,7 @@ class LoopController extends Controller
             ->get();
 
         // Set brand relationship to avoid N+1 queries in LoopResource
-        $loops->each(fn ($loop) => $loop->setRelation('brand', $brand));
+        $loops->each(fn (Loop $loop) => $loop->setRelation('brand', $brand));
 
         return Inertia::render('Loops/Index', [
             'loops' => LoopResource::collection($loops)->resolve(),
@@ -99,7 +100,7 @@ class LoopController extends Controller
         $loop->load(['items.socialPost', 'schedules', 'brand']);
 
         // Set the loop relationship on each item to avoid N+1 queries in LoopItemResource
-        $loop->items->each(fn ($item) => $item->setRelation('loop', $loop));
+        $loop->items->each(fn (LoopItem $item) => $item->setRelation('loop', $loop));
 
         // Get available social posts for adding to loop
         $availableSocialPosts = $brand->socialPosts()
@@ -109,7 +110,7 @@ class LoopController extends Controller
             ->get();
 
         // Set brand relationship to avoid N+1 queries in SocialPostResource
-        $availableSocialPosts->each(fn ($post) => $post->setRelation('brand', $brand));
+        $availableSocialPosts->each(fn (SocialPost $post) => $post->setRelation('brand', $brand));
 
         return Inertia::render('Loops/Show', [
             'loop' => (new LoopResource($loop))->resolve(),
