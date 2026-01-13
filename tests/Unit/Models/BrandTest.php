@@ -48,3 +48,59 @@ test('active subscribers count only includes confirmed subscribers', function ()
 
     expect($brand->active_subscribers_count)->toBe(3);
 });
+
+test('getEmailFromAddress uses custom email domain when verified', function () {
+    $brand = Brand::factory()->create([
+        'custom_email_domain' => 'myemail.com',
+        'custom_email_from' => 'newsletter',
+        'email_domain_verification_status' => 'verified',
+    ]);
+
+    expect($brand->getEmailFromAddress())->toBe('newsletter@myemail.com');
+});
+
+test('getEmailFromAddress uses hello as default from when custom_email_from is empty', function () {
+    $brand = Brand::factory()->create([
+        'custom_email_domain' => 'myemail.com',
+        'custom_email_from' => null,
+        'email_domain_verification_status' => 'verified',
+    ]);
+
+    expect($brand->getEmailFromAddress())->toBe('hello@myemail.com');
+});
+
+test('getEmailFromAddress returns default mail address when email domain not verified', function () {
+    $brand = Brand::factory()->create([
+        'custom_email_domain' => 'myemail.com',
+        'email_domain_verification_status' => 'pending',
+    ]);
+
+    expect($brand->getEmailFromAddress())->toBe(config('mail.from.address'));
+});
+
+test('hasVerifiedEmailDomain returns true when domain is verified', function () {
+    $brand = Brand::factory()->create([
+        'custom_email_domain' => 'myemail.com',
+        'email_domain_verification_status' => 'verified',
+    ]);
+
+    expect($brand->hasVerifiedEmailDomain())->toBeTrue();
+});
+
+test('hasVerifiedEmailDomain returns false when domain is not verified', function () {
+    $brand = Brand::factory()->create([
+        'custom_email_domain' => 'myemail.com',
+        'email_domain_verification_status' => 'pending',
+    ]);
+
+    expect($brand->hasVerifiedEmailDomain())->toBeFalse();
+});
+
+test('hasVerifiedEmailDomain returns false when custom_email_domain is null', function () {
+    $brand = Brand::factory()->create([
+        'custom_email_domain' => null,
+        'email_domain_verification_status' => 'verified',
+    ]);
+
+    expect($brand->hasVerifiedEmailDomain())->toBeFalse();
+});

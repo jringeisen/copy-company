@@ -19,7 +19,7 @@ class BuiltInNewsletterService implements NewsletterServiceInterface
         $newsletterSend = NewsletterSend::create([
             'brand_id' => $brand->id,
             'post_id' => $post->id,
-            'subject' => $subjectLine,
+            'subject_line' => $subjectLine,
             'preview_text' => $previewText,
             'status' => NewsletterSendStatus::Sending,
             'total_recipients' => $subscribers->count(),

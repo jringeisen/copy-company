@@ -157,3 +157,65 @@ test('user cannot delete posts from other account brands', function () {
 
     expect($this->policy->delete($user, $post))->toBeFalse();
 });
+
+test('user can restore their own account brand posts', function () {
+    $user = User::factory()->create();
+    $account = Account::factory()->create();
+    $account->users()->attach($user->id, ['role' => 'admin']);
+    $brand = Brand::factory()->forAccount($account)->create();
+    $post = Post::factory()->forBrand($brand)->forUser($user)->create();
+
+    session(['current_account_id' => $account->id]);
+    setPermissionsTeamId($account->id);
+    $user->assignRole('admin');
+
+    expect($this->policy->restore($user, $post))->toBeTrue();
+});
+
+test('user cannot restore posts from other account brands', function () {
+    $user = User::factory()->create();
+    $userAccount = Account::factory()->create();
+    $userAccount->users()->attach($user->id, ['role' => 'admin']);
+    Brand::factory()->forAccount($userAccount)->create();
+
+    $otherAccount = Account::factory()->create();
+    $otherBrand = Brand::factory()->forAccount($otherAccount)->create();
+    $post = Post::factory()->forBrand($otherBrand)->create();
+
+    session(['current_account_id' => $userAccount->id]);
+    setPermissionsTeamId($userAccount->id);
+    $user->assignRole('admin');
+
+    expect($this->policy->restore($user, $post))->toBeFalse();
+});
+
+test('user can force delete their own account brand posts', function () {
+    $user = User::factory()->create();
+    $account = Account::factory()->create();
+    $account->users()->attach($user->id, ['role' => 'admin']);
+    $brand = Brand::factory()->forAccount($account)->create();
+    $post = Post::factory()->forBrand($brand)->forUser($user)->create();
+
+    session(['current_account_id' => $account->id]);
+    setPermissionsTeamId($account->id);
+    $user->assignRole('admin');
+
+    expect($this->policy->forceDelete($user, $post))->toBeTrue();
+});
+
+test('user cannot force delete posts from other account brands', function () {
+    $user = User::factory()->create();
+    $userAccount = Account::factory()->create();
+    $userAccount->users()->attach($user->id, ['role' => 'admin']);
+    Brand::factory()->forAccount($userAccount)->create();
+
+    $otherAccount = Account::factory()->create();
+    $otherBrand = Brand::factory()->forAccount($otherAccount)->create();
+    $post = Post::factory()->forBrand($otherBrand)->create();
+
+    session(['current_account_id' => $userAccount->id]);
+    setPermissionsTeamId($userAccount->id);
+    $user->assignRole('admin');
+
+    expect($this->policy->forceDelete($user, $post))->toBeFalse();
+});

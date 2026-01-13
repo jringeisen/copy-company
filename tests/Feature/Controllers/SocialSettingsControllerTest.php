@@ -355,4 +355,496 @@ class SocialSettingsControllerTest extends TestCase
             )
         );
     }
+
+    public function test_social_settings_shows_configured_account_for_instagram(): void
+    {
+        $tokenManager = app(TokenManager::class);
+        $tokenManager->storeCredentials($this->brand, 'instagram', [
+            'access_token' => 'test_token',
+            'account_name' => 'Test User',
+            'instagram_account_id' => '123',
+            'instagram_username' => 'my_instagram',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social');
+
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('platforms', fn ($platforms) => $platforms
+                ->where('0.identifier', 'instagram')
+                ->where('0.connected', true)
+                ->where('0.needs_configuration', false)
+                ->where('0.configured_account', '@my_instagram')
+                ->etc()
+            )
+        );
+    }
+
+    public function test_social_settings_shows_needs_configuration_for_instagram_without_account(): void
+    {
+        $tokenManager = app(TokenManager::class);
+        $tokenManager->storeCredentials($this->brand, 'instagram', [
+            'access_token' => 'test_token',
+            'account_name' => 'Test User',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social');
+
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('platforms', fn ($platforms) => $platforms
+                ->where('0.identifier', 'instagram')
+                ->where('0.connected', true)
+                ->where('0.needs_configuration', true)
+                ->etc()
+            )
+        );
+    }
+
+    public function test_social_settings_shows_configured_account_for_pinterest(): void
+    {
+        $tokenManager = app(TokenManager::class);
+        $tokenManager->storeCredentials($this->brand, 'pinterest', [
+            'access_token' => 'test_token',
+            'account_name' => 'Test User',
+            'board_id' => '123',
+            'board_name' => 'My Board',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social');
+
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('platforms', fn ($platforms) => $platforms
+                ->where('2.identifier', 'pinterest')
+                ->where('2.connected', true)
+                ->where('2.needs_configuration', false)
+                ->where('2.configured_account', 'My Board')
+                ->etc()
+            )
+        );
+    }
+
+    public function test_social_settings_shows_needs_configuration_for_pinterest_without_board(): void
+    {
+        $tokenManager = app(TokenManager::class);
+        $tokenManager->storeCredentials($this->brand, 'pinterest', [
+            'access_token' => 'test_token',
+            'account_name' => 'Test User',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social');
+
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('platforms', fn ($platforms) => $platforms
+                ->where('2.identifier', 'pinterest')
+                ->where('2.connected', true)
+                ->where('2.needs_configuration', true)
+                ->etc()
+            )
+        );
+    }
+
+    public function test_instagram_account_selection_shows_accounts(): void
+    {
+        $tokenManager = app(TokenManager::class);
+        $tokenManager->storeCredentials($this->brand, 'instagram', [
+            'access_token' => 'test_token',
+            'account_name' => 'Test User',
+        ]);
+
+        $mockInstagramService = Mockery::mock(\App\Services\SocialPublishing\InstagramAccountsService::class);
+        $mockInstagramService->shouldReceive('fetchInstagramAccounts')
+            ->with('test_token')
+            ->once()
+            ->andReturn([
+                ['id' => '123', 'username' => 'my_instagram', 'name' => 'My Instagram'],
+            ]);
+        $this->app->instance(\App\Services\SocialPublishing\InstagramAccountsService::class, $mockInstagramService);
+
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social/instagram/select');
+
+        $response->assertOk();
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Settings/SocialAccountSelect')
+            ->where('platform', 'instagram')
+            ->where('platformName', 'Instagram')
+            ->where('accountType', 'account')
+            ->has('accounts', 1)
+        );
+    }
+
+    public function test_instagram_account_selection_shows_custom_error_when_no_accounts(): void
+    {
+        $tokenManager = app(TokenManager::class);
+        $tokenManager->storeCredentials($this->brand, 'instagram', [
+            'access_token' => 'test_token',
+        ]);
+
+        $mockInstagramService = Mockery::mock(\App\Services\SocialPublishing\InstagramAccountsService::class);
+        $mockInstagramService->shouldReceive('fetchInstagramAccounts')
+            ->with('test_token')
+            ->once()
+            ->andReturn([]);
+        $this->app->instance(\App\Services\SocialPublishing\InstagramAccountsService::class, $mockInstagramService);
+
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social/instagram/select');
+
+        $response->assertRedirect(route('settings.social'));
+        $response->assertSessionHas('error', 'No Instagram Business accounts found. Please make sure you have an Instagram Business or Creator account connected to a Facebook Page.');
+    }
+
+    public function test_store_instagram_account_selection(): void
+    {
+        $tokenManager = app(TokenManager::class);
+        $tokenManager->storeCredentials($this->brand, 'instagram', [
+            'access_token' => 'user_token',
+            'account_name' => 'Test User',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->post('/settings/social/instagram/select', [
+                'account_id' => '123',
+                'account_name' => 'my_instagram',
+                'access_token' => 'page_token_for_instagram',
+            ]);
+
+        $response->assertRedirect(route('settings.social'));
+        $response->assertSessionHas('success');
+
+        $credentials = $tokenManager->getCredentials($this->brand->fresh(), 'instagram');
+        $this->assertEquals('123', $credentials['instagram_account_id']);
+        $this->assertEquals('my_instagram', $credentials['instagram_username']);
+        $this->assertEquals('page_token_for_instagram', $credentials['access_token']);
+    }
+
+    public function test_store_account_selection_requires_credentials(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->post('/settings/social/facebook/select', [
+                'account_id' => '123',
+                'account_name' => 'My Page',
+            ]);
+
+        $response->assertRedirect(route('settings.social'));
+        $response->assertSessionHas('error', 'Please connect your account first.');
+    }
+
+    public function test_store_account_selection_returns_error_for_invalid_platform(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->post('/settings/social/linkedin/select', [
+                'account_id' => '123',
+                'account_name' => 'Test',
+            ]);
+
+        $response->assertRedirect(route('settings.social'));
+        $response->assertSessionHas('error', 'Invalid platform.');
+    }
+
+    public function test_disconnect_redirects_to_brand_create_if_no_brand(): void
+    {
+        $userWithoutBrand = User::factory()->create();
+        $accountWithoutBrand = Account::factory()->create();
+        $accountWithoutBrand->users()->attach($userWithoutBrand->id, ['role' => 'admin']);
+
+        $response = $this->actingAs($userWithoutBrand)
+            ->withSession(['current_account_id' => $accountWithoutBrand->id])
+            ->delete('/settings/social/linkedin');
+
+        $response->assertRedirect(route('brands.create'));
+    }
+
+    public function test_account_selection_redirects_to_brand_create_if_no_brand(): void
+    {
+        $userWithoutBrand = User::factory()->create();
+        $accountWithoutBrand = Account::factory()->create();
+        $accountWithoutBrand->users()->attach($userWithoutBrand->id, ['role' => 'admin']);
+
+        $response = $this->actingAs($userWithoutBrand)
+            ->withSession(['current_account_id' => $accountWithoutBrand->id])
+            ->get('/settings/social/facebook/select');
+
+        $response->assertRedirect(route('brands.create'));
+    }
+
+    public function test_store_account_selection_redirects_to_brand_create_if_no_brand(): void
+    {
+        $userWithoutBrand = User::factory()->create();
+        $accountWithoutBrand = Account::factory()->create();
+        $accountWithoutBrand->users()->attach($userWithoutBrand->id, ['role' => 'admin']);
+
+        $response = $this->actingAs($userWithoutBrand)
+            ->withSession(['current_account_id' => $accountWithoutBrand->id])
+            ->post('/settings/social/facebook/select', [
+                'account_id' => '123',
+                'account_name' => 'Test',
+            ]);
+
+        $response->assertRedirect(route('brands.create'));
+    }
+
+    public function test_callback_redirects_to_brand_create_if_no_brand(): void
+    {
+        $userWithoutBrand = User::factory()->create();
+        $accountWithoutBrand = Account::factory()->create();
+        $accountWithoutBrand->users()->attach($userWithoutBrand->id, ['role' => 'admin']);
+
+        $response = $this->actingAs($userWithoutBrand)
+            ->withSession(['current_account_id' => $accountWithoutBrand->id])
+            ->get('/settings/social/linkedin/callback');
+
+        $response->assertRedirect(route('brands.create'));
+    }
+
+    public function test_callback_returns_error_for_invalid_platform(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social/invalid/callback');
+
+        $response->assertRedirect(route('settings.social'));
+        $response->assertSessionHas('error', 'Invalid platform.');
+    }
+
+    public function test_redirect_with_empty_scopes_config(): void
+    {
+        // Set empty scopes config for a platform
+        config(['services.linkedin.scopes' => '']);
+
+        // Mock Socialite to avoid actual OAuth
+        $mockDriver = Mockery::mock(\Laravel\Socialite\Two\AbstractProvider::class);
+        $mockDriver->shouldReceive('redirect')
+            ->once()
+            ->andReturn(new \Symfony\Component\HttpFoundation\RedirectResponse('https://linkedin.com/oauth'));
+
+        \Laravel\Socialite\Facades\Socialite::shouldReceive('driver')
+            ->with('linkedin')
+            ->once()
+            ->andReturn($mockDriver);
+
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social/linkedin/redirect');
+
+        $response->assertRedirect();
+    }
+
+    public function test_redirect_with_scopes_config(): void
+    {
+        // Set scopes config for a platform
+        config(['services.linkedin.scopes' => 'openid,profile,w_member_social']);
+
+        // Mock Socialite
+        $mockDriver = Mockery::mock(\Laravel\Socialite\Two\AbstractProvider::class);
+        $mockDriver->shouldReceive('scopes')
+            ->once()
+            ->with(['openid', 'profile', 'w_member_social'])
+            ->andReturnSelf();
+        $mockDriver->shouldReceive('redirect')
+            ->once()
+            ->andReturn(new \Symfony\Component\HttpFoundation\RedirectResponse('https://linkedin.com/oauth'));
+
+        \Laravel\Socialite\Facades\Socialite::shouldReceive('driver')
+            ->with('linkedin')
+            ->once()
+            ->andReturn($mockDriver);
+
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social/linkedin/redirect');
+
+        $response->assertRedirect();
+    }
+
+    public function test_redirect_handles_socialite_exception(): void
+    {
+        \Laravel\Socialite\Facades\Socialite::shouldReceive('driver')
+            ->andThrow(new \Exception('OAuth configuration error'));
+
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social/linkedin/redirect');
+
+        $response->assertRedirect();
+        $response->assertSessionHas('error');
+    }
+
+    public function test_callback_handles_exception_and_shows_error(): void
+    {
+        \Laravel\Socialite\Facades\Socialite::shouldReceive('driver')
+            ->with('linkedin')
+            ->andThrow(new \Exception('OAuth callback failed'));
+
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social/linkedin/callback');
+
+        $response->assertRedirect(route('settings.social'));
+        $response->assertSessionHas('error');
+    }
+
+    public function test_callback_success_stores_credentials_and_redirects_to_account_selection_for_facebook(): void
+    {
+        $mockSocialiteUser = Mockery::mock(\Laravel\Socialite\Two\User::class);
+        $mockSocialiteUser->token = 'test_access_token';
+        $mockSocialiteUser->refreshToken = 'test_refresh_token';
+        $mockSocialiteUser->expiresIn = 3600;
+        $mockSocialiteUser->shouldReceive('getId')->andReturn('user_123');
+        $mockSocialiteUser->shouldReceive('getNickname')->andReturn('TestUser');
+        $mockSocialiteUser->shouldReceive('getName')->andReturn('Test User');
+
+        $mockDriver = Mockery::mock(\Laravel\Socialite\Two\AbstractProvider::class);
+        $mockDriver->shouldReceive('user')->andReturn($mockSocialiteUser);
+
+        \Laravel\Socialite\Facades\Socialite::shouldReceive('driver')
+            ->with('facebook')
+            ->andReturn($mockDriver);
+
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social/facebook/callback');
+
+        $response->assertRedirect(route('settings.social.select', ['platform' => 'facebook']));
+        $response->assertSessionHas('info', 'Please select which account to publish to.');
+
+        // Verify credentials were stored
+        $tokenManager = app(TokenManager::class);
+        $credentials = $tokenManager->getCredentials($this->brand->fresh(), 'facebook');
+        $this->assertEquals('test_access_token', $credentials['access_token']);
+        $this->assertEquals('user_123', $credentials['user_id']);
+    }
+
+    public function test_callback_success_stores_credentials_for_linkedin_without_account_selection(): void
+    {
+        $mockSocialiteUser = Mockery::mock(\Laravel\Socialite\Two\User::class);
+        $mockSocialiteUser->token = 'linkedin_access_token';
+        $mockSocialiteUser->refreshToken = null;
+        $mockSocialiteUser->expiresIn = 7200;
+        $mockSocialiteUser->shouldReceive('getId')->andReturn('person_456');
+        $mockSocialiteUser->shouldReceive('getNickname')->andReturn(null);
+        $mockSocialiteUser->shouldReceive('getName')->andReturn('LinkedIn User');
+
+        $mockDriver = Mockery::mock(\Laravel\Socialite\Two\AbstractProvider::class);
+        $mockDriver->shouldReceive('user')->andReturn($mockSocialiteUser);
+
+        \Laravel\Socialite\Facades\Socialite::shouldReceive('driver')
+            ->with('linkedin')
+            ->andReturn($mockDriver);
+
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social/linkedin/callback');
+
+        $response->assertRedirect(route('settings.social'));
+        $response->assertSessionHas('success', 'Linkedin connected successfully!');
+
+        // Verify credentials were stored with person_id
+        $tokenManager = app(TokenManager::class);
+        $credentials = $tokenManager->getCredentials($this->brand->fresh(), 'linkedin');
+        $this->assertEquals('linkedin_access_token', $credentials['access_token']);
+        $this->assertEquals('person_456', $credentials['person_id']);
+    }
+
+    public function test_callback_success_for_pinterest_redirects_to_account_selection(): void
+    {
+        $mockSocialiteUser = Mockery::mock(\Laravel\Socialite\Two\User::class);
+        $mockSocialiteUser->token = 'pinterest_access_token';
+        $mockSocialiteUser->refreshToken = 'pinterest_refresh_token';
+        $mockSocialiteUser->expiresIn = 3600;
+        $mockSocialiteUser->shouldReceive('getId')->andReturn('pinner_789');
+        $mockSocialiteUser->shouldReceive('getNickname')->andReturn('PinterestUser');
+        $mockSocialiteUser->shouldReceive('getName')->andReturn('Pinterest User');
+
+        $mockDriver = Mockery::mock(\Laravel\Socialite\Two\AbstractProvider::class);
+        $mockDriver->shouldReceive('user')->andReturn($mockSocialiteUser);
+
+        \Laravel\Socialite\Facades\Socialite::shouldReceive('driver')
+            ->with('pinterest')
+            ->andReturn($mockDriver);
+
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social/pinterest/callback');
+
+        $response->assertRedirect(route('settings.social.select', ['platform' => 'pinterest']));
+        $response->assertSessionHas('info');
+
+        // Verify Pinterest-specific fields
+        $tokenManager = app(TokenManager::class);
+        $credentials = $tokenManager->getCredentials($this->brand->fresh(), 'pinterest');
+        $this->assertEquals('pinner_789', $credentials['user_id']);
+    }
+
+    public function test_instagram_redirect_uses_facebook_driver_with_instagram_redirect_url(): void
+    {
+        config(['services.instagram.redirect' => '/settings/social/instagram/callback']);
+        config(['services.instagram.scopes' => 'instagram_basic,pages_show_list']);
+
+        $mockDriver = Mockery::mock(\Laravel\Socialite\Two\AbstractProvider::class);
+        $mockDriver->shouldReceive('scopes')
+            ->once()
+            ->with(['instagram_basic', 'pages_show_list'])
+            ->andReturnSelf();
+        $mockDriver->shouldReceive('redirectUrl')
+            ->once()
+            ->andReturnSelf();
+        $mockDriver->shouldReceive('redirect')
+            ->once()
+            ->andReturn(new \Symfony\Component\HttpFoundation\RedirectResponse('https://facebook.com/oauth'));
+
+        \Laravel\Socialite\Facades\Socialite::shouldReceive('driver')
+            ->with('facebook')  // Instagram uses Facebook driver
+            ->andReturn($mockDriver);
+
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social/instagram/redirect');
+
+        $response->assertRedirect();
+    }
+
+    public function test_instagram_callback_uses_facebook_driver(): void
+    {
+        config(['services.instagram.redirect' => '/settings/social/instagram/callback']);
+
+        $mockSocialiteUser = Mockery::mock(\Laravel\Socialite\Two\User::class);
+        $mockSocialiteUser->token = 'instagram_access_token';
+        $mockSocialiteUser->refreshToken = null;
+        $mockSocialiteUser->expiresIn = 3600;
+        $mockSocialiteUser->shouldReceive('getId')->andReturn('ig_user_123');
+        $mockSocialiteUser->shouldReceive('getNickname')->andReturn('insta_user');
+        $mockSocialiteUser->shouldReceive('getName')->andReturn('Instagram User');
+
+        $mockDriver = Mockery::mock(\Laravel\Socialite\Two\AbstractProvider::class);
+        $mockDriver->shouldReceive('redirectUrl')->andReturnSelf();
+        $mockDriver->shouldReceive('user')->andReturn($mockSocialiteUser);
+
+        \Laravel\Socialite\Facades\Socialite::shouldReceive('driver')
+            ->with('facebook')  // Instagram uses Facebook driver
+            ->andReturn($mockDriver);
+
+        $response = $this->actingAs($this->user)
+            ->withSession(['current_account_id' => $this->account->id])
+            ->get('/settings/social/instagram/callback');
+
+        $response->assertRedirect(route('settings.social.select', ['platform' => 'instagram']));
+
+        // Verify Instagram-specific fields
+        $tokenManager = app(TokenManager::class);
+        $credentials = $tokenManager->getCredentials($this->brand->fresh(), 'instagram');
+        $this->assertEquals('ig_user_123', $credentials['instagram_account_id']);
+    }
 }

@@ -115,3 +115,44 @@ test('user cannot delete other accounts brands', function () {
 
     expect($this->policy->delete($user, $brand))->toBeFalse();
 });
+
+test('any user can view any brands', function () {
+    $user = User::factory()->create();
+
+    expect($this->policy->viewAny($user))->toBeTrue();
+});
+
+test('admin with permission can create brands', function () {
+    $user = User::factory()->create();
+    $account = Account::factory()->create();
+    $account->users()->attach($user->id, ['role' => 'admin']);
+
+    // Set account context for role/permission assignment
+    setPermissionsTeamId($account->id);
+    $user->assignRole('admin');
+
+    session(['current_account_id' => $account->id]);
+
+    expect($this->policy->create($user))->toBeTrue();
+});
+
+test('user without permission cannot create brands', function () {
+    $user = User::factory()->create();
+    $account = Account::factory()->create();
+    $account->users()->attach($user->id, ['role' => 'member']);
+
+    // Set account context for role/permission assignment
+    setPermissionsTeamId($account->id);
+    $user->assignRole('member');
+
+    session(['current_account_id' => $account->id]);
+
+    expect($this->policy->create($user))->toBeFalse();
+});
+
+test('user without account cannot create brands', function () {
+    $user = User::factory()->create();
+
+    // No account set in session
+    expect($this->policy->create($user))->toBeFalse();
+});

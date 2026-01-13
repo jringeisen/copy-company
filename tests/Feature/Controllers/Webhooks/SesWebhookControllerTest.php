@@ -252,3 +252,96 @@ test('ses webhook returns error for notification without message', function () {
 
     $response->assertStatus(400);
 });
+
+test('ses webhook handles subscription confirmation failure', function () {
+    Http::fake([
+        'https://sns.amazonaws.com/*' => fn () => throw new \Exception('Connection failed'),
+    ]);
+
+    $payload = [
+        'Type' => 'SubscriptionConfirmation',
+        'TopicArn' => 'arn:aws:sns:us-east-1:123456789:wordsmith-ses-events',
+        'SubscribeURL' => 'https://sns.amazonaws.com/confirm?token=abc123',
+    ];
+
+    $response = $this->postJson('/webhooks/ses', $payload);
+
+    $response->assertStatus(500);
+    $response->assertSee('Failed to confirm');
+});
+
+test('ses webhook returns error for notification with invalid message json', function () {
+    $payload = [
+        'Type' => 'Notification',
+        'Message' => 'not-valid-json',
+    ];
+
+    $response = $this->postJson('/webhooks/ses', $payload);
+
+    $response->assertStatus(400);
+    $response->assertSee('Invalid message JSON');
+});
+
+test('ses webhook handles processing exception gracefully', function () {
+    // Send a notification with valid structure but unknown event type
+    // The processor should handle this gracefully and return 200
+    $payload = [
+        'Type' => 'Notification',
+        'Message' => json_encode([
+            'eventType' => 'Unknown',
+            'mail' => [
+                'messageId' => 'test-message-'.uniqid(),
+            ],
+        ]),
+    ];
+
+    $response = $this->postJson('/webhooks/ses', $payload);
+
+    // Should still return 200 to prevent SNS retries
+    $response->assertStatus(200);
+});
+
+test('ses webhook handles subscription confirmation without subscribe url', function () {
+    $payload = [
+        'Type' => 'SubscriptionConfirmation',
+        'TopicArn' => 'arn:aws:sns:us-east-1:123456789:wordsmith-ses-events',
+        // Missing SubscribeURL
+    ];
+
+    $response = $this->postJson('/webhooks/ses', $payload);
+
+    $response->assertStatus(200);
+    $response->assertSee('Confirmed');
+});
+
+test('ses webhook logs error and returns 200 when processor throws exception', function () {
+    // Mock the processor to throw an exception
+    $mockProcessor = Mockery::mock(\App\Services\SesEventProcessor::class);
+    $mockProcessor->shouldReceive('process')
+        ->once()
+        ->andThrow(new \Exception('Test processing error'));
+
+    $this->app->instance(\App\Services\SesEventProcessor::class, $mockProcessor);
+
+    \Illuminate\Support\Facades\Log::shouldReceive('error')
+        ->once()
+        ->with('Failed to process SES event', Mockery::on(function ($data) {
+            return $data['error'] === 'Test processing error'
+                && isset($data['message']);
+        }));
+
+    $payload = [
+        'Type' => 'Notification',
+        'Message' => json_encode([
+            'eventType' => 'Delivery',
+            'mail' => [
+                'messageId' => 'test-message-'.uniqid(),
+            ],
+        ]),
+    ];
+
+    $response = $this->postJson('/webhooks/ses', $payload);
+
+    // Should still return 200 to prevent SNS retries
+    $response->assertStatus(200);
+});

@@ -223,3 +223,28 @@ test('bulkDelete returns zero for empty array', function () {
 
     expect($count)->toBe(0);
 });
+
+// ===========================================
+// Generate Thumbnail Tests
+// ===========================================
+
+test('generateThumbnail can regenerate from storage', function () {
+    $user = User::factory()->create();
+    $brand = Brand::factory()->forUser($user)->create();
+    $file = UploadedFile::fake()->image('test-image.jpg', 800, 600);
+
+    $mediaService = app(MediaService::class);
+    $media = $mediaService->upload($file, $brand, $user->id);
+
+    // Delete the old thumbnail
+    $oldThumbnailPath = $media->thumbnail_path;
+    Storage::disk('media')->delete($oldThumbnailPath);
+
+    // Regenerate thumbnail from storage (no file argument)
+    $mediaService->generateThumbnail($media);
+
+    // Thumbnail should be regenerated
+    $media->refresh();
+    expect($media->thumbnail_path)->not->toBeNull();
+    Storage::disk('media')->assertExists($media->thumbnail_path);
+});

@@ -136,3 +136,58 @@ test('social post resource handles null scheduled_at', function () {
     expect($array['scheduled_at'])->toBeNull();
     expect($array['scheduled_at_form'])->toBeNull();
 });
+
+test('social post resource returns empty array when media is empty', function () {
+    $user = User::factory()->create();
+    $brand = Brand::factory()->forUser($user)->create();
+    $socialPost = SocialPost::factory()->forBrand($brand)->create([
+        'media' => [],
+    ]);
+
+    $resource = new SocialPostResource($socialPost);
+    $array = $resource->toArray(app(Request::class));
+
+    expect($array['media'])->toBe([]);
+});
+
+test('social post resource returns legacy media array as-is', function () {
+    $user = User::factory()->create();
+    $brand = Brand::factory()->forUser($user)->create();
+    // Legacy data format: array of objects with id, url, etc.
+    $legacyMedia = [
+        ['id' => 1, 'url' => 'https://example.com/image1.jpg', 'thumbnail_url' => 'https://example.com/thumb1.jpg'],
+        ['id' => 2, 'url' => 'https://example.com/image2.jpg', 'thumbnail_url' => 'https://example.com/thumb2.jpg'],
+    ];
+    $socialPost = SocialPost::factory()->forBrand($brand)->create([
+        'media' => $legacyMedia,
+    ]);
+
+    $resource = new SocialPostResource($socialPost);
+    $array = $resource->toArray(app(Request::class));
+
+    expect($array['media'])->toBe($legacyMedia);
+});
+
+test('social post resource hydrates media ids to full media objects', function () {
+    Illuminate\Support\Facades\Storage::fake('public');
+
+    $user = User::factory()->create();
+    $brand = Brand::factory()->forUser($user)->create();
+    $media = App\Models\Media::factory()->forBrand($brand)->create([
+        'disk' => 'public',
+        'path' => 'media/test-image.jpg',
+        'thumbnail_path' => 'media/thumbnails/test-thumb.jpg',
+    ]);
+
+    $socialPost = SocialPost::factory()->forBrand($brand)->create([
+        'media' => [$media->id],
+    ]);
+
+    $resource = new SocialPostResource($socialPost);
+    $array = $resource->toArray(app(Request::class));
+
+    expect($array['media'])->toHaveCount(1);
+    expect($array['media'][0]['id'])->toBe($media->id);
+    expect($array['media'][0])->toHaveKey('url');
+    expect($array['media'][0])->toHaveKey('thumbnail_url');
+});

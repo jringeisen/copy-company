@@ -206,3 +206,23 @@ test('handles service exception during status check', function () {
     $response->assertRedirect();
     $response->assertSessionHas('error');
 });
+
+test('handles service exception during domain removal', function () {
+    $this->brand->update([
+        'custom_email_domain' => 'example.com',
+        'custom_email_from' => 'hello',
+        'email_domain_verification_status' => 'verified',
+    ]);
+
+    $mockService = Mockery::mock(SesDomainVerificationService::class);
+    $mockService->shouldReceive('removeDomain')
+        ->once()
+        ->andThrow(new \Exception('AWS connection failed'));
+
+    $this->app->instance(SesDomainVerificationService::class, $mockService);
+
+    $response = $this->actingAs($this->user)->delete(route('settings.email-domain.remove'));
+
+    $response->assertRedirect();
+    $response->assertSessionHas('error');
+});

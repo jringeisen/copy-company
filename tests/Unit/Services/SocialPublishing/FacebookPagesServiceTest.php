@@ -1,63 +1,95 @@
 <?php
 
-namespace Tests\Unit\Services\SocialPublishing;
-
 use App\Services\SocialPublishing\FacebookPagesService;
-use Facebook\Facebook;
-use Facebook\FacebookResponse;
-use Facebook\GraphNodes\GraphEdge;
-use Facebook\GraphNodes\GraphNode;
-use Mockery;
-use Tests\TestCase;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
-class FacebookPagesServiceTest extends TestCase
-{
-    public function test_fetch_user_pages_returns_array_of_pages(): void
-    {
-        $mockResponse = Mockery::mock(FacebookResponse::class);
-        $mockEdge = Mockery::mock(GraphEdge::class);
+beforeEach(function () {
+    $this->service = new FacebookPagesService;
+});
 
-        $mockPage1 = Mockery::mock(GraphNode::class);
-        $mockPage1->shouldReceive('offsetGet')->with('id')->andReturn('123');
-        $mockPage1->shouldReceive('offsetGet')->with('name')->andReturn('My Business Page');
-        $mockPage1->shouldReceive('offsetGet')->with('access_token')->andReturn('page_token_123');
+test('fetchUserPages returns pages on successful response', function () {
+    Http::fake([
+        'graph.facebook.com/*' => Http::response([
+            'data' => [
+                [
+                    'id' => 'page_123',
+                    'name' => 'Test Page',
+                    'access_token' => 'page_token_123',
+                ],
+                [
+                    'id' => 'page_456',
+                    'name' => 'Another Page',
+                    'access_token' => 'page_token_456',
+                ],
+            ],
+        ], 200),
+    ]);
 
-        $mockPage2 = Mockery::mock(GraphNode::class);
-        $mockPage2->shouldReceive('offsetGet')->with('id')->andReturn('456');
-        $mockPage2->shouldReceive('offsetGet')->with('name')->andReturn('Another Page');
-        $mockPage2->shouldReceive('offsetGet')->with('access_token')->andReturn('page_token_456');
+    Log::shouldReceive('info')->once();
 
-        $mockEdge->shouldReceive('getIterator')->andReturn(new \ArrayIterator([$mockPage1, $mockPage2]));
-        $mockResponse->shouldReceive('getGraphEdge')->andReturn($mockEdge);
+    $pages = $this->service->fetchUserPages('user_access_token');
 
-        $mockFacebook = Mockery::mock(Facebook::class);
-        $mockFacebook->shouldReceive('get')
-            ->with('/me/accounts', 'test_user_token')
-            ->andReturn($mockResponse);
+    expect($pages)->toHaveCount(2)
+        ->and($pages[0]['id'])->toBe('page_123')
+        ->and($pages[0]['name'])->toBe('Test Page')
+        ->and($pages[0]['access_token'])->toBe('page_token_123')
+        ->and($pages[1]['id'])->toBe('page_456');
+});
 
-        $service = Mockery::mock(FacebookPagesService::class)->makePartial();
-        $service->shouldAllowMockingProtectedMethods();
+test('fetchUserPages returns empty array on API error', function () {
+    Http::fake([
+        'graph.facebook.com/*' => Http::response(['error' => 'Unauthorized'], 401),
+    ]);
 
-        // We need to test the actual service, but since it creates the Facebook instance internally,
-        // we'll test the return format in a simpler way
-        $service = new FacebookPagesService;
+    Log::shouldReceive('info')->once();
+    Log::shouldReceive('error')->once();
 
-        // Since we can't easily mock the Facebook SDK construction, we test that
-        // the service handles exceptions gracefully
-        $result = $service->fetchUserPages('invalid_token');
+    $pages = $this->service->fetchUserPages('invalid_token');
 
-        // Should return empty array on failure (SDK will throw exception with invalid token)
-        $this->assertIsArray($result);
-    }
+    expect($pages)->toBe([]);
+});
 
-    public function test_fetch_user_pages_returns_empty_array_on_exception(): void
-    {
-        $service = new FacebookPagesService;
+test('fetchUserPages returns empty array on exception', function () {
+    Http::fake(function () {
+        throw new Exception('Network error');
+    });
 
-        // Invalid token will cause an exception which should be caught
-        $result = $service->fetchUserPages('');
+    Log::shouldReceive('error')->once();
 
-        $this->assertIsArray($result);
-        $this->assertEmpty($result);
-    }
-}
+    $pages = $this->service->fetchUserPages('user_access_token');
+
+    expect($pages)->toBe([]);
+});
+
+test('fetchUserPages returns empty array when no pages exist', function () {
+    Http::fake([
+        'graph.facebook.com/*' => Http::response([
+            'data' => [],
+        ], 200),
+    ]);
+
+    Log::shouldReceive('info')->once();
+
+    $pages = $this->service->fetchUserPages('user_access_token');
+
+    expect($pages)->toBe([]);
+});
+
+test('fetchUserPages sends correct request parameters', function () {
+    Http::fake([
+        'graph.facebook.com/*' => Http::response([
+            'data' => [],
+        ], 200),
+    ]);
+
+    Log::shouldReceive('info')->once();
+
+    $this->service->fetchUserPages('test_token');
+
+    Http::assertSent(function ($request) {
+        return str_contains($request->url(), '/me/accounts')
+            && $request->data()['access_token'] === 'test_token'
+            && $request->data()['fields'] === 'id,name,access_token';
+    });
+});

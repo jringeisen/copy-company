@@ -224,3 +224,59 @@ test('move prevents moving folder into descendant', function () {
     expect(fn () => $service->move($parent, $grandchild->id))
         ->toThrow(InvalidArgumentException::class);
 });
+
+// ===========================================
+// Get Flat List Tests
+// ===========================================
+
+test('getFlatList returns all folders for brand', function () {
+    $user = User::factory()->create();
+    $brand = Brand::factory()->forUser($user)->create();
+    MediaFolder::factory()->forBrand($brand)->count(3)->create();
+
+    $service = app(MediaFolderService::class);
+    $list = $service->getFlatList($brand);
+
+    expect($list)->toHaveCount(3);
+});
+
+test('getFlatList includes nested folders', function () {
+    $user = User::factory()->create();
+    $brand = Brand::factory()->forUser($user)->create();
+    $parent = MediaFolder::factory()->forBrand($brand)->create();
+    MediaFolder::factory()->forBrand($brand)->withParent($parent)->create();
+
+    $service = app(MediaFolderService::class);
+    $list = $service->getFlatList($brand);
+
+    // Both parent and child should be included
+    expect($list)->toHaveCount(2);
+});
+
+test('getFlatList only returns folders for specified brand', function () {
+    $user = User::factory()->create();
+    $brand = Brand::factory()->forUser($user)->create();
+    MediaFolder::factory()->forBrand($brand)->count(2)->create();
+
+    $otherUser = User::factory()->create();
+    $otherBrand = Brand::factory()->forUser($otherUser)->create();
+    MediaFolder::factory()->forBrand($otherBrand)->count(3)->create();
+
+    $service = app(MediaFolderService::class);
+    $list = $service->getFlatList($brand);
+
+    expect($list)->toHaveCount(2);
+});
+
+test('getFlatList loads ancestors relationship', function () {
+    $user = User::factory()->create();
+    $brand = Brand::factory()->forUser($user)->create();
+    $parent = MediaFolder::factory()->forBrand($brand)->create(['name' => 'Parent']);
+    $child = MediaFolder::factory()->forBrand($brand)->withParent($parent)->create(['name' => 'Child']);
+
+    $service = app(MediaFolderService::class);
+    $list = $service->getFlatList($brand);
+
+    $childFromList = $list->firstWhere('id', $child->id);
+    expect($childFromList->relationLoaded('ancestors'))->toBeTrue();
+});

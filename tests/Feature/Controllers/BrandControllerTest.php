@@ -153,3 +153,65 @@ test('authenticated users can update their brand', function () {
         'tagline' => 'New tagline',
     ]);
 });
+
+test('store brand redirects to dashboard with error when no account', function () {
+    $user = User::factory()->create();
+    // User without any account association
+
+    $response = $this->actingAs($user)
+        ->post(route('brands.store'), [
+            'name' => 'My Awesome Brand',
+            'slug' => 'my-awesome-brand',
+        ]);
+
+    $response->assertRedirect(route('dashboard'));
+    $response->assertSessionHas('error', 'No account found.');
+});
+
+test('user can switch between brands', function () {
+    $user = User::factory()->create();
+    $account = Account::factory()->create();
+    $account->users()->attach($user->id, ['role' => 'admin']);
+
+    $brand1 = Brand::factory()->forAccount($account)->create(['name' => 'Brand One']);
+    $brand2 = Brand::factory()->forAccount($account)->create(['name' => 'Brand Two']);
+
+    $response = $this->actingAs($user)
+        ->withSession(['current_account_id' => $account->id])
+        ->post(route('brands.switch', $brand2));
+
+    $response->assertRedirect();
+    $response->assertSessionHas('success', 'Switched to Brand Two');
+    $response->assertSessionHas('current_brand_id', $brand2->id);
+});
+
+test('switch brand returns error when brand not found', function () {
+    $user = User::factory()->create();
+    $account = Account::factory()->create();
+    $account->users()->attach($user->id, ['role' => 'admin']);
+
+    // Create a brand for a different account
+    $otherAccount = Account::factory()->create();
+    $otherBrand = Brand::factory()->forAccount($otherAccount)->create();
+
+    $response = $this->actingAs($user)
+        ->withSession(['current_account_id' => $account->id])
+        ->post(route('brands.switch', $otherBrand));
+
+    $response->assertRedirect();
+    $response->assertSessionHas('error', 'Brand not found.');
+});
+
+test('switch brand returns error when no account', function () {
+    $user = User::factory()->create();
+
+    // Create a brand (for any account)
+    $account = Account::factory()->create();
+    $brand = Brand::factory()->forAccount($account)->create();
+
+    $response = $this->actingAs($user)
+        ->post(route('brands.switch', $brand));
+
+    $response->assertRedirect();
+    $response->assertSessionHas('error', 'Brand not found.');
+});

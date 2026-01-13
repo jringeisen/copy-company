@@ -72,4 +72,32 @@ class PinterestBoardsServiceTest extends TestCase
         $this->assertIsArray($result);
         $this->assertEmpty($result);
     }
+
+    public function test_fetch_user_boards_returns_empty_array_on_network_exception(): void
+    {
+        Http::fake(function () {
+            throw new \Exception('Network error');
+        });
+
+        $service = new PinterestBoardsService;
+        $result = $service->fetchUserBoards('test_token');
+
+        $this->assertIsArray($result);
+        $this->assertEmpty($result);
+    }
+
+    public function test_fetch_user_boards_handles_missing_items_key(): void
+    {
+        Http::fake([
+            'https://api.pinterest.com/v5/boards' => Http::response([
+                'data' => [], // Wrong key - items is expected
+            ], 200),
+        ]);
+
+        $service = new PinterestBoardsService;
+        $result = $service->fetchUserBoards('test_token');
+
+        $this->assertIsArray($result);
+        $this->assertEmpty($result);
+    }
 }

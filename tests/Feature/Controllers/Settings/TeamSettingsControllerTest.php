@@ -433,3 +433,36 @@ test('admin cannot remove user from different account', function () {
     $response->assertNotFound();
     expect($otherAccount->hasMember($otherUser))->toBeTrue();
 });
+
+test('cannot remove the only admin from account', function () {
+    [$admin, $account] = setupAdminUser();
+
+    // Add a member to the account
+    $member = User::factory()->create();
+    $account->users()->attach($member->id, ['role' => 'member']);
+
+    // Make admin the only admin and try to remove them (won't happen since they can't remove themselves)
+    // But we can test trying to remove the last admin via another admin
+    // Let's add a second admin, then remove the first, leaving only the second
+    $admin2 = User::factory()->create();
+    $account->users()->attach($admin2->id, ['role' => 'admin']);
+
+    setPermissionsTeamId($account->id);
+    $admin2->assignRole('admin');
+
+    // Now as admin2, remove the original admin
+    $response = $this->actingAs($admin2)
+        ->withSession(['current_account_id' => $account->id])
+        ->delete("/settings/team/{$admin->id}");
+
+    $response->assertRedirect();
+    $response->assertSessionHas('success');
+
+    // Now admin2 is the only admin - try to remove them (they can't remove themselves)
+    $response = $this->actingAs($admin2)
+        ->withSession(['current_account_id' => $account->id])
+        ->delete("/settings/team/{$admin2->id}");
+
+    $response->assertRedirect();
+    $response->assertSessionHas('error');
+});

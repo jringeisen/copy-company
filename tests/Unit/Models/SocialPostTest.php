@@ -92,3 +92,30 @@ test('status color returns correct color', function () {
     expect($published->status_color)->toBe('green');
     expect($failed->status_color)->toBe('red');
 });
+
+test('scheduled scope filters scheduled social posts', function () {
+    $brand = Brand::factory()->create();
+    SocialPost::factory()->forBrand($brand)->scheduled()->count(2)->create();
+    SocialPost::factory()->forBrand($brand)->draft()->count(1)->create();
+    SocialPost::factory()->forBrand($brand)->published()->count(1)->create();
+
+    expect(SocialPost::scheduled()->count())->toBe(2);
+});
+
+test('published scope filters published social posts', function () {
+    $brand = Brand::factory()->create();
+    SocialPost::factory()->forBrand($brand)->published()->count(3)->create();
+    SocialPost::factory()->forBrand($brand)->draft()->count(2)->create();
+    SocialPost::factory()->forBrand($brand)->scheduled()->count(1)->create();
+
+    expect(SocialPost::published()->count())->toBe(3);
+});
+
+test('failed scope filters failed social posts', function () {
+    $brand = Brand::factory()->create();
+    SocialPost::factory()->forBrand($brand)->failed()->count(2)->create();
+    SocialPost::factory()->forBrand($brand)->draft()->count(1)->create();
+    SocialPost::factory()->forBrand($brand)->published()->count(1)->create();
+
+    expect(SocialPost::failed()->count())->toBe(2);
+});

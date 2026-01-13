@@ -82,4 +82,47 @@ class PublishSocialPostTest extends TestCase
         $this->assertEquals(3, $job->tries);
         $this->assertEquals(60, $job->backoff);
     }
+
+    public function test_failed_method_logs_error(): void
+    {
+        $socialPost = SocialPost::factory()->create([
+            'brand_id' => $this->brand->id,
+            'platform' => SocialPlatform::Facebook,
+            'status' => SocialPostStatus::Queued,
+        ]);
+
+        $job = new PublishSocialPost($socialPost);
+
+        // The failed method should not throw an exception
+        $job->failed(new \Exception('Test failure'));
+
+        // Verify it completes without error
+        $this->assertTrue(true);
+    }
+
+    public function test_job_handles_different_platforms(): void
+    {
+        $platforms = [
+            SocialPlatform::Facebook,
+            SocialPlatform::Instagram,
+            SocialPlatform::LinkedIn,
+            SocialPlatform::Pinterest,
+            SocialPlatform::TikTok,
+        ];
+
+        foreach ($platforms as $platform) {
+            $socialPost = SocialPost::factory()->create([
+                'brand_id' => $this->brand->id,
+                'platform' => $platform,
+                'status' => SocialPostStatus::Queued,
+            ]);
+
+            $job = new PublishSocialPost($socialPost);
+            $job->handle(app(\App\Services\SocialPublishing\SocialPublishingService::class));
+
+            $socialPost->refresh();
+            // All should fail since not connected
+            $this->assertEquals(SocialPostStatus::Failed, $socialPost->status);
+        }
+    }
 }

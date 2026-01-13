@@ -4,6 +4,7 @@ use App\Enums\SubscriberStatus;
 use App\Models\Brand;
 use App\Models\Subscriber;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 
 uses(RefreshDatabase::class);
 
@@ -102,4 +103,30 @@ test('invalid unsubscribe token redirects with error', function () {
 
     $response->assertRedirect();
     $response->assertSessionHas('error', 'Invalid unsubscribe link.');
+});
+
+test('unsubscribed user can resubscribe and receives confirmation email', function () {
+    Mail::fake();
+
+    $brand = Brand::factory()->create(['slug' => 'test-brand']);
+    $subscriber = Subscriber::factory()->forBrand($brand)->unsubscribed()->create([
+        'email' => 'resubscribe@example.com',
+        'unsubscribed_at' => now()->subDays(7),
+    ]);
+
+    $response = $this->post("/@{$brand->slug}/subscribe", [
+        'email' => 'resubscribe@example.com',
+    ]);
+
+    $response->assertRedirect();
+    $response->assertSessionHas('success', 'Please check your email to confirm your subscription.');
+
+    $subscriber->refresh();
+    expect($subscriber->status)->toBe(SubscriberStatus::Pending);
+    expect($subscriber->confirmation_token)->not->toBeNull();
+    expect($subscriber->unsubscribed_at)->toBeNull();
+
+    Mail::assertSent(\App\Mail\SubscriptionConfirmation::class, function ($mail) {
+        return $mail->hasTo('resubscribe@example.com');
+    });
 });
