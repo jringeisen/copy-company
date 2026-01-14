@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AIAssistantController;
+use App\Http\Controllers\AISelectionController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ContentSprintController;
@@ -172,6 +173,15 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/longer', [AIAssistantController::class, 'longer'])->name('ai.longer');
         Route::post('/ask', [AIAssistantController::class, 'ask'])->name('ai.ask');
         Route::post('/atomize', [AIAssistantController::class, 'atomize'])->name('ai.atomize');
+
+        // Selection-based AI tools
+        Route::prefix('selection')->group(function () {
+            Route::post('/fix-grammar', [AISelectionController::class, 'fixGrammar'])->name('ai.selection.fix-grammar');
+            Route::post('/simplify', [AISelectionController::class, 'simplify'])->name('ai.selection.simplify');
+            Route::post('/rephrase', [AISelectionController::class, 'rephrase'])->name('ai.selection.rephrase');
+            Route::post('/to-list', [AISelectionController::class, 'toList'])->name('ai.selection.to-list');
+            Route::post('/add-examples', [AISelectionController::class, 'addExamples'])->name('ai.selection.add-examples');
+        });
     });
 
     // Logout route

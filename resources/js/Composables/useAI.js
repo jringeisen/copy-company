@@ -125,6 +125,82 @@ export function useAI() {
         }
     };
 
+    // Selection-based AI tools
+    const fixGrammar = async (text) => {
+        isLoading.value = true;
+        error.value = null;
+
+        try {
+            const response = await axios.post('/ai/selection/fix-grammar', { text });
+            return response.data.content;
+        } catch (e) {
+            error.value = e.response?.data?.error || 'Failed to fix grammar';
+            throw e;
+        } finally {
+            isLoading.value = false;
+        }
+    };
+
+    const simplify = async (text) => {
+        isLoading.value = true;
+        error.value = null;
+
+        try {
+            const response = await axios.post('/ai/selection/simplify', { text });
+            return response.data.content;
+        } catch (e) {
+            error.value = e.response?.data?.error || 'Failed to simplify text';
+            throw e;
+        } finally {
+            isLoading.value = false;
+        }
+    };
+
+    const rephrase = async (text) => {
+        isLoading.value = true;
+        error.value = null;
+
+        try {
+            const response = await axios.post('/ai/selection/rephrase', { text });
+            return response.data.content;
+        } catch (e) {
+            error.value = e.response?.data?.error || 'Failed to rephrase text';
+            throw e;
+        } finally {
+            isLoading.value = false;
+        }
+    };
+
+    const toList = async (text) => {
+        isLoading.value = true;
+        error.value = null;
+
+        try {
+            const response = await axios.post('/ai/selection/to-list', { text });
+            return response.data.content;
+        } catch (e) {
+            error.value = e.response?.data?.error || 'Failed to convert to list';
+            throw e;
+        } finally {
+            isLoading.value = false;
+        }
+    };
+
+    const addExamples = async (text) => {
+        isLoading.value = true;
+        error.value = null;
+
+        try {
+            const response = await axios.post('/ai/selection/add-examples', { text });
+            return response.data.content;
+        } catch (e) {
+            error.value = e.response?.data?.error || 'Failed to add examples';
+            throw e;
+        } finally {
+            isLoading.value = false;
+        }
+    };
+
     return {
         isLoading,
         error,
@@ -136,5 +212,11 @@ export function useAI() {
         makeItShorter,
         makeItLonger,
         askQuestion,
+        // Selection-based tools
+        fixGrammar,
+        simplify,
+        rephrase,
+        toList,
+        addExamples,
     };
 }

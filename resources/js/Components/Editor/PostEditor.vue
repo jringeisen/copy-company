@@ -6,6 +6,7 @@ import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import { ref, watch, onBeforeUnmount } from 'vue';
 import MediaPickerModal from '@/Components/Media/MediaPickerModal.vue';
+import AIBubbleMenu from '@/Components/Editor/AIBubbleMenu.vue';
 
 const props = defineProps({
     modelValue: {
@@ -275,6 +276,8 @@ defineExpose({ editor });
         <!-- Editor Content -->
         <div class="p-6">
             <EditorContent :editor="editor" />
+            <!-- AI Bubble Menu -->
+            <AIBubbleMenu v-if="editor" :editor="editor" />
         </div>
 
         <!-- Media Picker Modal -->
