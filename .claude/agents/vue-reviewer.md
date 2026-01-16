@@ -1,4 +1,3 @@
-# .claude/agents/vue-reviewer.md
 ---
 name: vue-reviewer
 description: Reviews Vue 3 components for best practices with Inertia.js v2. Use after building frontend features or when optimizing performance.

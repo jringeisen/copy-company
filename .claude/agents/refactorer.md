@@ -1,4 +1,3 @@
-# .claude/agents/refactorer.md
 ---
 name: refactorer
 description: Suggests refactoring opportunities to improve code quality. Use when code feels messy or hard to maintain.

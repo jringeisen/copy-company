@@ -1,4 +1,3 @@
-# .claude/agents/database-reviewer.md
 ---
 name: database-reviewer
 description: Reviews migrations, Eloquent queries, and database design. Use before running migrations or when optimizing queries.

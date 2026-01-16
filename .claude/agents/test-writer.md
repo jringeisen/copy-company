@@ -1,4 +1,3 @@
-# .claude/agents/test-writer.md
 ---
 name: test-writer
 description: Generates comprehensive Pest tests for Laravel features. Use when you need tests for new or existing code.

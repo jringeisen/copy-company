@@ -1,4 +1,3 @@
-# .claude/agents/security-reviewer.md
 ---
 name: security-reviewer
 description: Reviews Laravel code for security vulnerabilities. Use after implementing authentication, authorization, or data handling.

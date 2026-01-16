@@ -1,4 +1,3 @@
-# .claude/agents/laravel-reviewer.md
 ---
 name: laravel-reviewer
 description: Reviews Laravel controllers, requests, and policies for best practices and proper Inertia v2 usage. Use after implementing backend features.

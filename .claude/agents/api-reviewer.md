@@ -1,4 +1,3 @@
-# .claude/agents/api-reviewer.md
 ---
 name: api-reviewer
 description: Reviews API endpoints and resources for consistency and best practices. Use when building or refactoring APIs.
