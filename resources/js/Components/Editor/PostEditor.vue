@@ -315,6 +315,104 @@ const reconstructWithStructure = (aiContent, originalBlocks) => {
     return html;
 };
 
+// Reconstruct content with markdown parsing while preserving original block structure
+const reconstructWithMarkdown = (aiContent, originalBlocks) => {
+    // Normalize line endings
+    const normalizedContent = aiContent.replace(/\r\n/g, '\n').trim();
+
+    // If only one block, parse inline markdown and wrap
+    if (originalBlocks.length === 1) {
+        const parsedContent = marked.parseInline(normalizedContent);
+        return blockToHtmlRaw(originalBlocks[0].type, originalBlocks[0].attrs, parsedContent);
+    }
+
+    // First, try to split by newlines (double or single)
+    let parts = normalizedContent
+        .split(/\n\n+/)
+        .map(p => p.trim())
+        .filter(p => p.length > 0);
+
+    // If double newlines didn't give enough parts, try single newlines
+    if (parts.length < originalBlocks.length) {
+        const singleNewlineParts = normalizedContent
+            .split(/\n/)
+            .map(p => p.trim())
+            .filter(p => p.length > 0);
+
+        if (singleNewlineParts.length >= originalBlocks.length) {
+            parts = singleNewlineParts;
+        }
+    }
+
+    // If we have the right number of parts, use them directly
+    if (parts.length >= originalBlocks.length) {
+        let html = '';
+        for (let i = 0; i < originalBlocks.length; i++) {
+            const block = originalBlocks[i];
+            // If we have more parts than blocks, join remaining parts into the last block
+            const content = i === originalBlocks.length - 1
+                ? parts.slice(i).join(' ')
+                : parts[i];
+            // Parse inline markdown within the content
+            const parsedContent = marked.parseInline(content);
+            html += blockToHtmlRaw(block.type, block.attrs, parsedContent);
+        }
+        return html;
+    }
+
+    // Fallback: split proportionally and parse inline markdown
+    const totalOriginalLength = originalBlocks.reduce((sum, b) => sum + b.textContent.length, 0);
+    const sentenceBoundaries = findSentenceBoundaries(normalizedContent);
+
+    const splitParts = [];
+    let currentPos = 0;
+
+    for (let i = 0; i < originalBlocks.length; i++) {
+        const block = originalBlocks[i];
+
+        if (i === originalBlocks.length - 1) {
+            splitParts.push(normalizedContent.slice(currentPos).trim());
+        } else {
+            const blockRatio = block.textContent.length / totalOriginalLength;
+            const targetLength = Math.round(normalizedContent.length * blockRatio);
+            const targetPos = currentPos + targetLength;
+            const splitPos = findBestSplitPoint(normalizedContent, targetPos, sentenceBoundaries);
+
+            splitParts.push(normalizedContent.slice(currentPos, splitPos).trim());
+            currentPos = splitPos;
+        }
+    }
+
+    // Build HTML with parsed markdown
+    let html = '';
+    for (let i = 0; i < originalBlocks.length; i++) {
+        const block = originalBlocks[i];
+        const content = splitParts[i] || '';
+        if (content) {
+            const parsedContent = marked.parseInline(content);
+            html += blockToHtmlRaw(block.type, block.attrs, parsedContent);
+        }
+    }
+
+    return html;
+};
+
+// Convert block type to HTML tag (content is already HTML, no escaping)
+const blockToHtmlRaw = (blockType, attrs, htmlContent) => {
+    switch (blockType) {
+        case 'heading': {
+            const level = attrs.level || 1;
+            return `<h${level}>${htmlContent}</h${level}>`;
+        }
+        case 'paragraph':
+            return `<p>${htmlContent}</p>`;
+        case 'codeBlock':
+            return `<pre><code>${htmlContent}</code></pre>`;
+        default:
+            return `<p>${htmlContent}</p>`;
+    }
+};
+
 // Handle AI suggestion from AIBubbleMenu
 const handleSuggestion = ({ content, range, action, originalText }) => {
     if (!editor.value) return;
@@ -327,15 +425,41 @@ const handleSuggestion = ({ content, range, action, originalText }) => {
         // For structured actions, parse as markdown
         insertContent = marked.parse(content);
     } else {
-        // For inline actions, preserve the original block structure
-        const originalBlocks = getBlockStructure(range.from, range.to);
+        // Check for block-level markdown (headings, code blocks, blockquotes)
+        // Headings: lines starting with # (with 1-6 hashes)
+        const hasBlockMarkdown = /^#{1,6}\s/m.test(content) ||
+            /^```/m.test(content) ||
+            /^>/m.test(content);
 
-        if (originalBlocks.length > 0) {
-            // Reconstruct with original structure
-            insertContent = reconstructWithStructure(content, originalBlocks);
+        // Check for inline markdown formatting
+        // Matches: **bold**, __bold__, _italic_, *italic*, ~~strike~~, `code`, [links](url)
+        const hasInlineMarkdown = /(\*\*|__|_(?=[^\s])|(?<=[^\s])_|\*(?=[^\s])|(?<=[^\s])\*|~~|`|\[.*?\]\(.*?\))/.test(content);
+
+        if (hasBlockMarkdown) {
+            // Parse full markdown to HTML (handles headings, paragraphs, etc.)
+            insertContent = marked.parse(content);
+        } else if (hasInlineMarkdown) {
+            // Parse only inline markdown, preserve original block structure
+            const originalBlocks = getBlockStructure(range.from, range.to);
+
+            if (originalBlocks.length > 0) {
+                // Reconstruct with original structure, parsing inline markdown for each block
+                insertContent = reconstructWithMarkdown(content, originalBlocks);
+            } else {
+                // Fallback to inline parsing
+                insertContent = marked.parseInline(content);
+            }
         } else {
-            // Fallback to plain text if no blocks found
-            insertContent = content;
+            // No formatting, preserve block structure
+            const originalBlocks = getBlockStructure(range.from, range.to);
+
+            if (originalBlocks.length > 0) {
+                // Reconstruct with original structure
+                insertContent = reconstructWithStructure(content, originalBlocks);
+            } else {
+                // Fallback to plain text if no blocks found
+                insertContent = content;
+            }
         }
     }
 

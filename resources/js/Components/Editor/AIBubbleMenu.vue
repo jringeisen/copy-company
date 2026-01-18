@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useAI } from '@/Composables/useAI';
+import { selectionToMarkdown } from '@/Utils/prosemirrorToMarkdown';
 
 const props = defineProps({
     editor: {
@@ -63,11 +64,11 @@ const isValidSelection = () => {
     return selectedText.trim().length > 0;
 };
 
-// Get selected text
+// Get selected text as markdown (preserves formatting)
 const getSelectedText = () => {
     const { state } = props.editor;
     const { selection } = state;
-    return state.doc.textBetween(selection.from, selection.to, ' ');
+    return selectionToMarkdown(state.doc, selection.from, selection.to);
 };
 
 // Save selection range

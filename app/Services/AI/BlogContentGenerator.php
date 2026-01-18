@@ -8,6 +8,11 @@ use Prism\Prism\Facades\Prism;
 
 class BlogContentGenerator
 {
+    /**
+     * Instruction to preserve markdown formatting in AI responses.
+     */
+    private const FORMATTING_INSTRUCTION = 'IMPORTANT: The input contains markdown formatting that you MUST preserve exactly. This includes: block-level structure (# Heading 1, ## Heading 2, ### Heading 3, paragraphs separated by blank lines) and inline formatting (**bold**, _italic_, ~~strikethrough~~, `code`, [links](url)). Return the same number of blocks in the same order with the same heading levels. Only modify the text content, not the formatting structure.';
+
     public function __construct(
         protected PromptBuilder $promptBuilder
     ) {}
@@ -29,7 +34,7 @@ class BlogContentGenerator
 
     public function polishWriting(Brand $brand, string $content): string
     {
-        $systemPrompt = $this->promptBuilder->build($brand, 'polish_writing');
+        $systemPrompt = $this->promptBuilder->build($brand, 'polish_writing').' '.self::FORMATTING_INSTRUCTION;
 
         $userPrompt = "Please polish and improve the following content while maintaining the author's voice and intent. Focus on clarity, flow, and engagement. Do not add new information, just improve what's there.\n\nContent:\n{$content}";
 
@@ -62,7 +67,7 @@ class BlogContentGenerator
 
     public function changeTone(Brand $brand, string $content, string $targetTone): string
     {
-        $systemPrompt = $this->promptBuilder->build($brand, 'change_tone');
+        $systemPrompt = $this->promptBuilder->build($brand, 'change_tone').' '.self::FORMATTING_INSTRUCTION;
 
         $userPrompt = "Rewrite the following content to have a more {$targetTone} tone while preserving the core message and information.\n\nOriginal content:\n{$content}";
 
@@ -71,7 +76,7 @@ class BlogContentGenerator
 
     public function makeItShorter(string $content): string
     {
-        $systemPrompt = $this->promptBuilder->buildEditorPrompt();
+        $systemPrompt = $this->promptBuilder->buildEditorPrompt().' '.self::FORMATTING_INSTRUCTION;
 
         $userPrompt = "Make the following content shorter and more concise. Remove redundancy and unnecessary words while keeping the core message intact.\n\nContent:\n{$content}";
 

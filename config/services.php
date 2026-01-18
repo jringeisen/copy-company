@@ -57,7 +57,7 @@ return [
         'scopes' => env('INSTAGRAM_SCOPES', 'pages_show_list,instagram_basic,instagram_content_publish'),
     ],
 
-    'linkedin' => [
+    'linkedin-openid' => [
         'client_id' => env('LINKEDIN_CLIENT_ID'),
         'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
         'redirect' => '/settings/social/linkedin/callback',

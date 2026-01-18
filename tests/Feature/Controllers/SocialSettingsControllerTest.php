@@ -621,8 +621,8 @@ class SocialSettingsControllerTest extends TestCase
 
     public function test_redirect_with_empty_scopes_config(): void
     {
-        // Set empty scopes config for a platform
-        config(['services.linkedin.scopes' => '']);
+        // Set empty scopes config for a platform (LinkedIn uses linkedin-openid config key)
+        config(['services.linkedin-openid.scopes' => '']);
 
         // Mock Socialite to avoid actual OAuth
         $mockDriver = Mockery::mock(\Laravel\Socialite\Two\AbstractProvider::class);
@@ -631,7 +631,7 @@ class SocialSettingsControllerTest extends TestCase
             ->andReturn(new \Symfony\Component\HttpFoundation\RedirectResponse('https://linkedin.com/oauth'));
 
         \Laravel\Socialite\Facades\Socialite::shouldReceive('driver')
-            ->with('linkedin')
+            ->with('linkedin-openid')
             ->once()
             ->andReturn($mockDriver);
 
@@ -644,8 +644,8 @@ class SocialSettingsControllerTest extends TestCase
 
     public function test_redirect_with_scopes_config(): void
     {
-        // Set scopes config for a platform
-        config(['services.linkedin.scopes' => 'openid,profile,w_member_social']);
+        // Set scopes config for a platform (LinkedIn uses linkedin-openid config key)
+        config(['services.linkedin-openid.scopes' => 'openid,profile,w_member_social']);
 
         // Mock Socialite
         $mockDriver = Mockery::mock(\Laravel\Socialite\Two\AbstractProvider::class);
@@ -658,7 +658,7 @@ class SocialSettingsControllerTest extends TestCase
             ->andReturn(new \Symfony\Component\HttpFoundation\RedirectResponse('https://linkedin.com/oauth'));
 
         \Laravel\Socialite\Facades\Socialite::shouldReceive('driver')
-            ->with('linkedin')
+            ->with('linkedin-openid')
             ->once()
             ->andReturn($mockDriver);
 
@@ -685,7 +685,7 @@ class SocialSettingsControllerTest extends TestCase
     public function test_callback_handles_exception_and_shows_error(): void
     {
         \Laravel\Socialite\Facades\Socialite::shouldReceive('driver')
-            ->with('linkedin')
+            ->with('linkedin-openid')
             ->andThrow(new \Exception('OAuth callback failed'));
 
         $response = $this->actingAs($this->user)
@@ -741,7 +741,7 @@ class SocialSettingsControllerTest extends TestCase
         $mockDriver->shouldReceive('user')->andReturn($mockSocialiteUser);
 
         \Laravel\Socialite\Facades\Socialite::shouldReceive('driver')
-            ->with('linkedin')
+            ->with('linkedin-openid')
             ->andReturn($mockDriver);
 
         $response = $this->actingAs($this->user)

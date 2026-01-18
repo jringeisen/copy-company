@@ -35,7 +35,9 @@ class SocialSettingsController extends Controller
      */
     protected function getScopesForPlatform(string $platform): array
     {
-        $scopes = config("services.{$platform}.scopes", '');
+        // LinkedIn uses 'linkedin-openid' as the config key
+        $configKey = $platform === 'linkedin' ? 'linkedin-openid' : $platform;
+        $scopes = config("services.{$configKey}.scopes", '');
 
         if (empty($scopes)) {
             return [];
@@ -106,7 +108,12 @@ class SocialSettingsController extends Controller
 
         try {
             // Instagram Business API uses Facebook OAuth
-            $driverName = $platform === 'instagram' ? 'facebook' : $platform;
+            // LinkedIn uses OpenID Connect (linkedin-openid driver)
+            $driverName = match ($platform) {
+                'instagram' => 'facebook',
+                'linkedin' => 'linkedin-openid',
+                default => $platform,
+            };
 
             /** @var \Laravel\Socialite\Two\AbstractProvider $driver */
             $driver = Socialite::driver($driverName);
@@ -145,7 +152,12 @@ class SocialSettingsController extends Controller
 
         try {
             // Instagram Business API uses Facebook OAuth
-            $driverName = $platform === 'instagram' ? 'facebook' : $platform;
+            // LinkedIn uses OpenID Connect (linkedin-openid driver)
+            $driverName = match ($platform) {
+                'instagram' => 'facebook',
+                'linkedin' => 'linkedin-openid',
+                default => $platform,
+            };
 
             /** @var \Laravel\Socialite\Two\AbstractProvider $driver */
             $driver = Socialite::driver($driverName);
