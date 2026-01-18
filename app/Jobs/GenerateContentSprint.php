@@ -54,6 +54,8 @@ class GenerateContentSprint implements ShouldQueue
                 'error' => $e->getMessage(),
             ]);
 
+            // Set failed immediately so users see the error state.
+            // On retry, handle() will reset to Generating.
             $this->sprint->update(['status' => ContentSprintStatus::Failed]);
             throw $e;
         }

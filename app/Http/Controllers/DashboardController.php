@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Enums\PostStatus;
 use App\Http\Controllers\Concerns\HasBrandAuthorization;
-use App\Models\Brand;
 use Illuminate\Database\Eloquent\Builder;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -18,17 +17,12 @@ class DashboardController extends Controller
         $user = auth()->user();
         $brand = $this->currentBrand();
 
-        // Eager load counts in a single query
-        if ($brand) {
-            /** @var Brand|null $brand */
-            $brand = Brand::where('id', $brand->id)
-                ->withCount([
-                    'posts',
-                    'posts as drafts_count' => fn (Builder $query) => $query->where('status', PostStatus::Draft),
-                    'subscribers as confirmed_subscribers_count' => fn (Builder $query) => $query->where('status', \App\Enums\SubscriberStatus::Confirmed),
-                ])
-                ->first();
-        }
+        // Eager load counts in a single query using loadCount (avoids re-query)
+        $brand?->loadCount([
+            'posts',
+            'posts as drafts_count' => fn (Builder $query) => $query->where('status', PostStatus::Draft),
+            'subscribers as confirmed_subscribers_count' => fn (Builder $query) => $query->where('status', \App\Enums\SubscriberStatus::Confirmed),
+        ]);
 
         return Inertia::render('Dashboard', [
             'user' => $user,

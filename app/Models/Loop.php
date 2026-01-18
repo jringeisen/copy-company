@@ -59,15 +59,15 @@ class Loop extends Model
      */
     public function getNextItem(): ?LoopItem
     {
-        $items = $this->items()->get();
+        $itemCount = $this->items()->count();
 
-        if ($items->isEmpty()) {
+        if ($itemCount === 0) {
             return null;
         }
 
-        $nextPosition = $this->current_position % $items->count();
+        $nextPosition = $this->current_position % $itemCount;
 
-        return $items->get($nextPosition);
+        return $this->items()->offset($nextPosition)->first();
     }
 
     /**
@@ -95,9 +95,21 @@ class Loop extends Model
 
     /**
      * Get the total number of items in the loop.
+     * Uses loaded relation if available; otherwise uses withCount value or queries.
      */
     public function getItemsCountAttribute(): int
     {
+        // If items_count was eager loaded via withCount, use it
+        if (array_key_exists('items_count', $this->attributes)) {
+            return (int) $this->attributes['items_count'];
+        }
+
+        // If items relation is already loaded, count from collection
+        if ($this->relationLoaded('items')) {
+            return $this->items->count();
+        }
+
+        // Fallback to query
         return $this->items()->count();
     }
 }

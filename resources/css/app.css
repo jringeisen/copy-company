@@ -26,4 +26,8 @@
     --color-primary-800: #3730a3;
     --color-primary-900: #312e81;
     --color-primary-950: #1e1b4b;
+
+    /* UI colors - use these instead of hardcoded values */
+    --color-brand-dark: #0b1215;
+    --color-brand-gold: #a1854f;
 }

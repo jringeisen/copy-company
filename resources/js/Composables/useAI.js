@@ -5,201 +5,67 @@ export function useAI() {
     const isLoading = ref(false);
     const error = ref(null);
 
-    const generateDraft = async (title, bullets = null) => {
+    /**
+     * Factory function to create AI methods with consistent error handling.
+     * @param {string} endpoint - The API endpoint to call
+     * @param {string} errorMsg - Default error message if request fails
+     * @returns {Function} Async function that makes the AI request
+     */
+    const createAIMethod = (endpoint, errorMsg) => async (params) => {
         isLoading.value = true;
         error.value = null;
 
         try {
-            const response = await axios.post('/ai/draft', { title, bullets });
+            const response = await axios.post(endpoint, params);
             return response.data.content;
         } catch (e) {
-            error.value = e.response?.data?.error || 'Failed to generate draft';
+            error.value = e.response?.data?.error || errorMsg;
             throw e;
         } finally {
             isLoading.value = false;
         }
     };
 
-    const polishWriting = async (content) => {
-        isLoading.value = true;
-        error.value = null;
+    // Content generation methods
+    const generateDraft = async (title, bullets = null) =>
+        createAIMethod('/ai/draft', 'Failed to generate draft')({ title, bullets });
 
-        try {
-            const response = await axios.post('/ai/polish', { content });
-            return response.data.content;
-        } catch (e) {
-            error.value = e.response?.data?.error || 'Failed to polish content';
-            throw e;
-        } finally {
-            isLoading.value = false;
-        }
-    };
+    const polishWriting = async (content) =>
+        createAIMethod('/ai/polish', 'Failed to polish content')({ content });
 
-    const continueWriting = async (content) => {
-        isLoading.value = true;
-        error.value = null;
+    const continueWriting = async (content) =>
+        createAIMethod('/ai/continue', 'Failed to continue writing')({ content });
 
-        try {
-            const response = await axios.post('/ai/continue', { content });
-            return response.data.content;
-        } catch (e) {
-            error.value = e.response?.data?.error || 'Failed to continue writing';
-            throw e;
-        } finally {
-            isLoading.value = false;
-        }
-    };
+    const suggestOutline = async (title, notes = null) =>
+        createAIMethod('/ai/outline', 'Failed to generate outline')({ title, notes });
 
-    const suggestOutline = async (title, notes = null) => {
-        isLoading.value = true;
-        error.value = null;
+    const changeTone = async (content, tone) =>
+        createAIMethod('/ai/tone', 'Failed to change tone')({ content, tone });
 
-        try {
-            const response = await axios.post('/ai/outline', { title, notes });
-            return response.data.content;
-        } catch (e) {
-            error.value = e.response?.data?.error || 'Failed to generate outline';
-            throw e;
-        } finally {
-            isLoading.value = false;
-        }
-    };
+    const makeItShorter = async (content) =>
+        createAIMethod('/ai/shorter', 'Failed to shorten content')({ content });
 
-    const changeTone = async (content, tone) => {
-        isLoading.value = true;
-        error.value = null;
+    const makeItLonger = async (content) =>
+        createAIMethod('/ai/longer', 'Failed to expand content')({ content });
 
-        try {
-            const response = await axios.post('/ai/tone', { content, tone });
-            return response.data.content;
-        } catch (e) {
-            error.value = e.response?.data?.error || 'Failed to change tone';
-            throw e;
-        } finally {
-            isLoading.value = false;
-        }
-    };
-
-    const makeItShorter = async (content) => {
-        isLoading.value = true;
-        error.value = null;
-
-        try {
-            const response = await axios.post('/ai/shorter', { content });
-            return response.data.content;
-        } catch (e) {
-            error.value = e.response?.data?.error || 'Failed to shorten content';
-            throw e;
-        } finally {
-            isLoading.value = false;
-        }
-    };
-
-    const makeItLonger = async (content) => {
-        isLoading.value = true;
-        error.value = null;
-
-        try {
-            const response = await axios.post('/ai/longer', { content });
-            return response.data.content;
-        } catch (e) {
-            error.value = e.response?.data?.error || 'Failed to expand content';
-            throw e;
-        } finally {
-            isLoading.value = false;
-        }
-    };
-
-    const askQuestion = async (content, question) => {
-        isLoading.value = true;
-        error.value = null;
-
-        try {
-            const response = await axios.post('/ai/ask', { content, question });
-            return response.data.content;
-        } catch (e) {
-            error.value = e.response?.data?.error || 'Failed to process question';
-            throw e;
-        } finally {
-            isLoading.value = false;
-        }
-    };
+    const askQuestion = async (content, question) =>
+        createAIMethod('/ai/ask', 'Failed to process question')({ content, question });
 
     // Selection-based AI tools
-    const fixGrammar = async (text) => {
-        isLoading.value = true;
-        error.value = null;
+    const fixGrammar = async (text) =>
+        createAIMethod('/ai/selection/fix-grammar', 'Failed to fix grammar')({ text });
 
-        try {
-            const response = await axios.post('/ai/selection/fix-grammar', { text });
-            return response.data.content;
-        } catch (e) {
-            error.value = e.response?.data?.error || 'Failed to fix grammar';
-            throw e;
-        } finally {
-            isLoading.value = false;
-        }
-    };
+    const simplify = async (text) =>
+        createAIMethod('/ai/selection/simplify', 'Failed to simplify text')({ text });
 
-    const simplify = async (text) => {
-        isLoading.value = true;
-        error.value = null;
+    const rephrase = async (text) =>
+        createAIMethod('/ai/selection/rephrase', 'Failed to rephrase text')({ text });
 
-        try {
-            const response = await axios.post('/ai/selection/simplify', { text });
-            return response.data.content;
-        } catch (e) {
-            error.value = e.response?.data?.error || 'Failed to simplify text';
-            throw e;
-        } finally {
-            isLoading.value = false;
-        }
-    };
+    const toList = async (text) =>
+        createAIMethod('/ai/selection/to-list', 'Failed to convert to list')({ text });
 
-    const rephrase = async (text) => {
-        isLoading.value = true;
-        error.value = null;
-
-        try {
-            const response = await axios.post('/ai/selection/rephrase', { text });
-            return response.data.content;
-        } catch (e) {
-            error.value = e.response?.data?.error || 'Failed to rephrase text';
-            throw e;
-        } finally {
-            isLoading.value = false;
-        }
-    };
-
-    const toList = async (text) => {
-        isLoading.value = true;
-        error.value = null;
-
-        try {
-            const response = await axios.post('/ai/selection/to-list', { text });
-            return response.data.content;
-        } catch (e) {
-            error.value = e.response?.data?.error || 'Failed to convert to list';
-            throw e;
-        } finally {
-            isLoading.value = false;
-        }
-    };
-
-    const addExamples = async (text) => {
-        isLoading.value = true;
-        error.value = null;
-
-        try {
-            const response = await axios.post('/ai/selection/add-examples', { text });
-            return response.data.content;
-        } catch (e) {
-            error.value = e.response?.data?.error || 'Failed to add examples';
-            throw e;
-        } finally {
-            isLoading.value = false;
-        }
-    };
+    const addExamples = async (text) =>
+        createAIMethod('/ai/selection/add-examples', 'Failed to add examples')({ text });
 
     return {
         isLoading,
