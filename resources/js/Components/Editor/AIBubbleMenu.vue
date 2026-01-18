@@ -1,7 +1,6 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useAI } from '@/Composables/useAI';
-import { marked } from 'marked';
 
 const props = defineProps({
     editor: {
@@ -9,6 +8,8 @@ const props = defineProps({
         required: true,
     },
 });
+
+const emit = defineEmits(['suggestion']);
 
 const {
     isLoading,
@@ -27,15 +28,10 @@ const {
 // State
 const menuRef = ref(null);
 const isVisible = ref(false);
-const preview = ref(null);
 const selectionRange = ref(null);
 const showToneMenu = ref(false);
 const activeAction = ref(null);
-const lastAction = ref(null);
 const menuPosition = ref({ top: 0, left: 0 });
-
-// Actions that produce structured content (markdown) vs inline text
-const structuredActions = ['list', 'examples', 'longer'];
 
 // Tone options
 const toneOptions = [
@@ -45,9 +41,6 @@ const toneOptions = [
     { value: 'friendly', label: 'Friendly' },
     { value: 'persuasive', label: 'Persuasive' },
 ];
-
-// Computed
-const hasPreview = computed(() => preview.value !== null);
 
 // Check if selection is valid
 const isValidSelection = () => {
@@ -130,7 +123,7 @@ const updateMenuPosition = () => {
 
 // Handle selection change
 const handleSelectionUpdate = () => {
-    if (hasPreview.value || isLoading.value) return;
+    if (isLoading.value) return;
 
     if (isValidSelection()) {
         isVisible.value = true;
@@ -144,10 +137,9 @@ const handleSelectionUpdate = () => {
 
 // Handle AI action
 const handleAction = async (action, actionFn, actionParams = null) => {
-    if (isLoading.value || hasPreview.value) return;
+    if (isLoading.value) return;
 
     activeAction.value = action;
-    lastAction.value = action;
     saveSelection();
 
     const selectedText = getSelectedText();
@@ -159,9 +151,17 @@ const handleAction = async (action, actionFn, actionParams = null) => {
         } else {
             result = await actionFn(selectedText);
         }
-        preview.value = result;
-        // Keep menu visible and update position
-        setTimeout(updateMenuPosition, 0);
+
+        // Emit suggestion for parent to handle inline preview
+        emit('suggestion', {
+            content: result,
+            range: selectionRange.value,
+            action: action,
+            originalText: selectedText,
+        });
+
+        // Hide menu after emitting suggestion
+        isVisible.value = false;
     } catch (e) {
         console.error('AI action failed:', e);
     }
@@ -175,42 +175,12 @@ const handleToneChange = async (tone) => {
     await handleAction('tone', changeTone, tone);
 };
 
-// Apply preview (accept)
-const applyPreview = () => {
-    if (!preview.value || !selectionRange.value) return;
-
-    const { from, to } = selectionRange.value;
-
-    // For structured actions (list, examples, longer), parse as markdown
-    // For inline actions (polish, shorter, etc.), insert as plain text
-    const isStructuredAction = structuredActions.includes(lastAction.value);
-    const content = isStructuredAction ? marked.parse(preview.value) : preview.value;
-
-    props.editor
-        .chain()
-        .focus()
-        .deleteRange({ from, to })
-        .insertContentAt(from, content)
-        .run();
-
-    clearPreview();
-};
-
-// Reject preview
-const clearPreview = () => {
-    preview.value = null;
-    selectionRange.value = null;
-    activeAction.value = null;
-    lastAction.value = null;
-    isVisible.value = false;
-};
-
 // Close tone menu when clicking outside
 const handleClickOutside = (event) => {
     if (menuRef.value && !menuRef.value.contains(event.target)) {
         showToneMenu.value = false;
-        if (!hasPreview.value && !isLoading.value) {
-            // Only hide if not in preview or loading state
+        if (!isLoading.value) {
+            // Only hide if not in loading state
             if (!isValidSelection()) {
                 isVisible.value = false;
             }
@@ -225,7 +195,7 @@ onMounted(() => {
         props.editor.on('blur', () => {
             // Delay hide to allow clicking menu buttons
             setTimeout(() => {
-                if (!hasPreview.value && !isLoading.value) {
+                if (!isLoading.value) {
                     isVisible.value = false;
                     showToneMenu.value = false;
                 }
@@ -271,35 +241,8 @@ onUnmounted(() => {
                     </div>
                 </template>
 
-                <!-- Preview State -->
-                <template v-else-if="hasPreview">
-                    <div class="flex items-center gap-2">
-                        <div class="max-w-md px-3 py-1.5 text-sm bg-green-50 border border-green-200 rounded text-green-800 max-h-32 overflow-y-auto">
-                            {{ preview }}
-                        </div>
-                        <button
-                            @click="applyPreview"
-                            class="p-1.5 text-green-600 hover:bg-green-100 rounded transition"
-                            title="Accept"
-                        >
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                        </button>
-                        <button
-                            @click="clearPreview"
-                            class="p-1.5 text-red-600 hover:bg-red-100 rounded transition"
-                            title="Reject"
-                        >
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                </template>
-
                 <!-- Normal State: Tool Buttons -->
-                <template v-else>
+                <template v-if="!isLoading">
                     <!-- Text Manipulation -->
                     <button
                         @click="handleAction('shorter', makeItShorter)"
@@ -419,7 +362,7 @@ onUnmounted(() => {
                 </template>
 
                 <!-- Error Display -->
-                <div v-if="error && !isLoading && !hasPreview" class="px-2 py-1 text-xs text-red-600 bg-red-50 rounded">
+                <div v-if="error && !isLoading" class="px-2 py-1 text-xs text-red-600 bg-red-50 rounded">
                     {{ error }}
                 </div>
             </div>

@@ -4,10 +4,6 @@ import { useAI } from '@/Composables/useAI';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
 
 const props = defineProps({
-    content: {
-        type: String,
-        default: '',
-    },
     title: {
         type: String,
         default: '',
@@ -20,32 +16,14 @@ const {
     isLoading,
     error,
     generateDraft,
-    polishWriting,
-    continueWriting,
     suggestOutline,
-    changeTone,
-    makeItShorter,
-    makeItLonger,
-    askQuestion,
 } = useAI();
 
 const isOpen = ref(true);
-const activeTab = ref('assist');
 const suggestion = ref(null);
-const freeformQuestion = ref('');
 const draftBullets = ref('');
 const outlineNotes = ref('');
-const selectedTone = ref('professional');
 
-const toneOptions = [
-    { value: 'formal', label: 'Formal' },
-    { value: 'casual', label: 'Casual' },
-    { value: 'professional', label: 'Professional' },
-    { value: 'friendly', label: 'Friendly' },
-    { value: 'persuasive', label: 'Persuasive' },
-];
-
-const hasContent = computed(() => props.content && props.content.trim().length > 0);
 const hasTitle = computed(() => props.title && props.title.trim().length > 0);
 const showReplaceConfirm = ref(false);
 
@@ -82,26 +60,6 @@ const handleGenerateDraft = async () => {
     }
 };
 
-const handlePolish = async () => {
-    if (!hasContent.value) return;
-    try {
-        const result = await polishWriting(props.content);
-        suggestion.value = result;
-    } catch (e) {
-        console.error('Failed to polish:', e);
-    }
-};
-
-const handleContinue = async () => {
-    if (!hasContent.value) return;
-    try {
-        const result = await continueWriting(props.content);
-        suggestion.value = result;
-    } catch (e) {
-        console.error('Failed to continue:', e);
-    }
-};
-
 const handleOutline = async () => {
     if (!hasTitle.value) return;
     try {
@@ -109,47 +67,6 @@ const handleOutline = async () => {
         suggestion.value = result;
     } catch (e) {
         console.error('Failed to generate outline:', e);
-    }
-};
-
-const handleChangeTone = async () => {
-    if (!hasContent.value) return;
-    try {
-        const result = await changeTone(props.content, selectedTone.value);
-        suggestion.value = result;
-    } catch (e) {
-        console.error('Failed to change tone:', e);
-    }
-};
-
-const handleShorter = async () => {
-    if (!hasContent.value) return;
-    try {
-        const result = await makeItShorter(props.content);
-        suggestion.value = result;
-    } catch (e) {
-        console.error('Failed to shorten:', e);
-    }
-};
-
-const handleLonger = async () => {
-    if (!hasContent.value) return;
-    try {
-        const result = await makeItLonger(props.content);
-        suggestion.value = result;
-    } catch (e) {
-        console.error('Failed to expand:', e);
-    }
-};
-
-const handleAskQuestion = async () => {
-    if (!freeformQuestion.value.trim()) return;
-    try {
-        const result = await askQuestion(props.content, freeformQuestion.value);
-        suggestion.value = result;
-        freeformQuestion.value = '';
-    } catch (e) {
-        console.error('Failed to process question:', e);
     }
 };
 </script>
@@ -176,26 +93,8 @@ const handleAskQuestion = async () => {
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#a1854f]" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z" />
                     </svg>
-                    AI Assistant
+                    AI Generate
                 </h3>
-            </div>
-
-            <!-- Tabs -->
-            <div class="flex border-b border-[#0b1215]/10">
-                <button
-                    @click="activeTab = 'assist'"
-                    class="flex-1 px-4 py-2.5 text-sm font-medium transition-colors"
-                    :class="activeTab === 'assist' ? 'text-[#a1854f] border-b-2 border-[#a1854f]' : 'text-[#0b1215]/50 hover:text-[#0b1215]'"
-                >
-                    Assist
-                </button>
-                <button
-                    @click="activeTab = 'generate'"
-                    class="flex-1 px-4 py-2.5 text-sm font-medium transition-colors"
-                    :class="activeTab === 'generate' ? 'text-[#a1854f] border-b-2 border-[#a1854f]' : 'text-[#0b1215]/50 hover:text-[#0b1215]'"
-                >
-                    Generate
-                </button>
             </div>
 
             <!-- Content -->
@@ -244,101 +143,8 @@ const handleAskQuestion = async () => {
                     </div>
                 </div>
 
-                <!-- Assist Tab -->
-                <template v-else-if="activeTab === 'assist'">
-                    <div class="space-y-3">
-                        <p class="text-xs text-[#0b1215]/50">Work with your existing content</p>
-
-                        <button
-                            @click="handleContinue"
-                            :disabled="!hasContent || isLoading"
-                            class="w-full flex items-center gap-2 px-3 py-2.5 bg-white border border-[#0b1215]/10 rounded-xl hover:bg-[#0b1215]/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#0b1215]/50" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                            <span class="text-sm text-[#0b1215]">Continue writing</span>
-                        </button>
-
-                        <button
-                            @click="handlePolish"
-                            :disabled="!hasContent || isLoading"
-                            class="w-full flex items-center gap-2 px-3 py-2.5 bg-white border border-[#0b1215]/10 rounded-xl hover:bg-[#0b1215]/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#0b1215]/50" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                            </svg>
-                            <span class="text-sm text-[#0b1215]">Polish writing</span>
-                        </button>
-
-                        <button
-                            @click="handleShorter"
-                            :disabled="!hasContent || isLoading"
-                            class="w-full flex items-center gap-2 px-3 py-2.5 bg-white border border-[#0b1215]/10 rounded-xl hover:bg-[#0b1215]/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#0b1215]/50" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
-                            </svg>
-                            <span class="text-sm text-[#0b1215]">Make it shorter</span>
-                        </button>
-
-                        <button
-                            @click="handleLonger"
-                            :disabled="!hasContent || isLoading"
-                            class="w-full flex items-center gap-2 px-3 py-2.5 bg-white border border-[#0b1215]/10 rounded-xl hover:bg-[#0b1215]/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#0b1215]/50" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
-                            </svg>
-                            <span class="text-sm text-[#0b1215]">Make it longer</span>
-                        </button>
-
-                        <!-- Tone Change -->
-                        <div class="pt-3 border-t border-[#0b1215]/10">
-                            <label class="block text-xs text-[#0b1215]/50 mb-2">Change tone</label>
-                            <div class="flex gap-2">
-                                <select
-                                    v-model="selectedTone"
-                                    class="flex-1 text-sm border border-[#0b1215]/10 rounded-xl px-3 py-2 bg-white focus:ring-[#0b1215]/20 focus:border-[#0b1215]/30"
-                                >
-                                    <option v-for="tone in toneOptions" :key="tone.value" :value="tone.value">
-                                        {{ tone.label }}
-                                    </option>
-                                </select>
-                                <button
-                                    @click="handleChangeTone"
-                                    :disabled="!hasContent || isLoading"
-                                    class="px-4 py-2 bg-[#0b1215] text-white text-sm rounded-xl hover:bg-[#0b1215]/90 disabled:opacity-50 transition-colors"
-                                >
-                                    Apply
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Freeform Question -->
-                        <div class="pt-3 border-t border-[#0b1215]/10">
-                            <label class="block text-xs text-[#0b1215]/50 mb-2">Ask anything</label>
-                            <div class="space-y-2">
-                                <textarea
-                                    v-model="freeformQuestion"
-                                    placeholder="How can I improve the introduction?"
-                                    rows="2"
-                                    class="w-full text-sm border border-[#0b1215]/10 rounded-xl px-3 py-2 resize-none focus:ring-[#0b1215]/20 focus:border-[#0b1215]/30 placeholder-[#0b1215]/30"
-                                ></textarea>
-                                <button
-                                    @click="handleAskQuestion"
-                                    :disabled="!freeformQuestion.trim() || isLoading"
-                                    class="w-full px-3 py-2.5 bg-[#0b1215] text-white text-sm font-medium rounded-xl hover:bg-[#0b1215]/90 disabled:opacity-50 transition-colors"
-                                >
-                                    Ask AI
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </template>
-
-                <!-- Generate Tab -->
-                <template v-else-if="activeTab === 'generate'">
+                <!-- Generate Content -->
+                <template v-else>
                     <div class="space-y-4">
                         <!-- Generate Draft -->
                         <div class="space-y-2">

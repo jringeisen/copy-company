@@ -314,7 +314,6 @@ const handleInsertContent = (content) => {
             <!-- AI Assistant Panel -->
             <div @mousedown="saveEditorSelection" class="flex">
                 <AIAssistantPanel
-                    :content="form.content_html"
                     :title="form.title"
                     @apply-suggestion="handleApplySuggestion"
                     @insert-content="handleInsertContent"

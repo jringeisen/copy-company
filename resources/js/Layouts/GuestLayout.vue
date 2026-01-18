@@ -9,29 +9,16 @@ defineProps({
 
 <template>
     <div class="min-h-screen bg-[#fcfbf8] flex flex-col">
-        <!-- Header -->
-        <header class="py-6 px-6 lg:px-12">
-            <div class="max-w-7xl mx-auto flex justify-between items-center">
-                <Link href="/">
-                    <img src="/images/logo.svg" alt="Copy Company" class="h-10" />
-                </Link>
-                <div class="flex items-center gap-6">
-                    <Link href="/login" class="text-sm text-[#0b1215]/70 hover:text-[#0b1215] transition">
-                        Sign in
-                    </Link>
-                    <Link
-                        href="/register"
-                        class="px-6 py-2.5 bg-[#0b1215] text-white text-sm rounded-full hover:bg-[#0b1215]/90 transition"
-                    >
-                        Get Started
-                    </Link>
-                </div>
-            </div>
-        </header>
-
         <!-- Main Content -->
         <main class="flex-1 flex flex-col items-center justify-center px-6 py-12">
             <div class="w-full max-w-md">
+                <!-- Logo -->
+                <div class="text-center mb-8">
+                    <Link href="/">
+                        <img src="/images/logo.svg" alt="Copy Company" class="h-12 mx-auto" />
+                    </Link>
+                </div>
+
                 <!-- Title Section -->
                 <div class="text-center mb-8" v-if="title">
                     <h1 class="font-serif text-3xl lg:text-4xl font-light text-[#0b1215] mb-3">

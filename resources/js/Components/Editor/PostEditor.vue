@@ -2,11 +2,17 @@
 import { useEditor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
-import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
-import { ref, watch, onBeforeUnmount } from 'vue';
+import { ref, watch, onBeforeUnmount, computed } from 'vue';
+import { marked } from 'marked';
+import { Plugin, PluginKey } from 'prosemirror-state';
+import { Decoration, DecorationSet } from 'prosemirror-view';
 import MediaPickerModal from '@/Components/Media/MediaPickerModal.vue';
 import AIBubbleMenu from '@/Components/Editor/AIBubbleMenu.vue';
+import InlineSuggestionToolbar from '@/Components/Editor/InlineSuggestionToolbar.vue';
+
+// Actions that produce structured content (markdown) vs inline text
+const structuredActions = ['list', 'examples', 'longer'];
 
 const props = defineProps({
     modelValue: {
@@ -21,21 +27,61 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'update:html']);
 
+// Suggestion state for inline preview
+const suggestionState = ref(null);
+const hasSuggestion = computed(() => suggestionState.value !== null);
+
+// Plugin key for suggestion highlight decorations
+const suggestionHighlightKey = new PluginKey('suggestionHighlight');
+
+// Create the suggestion highlight plugin
+const createSuggestionHighlightPlugin = () => {
+    return new Plugin({
+        key: suggestionHighlightKey,
+        state: {
+            init: () => DecorationSet.empty,
+            apply: (tr, set) => {
+                // Check if there's a new highlight range in the meta
+                const highlightMeta = tr.getMeta(suggestionHighlightKey);
+                if (highlightMeta !== undefined) {
+                    if (highlightMeta === null) {
+                        // Clear decorations
+                        return DecorationSet.empty;
+                    }
+                    // Create new decoration
+                    const { from, to } = highlightMeta;
+                    const decoration = Decoration.inline(from, to, {
+                        class: 'ai-suggestion-highlight',
+                    });
+                    return DecorationSet.create(tr.doc, [decoration]);
+                }
+                // Map existing decorations through document changes
+                return set.map(tr.mapping, tr.doc);
+            },
+        },
+        props: {
+            decorations(state) {
+                return this.getState(state);
+            },
+        },
+    });
+};
+
 const editor = useEditor({
     extensions: [
         StarterKit.configure({
             heading: {
                 levels: [1, 2, 3],
             },
+            link: {
+                openOnClick: false,
+                HTMLAttributes: {
+                    class: 'text-primary-600 underline',
+                },
+            },
         }),
         Placeholder.configure({
             placeholder: props.placeholder,
-        }),
-        Link.configure({
-            openOnClick: false,
-            HTMLAttributes: {
-                class: 'text-primary-600 underline',
-            },
         }),
         Image.configure({
             HTMLAttributes: {
@@ -43,6 +89,14 @@ const editor = useEditor({
             },
         }),
     ],
+    // Add the suggestion highlight plugin after editor is created
+    onCreate: ({ editor }) => {
+        editor.view.updateState(
+            editor.view.state.reconfigure({
+                plugins: [...editor.view.state.plugins, createSuggestionHighlightPlugin()],
+            })
+        );
+    },
     content: props.modelValue,
     editorProps: {
         attributes: {
@@ -65,6 +119,285 @@ watch(() => props.modelValue, (newContent) => {
 onBeforeUnmount(() => {
     editor.value?.destroy();
 });
+
+// Extract block structure from selection range
+const getBlockStructure = (from, to) => {
+    const doc = editor.value.state.doc;
+    const blocks = [];
+    const seenPositions = new Set();
+
+    doc.nodesBetween(from, to, (node, pos) => {
+        // Skip the doc node itself
+        if (node.type.name === 'doc') {
+            return true;
+        }
+
+        // Only process top-level block nodes (direct children of doc)
+        // Check if this node's parent is the doc
+        const $pos = doc.resolve(pos);
+        const depth = $pos.depth;
+
+        // We want nodes at depth 1 (direct children of doc)
+        // But we also need to handle the case where selection starts mid-node
+        if (node.isBlock && !seenPositions.has(pos)) {
+            // Check if this is a content block (heading, paragraph, etc.)
+            // not a wrapper block (bulletList, orderedList, blockquote wrapper)
+            const isContentBlock = ['heading', 'paragraph', 'codeBlock'].includes(node.type.name);
+            const isListItem = node.type.name === 'listItem';
+
+            if (isContentBlock) {
+                seenPositions.add(pos);
+                blocks.push({
+                    type: node.type.name,
+                    attrs: { ...node.attrs },
+                    textContent: node.textContent,
+                });
+                return false; // Don't descend into children
+            } else if (isListItem) {
+                // For list items, we'll treat them as paragraphs
+                seenPositions.add(pos);
+                blocks.push({
+                    type: 'paragraph',
+                    attrs: {},
+                    textContent: node.textContent,
+                });
+                return false;
+            }
+        }
+
+        return true;
+    });
+
+    return blocks;
+};
+
+// Convert block type to HTML tag
+const blockToHtml = (blockType, attrs, content) => {
+    // Escape HTML entities in content
+    const escapedContent = content
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+    switch (blockType) {
+        case 'heading': {
+            const level = attrs.level || 1;
+            return `<h${level}>${escapedContent}</h${level}>`;
+        }
+        case 'paragraph':
+            return `<p>${escapedContent}</p>`;
+        case 'codeBlock':
+            return `<pre><code>${escapedContent}</code></pre>`;
+        default:
+            return `<p>${escapedContent}</p>`;
+    }
+};
+
+// Find sentence boundaries in text
+const findSentenceBoundaries = (text) => {
+    const boundaries = [];
+    // Match sentence endings: . ! ? followed by space or end of string
+    const regex = /[.!?]+[\s]+|[.!?]+$/g;
+    let match;
+    while ((match = regex.exec(text)) !== null) {
+        boundaries.push(match.index + match[0].length);
+    }
+    return boundaries;
+};
+
+// Find the best split point near a target position
+const findBestSplitPoint = (text, targetPos, boundaries) => {
+    if (boundaries.length === 0) {
+        return targetPos; // No sentence boundaries, just split at target
+    }
+
+    // Find the closest sentence boundary to the target position
+    let bestBoundary = boundaries[0];
+    let minDistance = Math.abs(targetPos - bestBoundary);
+
+    for (const boundary of boundaries) {
+        const distance = Math.abs(targetPos - boundary);
+        if (distance < minDistance) {
+            minDistance = distance;
+            bestBoundary = boundary;
+        }
+    }
+
+    // Only use the sentence boundary if it's reasonably close (within 30% of target)
+    const tolerance = text.length * 0.15;
+    if (minDistance <= tolerance) {
+        return bestBoundary;
+    }
+
+    return targetPos;
+};
+
+// Reconstruct content preserving original block structure
+const reconstructWithStructure = (aiContent, originalBlocks) => {
+    // Normalize line endings
+    const normalizedContent = aiContent.replace(/\r\n/g, '\n').trim();
+
+    // If only one block, just wrap and return
+    if (originalBlocks.length === 1) {
+        return blockToHtml(originalBlocks[0].type, originalBlocks[0].attrs, normalizedContent);
+    }
+
+    // First, try to split by newlines (double or single)
+    let parts = normalizedContent
+        .split(/\n\n+/)
+        .map(p => p.trim())
+        .filter(p => p.length > 0);
+
+    // If double newlines didn't give enough parts, try single newlines
+    if (parts.length < originalBlocks.length) {
+        const singleNewlineParts = normalizedContent
+            .split(/\n/)
+            .map(p => p.trim())
+            .filter(p => p.length > 0);
+
+        if (singleNewlineParts.length >= originalBlocks.length) {
+            parts = singleNewlineParts;
+        }
+    }
+
+    // If we have the right number of parts, use them directly
+    if (parts.length >= originalBlocks.length) {
+        let html = '';
+        for (let i = 0; i < originalBlocks.length; i++) {
+            const block = originalBlocks[i];
+            // If we have more parts than blocks, join remaining parts into the last block
+            const content = i === originalBlocks.length - 1
+                ? parts.slice(i).join(' ')
+                : parts[i];
+            html += blockToHtml(block.type, block.attrs, content);
+        }
+        return html;
+    }
+
+    // If newline splitting didn't work (AI returned continuous text),
+    // split proportionally based on original block lengths at sentence boundaries
+    const totalOriginalLength = originalBlocks.reduce((sum, b) => sum + b.textContent.length, 0);
+    const sentenceBoundaries = findSentenceBoundaries(normalizedContent);
+
+    const splitParts = [];
+    let currentPos = 0;
+
+    for (let i = 0; i < originalBlocks.length; i++) {
+        const block = originalBlocks[i];
+
+        if (i === originalBlocks.length - 1) {
+            // Last block gets the rest
+            splitParts.push(normalizedContent.slice(currentPos).trim());
+        } else {
+            // Calculate proportional position
+            const blockRatio = block.textContent.length / totalOriginalLength;
+            const targetLength = Math.round(normalizedContent.length * blockRatio);
+            const targetPos = currentPos + targetLength;
+
+            // Find best split point (at sentence boundary if possible)
+            const splitPos = findBestSplitPoint(normalizedContent, targetPos, sentenceBoundaries);
+
+            splitParts.push(normalizedContent.slice(currentPos, splitPos).trim());
+            currentPos = splitPos;
+        }
+    }
+
+    // Build HTML
+    let html = '';
+    for (let i = 0; i < originalBlocks.length; i++) {
+        const block = originalBlocks[i];
+        const content = splitParts[i] || '';
+        if (content) {
+            html += blockToHtml(block.type, block.attrs, content);
+        }
+    }
+
+    return html;
+};
+
+// Handle AI suggestion from AIBubbleMenu
+const handleSuggestion = ({ content, range, action, originalText }) => {
+    if (!editor.value) return;
+
+    // Determine if we need to parse as markdown (for structured content like lists)
+    const isStructuredAction = structuredActions.includes(action);
+
+    let insertContent;
+    if (isStructuredAction) {
+        // For structured actions, parse as markdown
+        insertContent = marked.parse(content);
+    } else {
+        // For inline actions, preserve the original block structure
+        const originalBlocks = getBlockStructure(range.from, range.to);
+
+        if (originalBlocks.length > 0) {
+            // Reconstruct with original structure
+            insertContent = reconstructWithStructure(content, originalBlocks);
+        } else {
+            // Fallback to plain text if no blocks found
+            insertContent = content;
+        }
+    }
+
+    // Replace the selected content with the suggestion
+    editor.value
+        .chain()
+        .focus()
+        .deleteRange(range)
+        .insertContentAt(range.from, insertContent)
+        .run();
+
+    // Get the new selection position after insertion
+    const newEndPos = editor.value.state.selection.to;
+
+    // Store suggestion state for accept/reject
+    suggestionState.value = {
+        originalText,
+        originalRange: range,
+        action,
+        newRange: { from: range.from, to: newEndPos },
+    };
+
+    // Apply highlight decoration
+    applyHighlight({ from: range.from, to: newEndPos });
+};
+
+// Apply highlight decoration to a range
+const applyHighlight = (range) => {
+    if (!editor.value) return;
+
+    const tr = editor.value.view.state.tr;
+    tr.setMeta(suggestionHighlightKey, range);
+    editor.value.view.dispatch(tr);
+};
+
+// Remove highlight decoration
+const removeHighlight = () => {
+    if (!editor.value) return;
+
+    const tr = editor.value.view.state.tr;
+    tr.setMeta(suggestionHighlightKey, null);
+    editor.value.view.dispatch(tr);
+};
+
+// Accept the suggestion
+const acceptSuggestion = () => {
+    removeHighlight();
+    suggestionState.value = null;
+    editor.value?.commands.focus();
+};
+
+// Reject the suggestion and restore original
+const rejectSuggestion = () => {
+    if (!editor.value || !suggestionState.value) return;
+
+    // Undo the change to restore original content
+    editor.value.commands.undo();
+
+    removeHighlight();
+    suggestionState.value = null;
+    editor.value.commands.focus();
+};
 
 const setLink = () => {
     const url = window.prompt('Enter URL');
@@ -277,7 +610,20 @@ defineExpose({ editor });
         <div class="p-6">
             <EditorContent :editor="editor" />
             <!-- AI Bubble Menu -->
-            <AIBubbleMenu v-if="editor" :editor="editor" />
+            <AIBubbleMenu
+                v-if="editor && !hasSuggestion"
+                :editor="editor"
+                @suggestion="handleSuggestion"
+            />
+            <!-- Inline Suggestion Toolbar -->
+            <InlineSuggestionToolbar
+                v-if="editor && hasSuggestion"
+                :editor="editor"
+                :suggestion-range="suggestionState.newRange"
+                :original-text="suggestionState.originalText"
+                @accept="acceptSuggestion"
+                @reject="rejectSuggestion"
+            />
         </div>
 
         <!-- Media Picker Modal -->
@@ -300,5 +646,13 @@ defineExpose({ editor });
 
 .ProseMirror:focus {
     outline: none;
+}
+
+/* AI Suggestion Highlight */
+.ProseMirror .ai-suggestion-highlight {
+    background: rgb(220, 252, 231); /* green-100 */
+    border-bottom: 2px dashed rgb(34, 197, 94); /* green-500 */
+    border-radius: 2px;
+    padding: 1px 0;
 }
 </style>
