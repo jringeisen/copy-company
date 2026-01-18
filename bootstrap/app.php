@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Middleware\CheckFeatureAccess;
 use App\Http\Middleware\ComingSoonMode;
+use App\Http\Middleware\EnsureAccountIsSubscribed;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SetPermissionsTeamContext;
 use Illuminate\Foundation\Application;
@@ -22,6 +24,11 @@ return Application::configure(basePath: dirname(__DIR__))
             ComingSoonMode::class,
             HandleInertiaRequests::class,
             SetPermissionsTeamContext::class,
+        ]);
+
+        $middleware->alias([
+            'subscribed' => EnsureAccountIsSubscribed::class,
+            'feature' => CheckFeatureAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

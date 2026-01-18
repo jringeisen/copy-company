@@ -15,18 +15,24 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\Public\BlogController;
 use App\Http\Controllers\Public\SubscribeController;
 use App\Http\Controllers\Settings\AccountInvitationController;
+use App\Http\Controllers\Settings\BillingController;
 use App\Http\Controllers\Settings\EmailDomainController;
 use App\Http\Controllers\Settings\TeamSettingsController;
 use App\Http\Controllers\SocialPostController;
 use App\Http\Controllers\SocialSettingsController;
 use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\Webhooks\SesWebhookController;
+use App\Http\Controllers\Webhooks\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 // Webhook routes (CSRF excluded in bootstrap/app.php)
 Route::post('/webhooks/ses', [SesWebhookController::class, 'handle'])
-    ->name('webhooks.ses');
+    ->name('webhooks.ses')
+    ->withoutMiddleware(['web']);
+Route::post('/webhooks/stripe', [StripeWebhookController::class, 'handleWebhook'])
+    ->name('webhooks.stripe')
+    ->withoutMiddleware(['web']);
 
 // Coming soon page (production only)
 Route::get('/coming-soon', function () {
@@ -101,6 +107,15 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/settings/team/{user}', [TeamSettingsController::class, 'removeMember'])->name('team.remove');
     Route::delete('/settings/team/invitations/{invitation}', [AccountInvitationController::class, 'destroy'])->name('team.invitation.cancel');
     Route::post('/settings/team/invitations/{invitation}/resend', [AccountInvitationController::class, 'resend'])->name('team.invitation.resend');
+
+    // Billing routes
+    Route::get('/settings/billing', [BillingController::class, 'index'])->name('settings.billing');
+    Route::get('/billing/subscribe', [BillingController::class, 'subscribe'])->name('billing.subscribe');
+    Route::post('/billing/checkout', [BillingController::class, 'checkout'])->name('billing.checkout');
+    Route::get('/billing/portal', [BillingController::class, 'portal'])->name('billing.portal');
+    Route::get('/billing/invoice/{invoiceId}', [BillingController::class, 'downloadInvoice'])->name('billing.invoice.download');
+    Route::post('/billing/resume', [BillingController::class, 'resume'])->name('billing.resume');
+    Route::post('/billing/cancel', [BillingController::class, 'cancel'])->name('billing.cancel');
 
     // Post routes
     Route::delete('/posts/bulk-delete', [PostController::class, 'bulkDestroy'])->name('posts.bulk-destroy');

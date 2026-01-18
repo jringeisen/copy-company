@@ -14,6 +14,20 @@ return [
     |
     */
 
+    'stripe' => [
+        'prices' => [
+            'starter_monthly' => env('STRIPE_STARTER_MONTHLY'),
+            'starter_annual' => env('STRIPE_STARTER_ANNUAL'),
+            'creator_monthly' => env('STRIPE_CREATOR_MONTHLY'),
+            'creator_annual' => env('STRIPE_CREATOR_ANNUAL'),
+            'pro_monthly' => env('STRIPE_PRO_MONTHLY'),
+            'pro_annual' => env('STRIPE_PRO_ANNUAL'),
+            'email_metered' => env('STRIPE_EMAIL_METERED'),
+        ],
+        'email_meter_id' => env('STRIPE_EMAIL_METER_ID'),
+        'email_meter_event_name' => env('STRIPE_EMAIL_METER_EVENT_NAME', 'email_sent'),
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],

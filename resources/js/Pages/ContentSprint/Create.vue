@@ -2,10 +2,16 @@
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import UpgradeModal from '@/Components/UpgradeModal.vue';
+import { useSubscription } from '@/Composables/useSubscription';
+
+const { canCreateSprint, getRequiredPlan } = useSubscription();
 
 const props = defineProps({
     brand: Object,
 });
+
+const showUpgradeModal = ref(false);
 
 const form = useForm({
     topics: [''],
@@ -26,6 +32,12 @@ const removeTopic = (index) => {
 };
 
 const submit = () => {
+    // Check subscription limit first
+    if (!canCreateSprint.value) {
+        showUpgradeModal.value = true;
+        return;
+    }
+
     // Filter out empty topics
     form.topics = form.topics.filter(t => t.trim() !== '');
 
@@ -156,5 +168,14 @@ const submit = () => {
                 </form>
             </div>
         </div>
+
+        <UpgradeModal
+            :show="showUpgradeModal"
+            title="Content Sprint Limit Reached"
+            message="You've used all your content sprints for this month. Upgrade to generate more AI content ideas."
+            feature="content_sprints"
+            :required-plan="getRequiredPlan('content_sprints')"
+            @close="showUpgradeModal = false"
+        />
     </AppLayout>
 </template>

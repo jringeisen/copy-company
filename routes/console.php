@@ -24,3 +24,6 @@ Schedule::job(new ProcessScheduledLoops)->everyMinute();
 
 // Check SES reputation hourly
 Schedule::command('ses:check-reputation')->hourly();
+
+// Report email usage to Stripe for metered billing (hourly)
+Schedule::command('billing:report-email-usage')->hourly();

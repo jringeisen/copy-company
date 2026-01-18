@@ -2,19 +2,41 @@
 
 namespace App\Models;
 
+use App\Services\SubscriptionLimitsService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Laravel\Cashier\Billable;
 
 class Account extends Model
 {
+    use Billable;
     use HasFactory;
 
     protected $fillable = [
         'name',
         'slug',
+        'stripe_id',
+        'pm_type',
+        'pm_last_four',
+        'trial_ends_at',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'trial_ends_at' => 'datetime',
+        ];
+    }
+
+    /**
+     * Get the subscription limits service for this account.
+     */
+    public function subscriptionLimits(): SubscriptionLimitsService
+    {
+        return new SubscriptionLimitsService($this);
+    }
 
     /**
      * Get all users belonging to this account.

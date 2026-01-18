@@ -74,7 +74,16 @@ class CreateNewUser implements CreatesNewUsers
             $account = Account::create([
                 'name' => $user->name."'s Account",
                 'slug' => $this->generateUniqueSlug($user->name),
+                'trial_ends_at' => now()->addDays(14),
             ]);
+
+            // Create Stripe customer for the account (if Stripe is configured)
+            if (config('cashier.secret')) {
+                $account->createAsStripeCustomer([
+                    'name' => $account->name,
+                    'email' => $user->email,
+                ]);
+            }
 
             // Attach user as admin
             $account->users()->attach($user->id, ['role' => 'admin']);

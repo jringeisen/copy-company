@@ -1,7 +1,9 @@
 <?php
 
+use App\Enums\SubscriptionPlan;
 use App\Models\Brand;
 use App\Models\ContentSprint;
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
@@ -21,6 +23,16 @@ beforeEach(function () {
         'sprints.create',
         'sprints.manage',
         'posts.create',
+    ]);
+
+    // Set up Stripe price IDs for testing
+    config([
+        'services.stripe.prices.starter_monthly' => 'price_starter_monthly',
+        'services.stripe.prices.starter_annual' => 'price_starter_annual',
+        'services.stripe.prices.creator_monthly' => 'price_creator_monthly',
+        'services.stripe.prices.creator_annual' => 'price_creator_annual',
+        'services.stripe.prices.pro_monthly' => 'price_pro_monthly',
+        'services.stripe.prices.pro_annual' => 'price_pro_annual',
     ]);
 });
 
@@ -321,4 +333,112 @@ test('sprint show paginates ideas', function () {
         ->get(route('content-sprints.show', ['content_sprint' => $sprint, 'page' => 2]));
 
     $response->assertOk();
+});
+
+test('accepting ideas respects subscription post limit', function () {
+    $user = User::factory()->create();
+    $brand = Brand::factory()->forUser($user)->create();
+    $account = $user->currentAccount();
+
+    // Put account on trial (Starter limits: 5 posts)
+    $account->update(['trial_ends_at' => now()->addDays(14)]);
+
+    // Create 4 posts already (limit is 5 for Starter/trial)
+    Post::factory()->count(4)->forBrand($brand)->forUser($user)->create();
+
+    $sprint = ContentSprint::factory()
+        ->forBrand($brand)
+        ->completed()
+        ->create();
+
+    setupUserWithSprintPermissions($user);
+
+    // Try to create 3 posts (would put us at 7, over limit of 5)
+    $response = $this->actingAs($user)->post(route('content-sprints.accept', $sprint), [
+        'idea_indices' => [0, 1, 2],
+    ]);
+
+    $response->assertRedirect();
+    $response->assertSessionHasErrors('idea_indices');
+});
+
+test('accepting ideas within limit succeeds', function () {
+    $user = User::factory()->create();
+    $brand = Brand::factory()->forUser($user)->create();
+    $account = $user->currentAccount();
+
+    // Put account on trial (Starter limits: 5 posts)
+    $account->update(['trial_ends_at' => now()->addDays(14)]);
+
+    // Create 3 posts already (limit is 5 for Starter/trial)
+    Post::factory()->count(3)->forBrand($brand)->forUser($user)->create();
+
+    $sprint = ContentSprint::factory()
+        ->forBrand($brand)
+        ->completed()
+        ->create();
+
+    setupUserWithSprintPermissions($user);
+
+    // Try to create 2 posts (would put us at 5, exactly at limit)
+    $response = $this->actingAs($user)->post(route('content-sprints.accept', $sprint), [
+        'idea_indices' => [0, 1],
+    ]);
+
+    $response->assertRedirect(route('posts.index'));
+    expect($brand->posts()->count())->toBe(5);
+});
+
+test('sprint show includes post limits data', function () {
+    $user = User::factory()->create();
+    $brand = Brand::factory()->forUser($user)->create();
+    $sprint = ContentSprint::factory()
+        ->forBrand($brand)
+        ->completed()
+        ->create();
+
+    setupUserWithSprintPermissions($user);
+
+    $response = $this->actingAs($user)->get(route('content-sprints.show', $sprint));
+
+    $response->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('ContentSprint/Show')
+            ->has('postLimits')
+            ->has('postLimits.limit')
+            ->has('postLimits.remaining')
+            ->has('postLimits.unlimited')
+        );
+});
+
+test('user on Creator plan can accept unlimited posts', function () {
+    $user = User::factory()->create();
+    $brand = Brand::factory()->forUser($user)->create();
+    $account = $user->currentAccount();
+
+    // Give user a Creator subscription
+    $account->subscriptions()->create([
+        'type' => 'default',
+        'stripe_id' => 'sub_test',
+        'stripe_status' => 'active',
+        'stripe_price' => SubscriptionPlan::Creator->monthlyPriceId(),
+    ]);
+
+    // Create 10 posts already
+    Post::factory()->count(10)->forBrand($brand)->forUser($user)->create();
+
+    $sprint = ContentSprint::factory()
+        ->forBrand($brand)
+        ->completed()
+        ->create();
+
+    setupUserWithSprintPermissions($user);
+
+    // Should be able to create more posts since Creator has unlimited
+    $response = $this->actingAs($user)->post(route('content-sprints.accept', $sprint), [
+        'idea_indices' => [0, 1, 2],
+    ]);
+
+    $response->assertRedirect(route('posts.index'));
+    expect($brand->posts()->count())->toBe(13);
 });

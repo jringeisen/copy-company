@@ -3,7 +3,9 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
+import UpgradeModal from '@/Components/UpgradeModal.vue';
 import { usePermissions } from '@/Composables/usePermissions';
+import { useSubscription } from '@/Composables/useSubscription';
 
 const props = defineProps({
     posts: Object,
@@ -11,6 +13,9 @@ const props = defineProps({
 });
 
 const { canCreatePosts, canDeletePosts, canUpdatePosts } = usePermissions();
+const { canCreatePost, getRequiredPlan } = useSubscription();
+
+const showUpgradeModal = ref(false);
 
 const selectedIds = ref([]);
 const isDeleting = ref(false);
@@ -91,12 +96,19 @@ const getStatusColor = (status) => {
                         Delete ({{ selectedIds.length }})
                     </button>
                     <Link
-                        v-if="canCreatePosts"
+                        v-if="canCreatePosts && canCreatePost"
                         href="/posts/create"
                         class="px-5 py-2.5 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition text-sm"
                     >
                         New Post
                     </Link>
+                    <button
+                        v-else-if="canCreatePosts && !canCreatePost"
+                        @click="showUpgradeModal = true"
+                        class="px-5 py-2.5 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition text-sm"
+                    >
+                        New Post
+                    </button>
                 </div>
             </div>
 
@@ -205,14 +217,30 @@ const getStatusColor = (status) => {
                     {{ canCreatePosts ? 'Get started by creating your first post.' : 'No posts have been created yet.' }}
                 </p>
                 <Link
-                    v-if="canCreatePosts"
+                    v-if="canCreatePosts && canCreatePost"
                     href="/posts/create"
                     class="mt-6 inline-flex items-center px-5 py-2.5 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition text-sm"
                 >
                     Create Your First Post
                 </Link>
+                <button
+                    v-else-if="canCreatePosts && !canCreatePost"
+                    @click="showUpgradeModal = true"
+                    class="mt-6 inline-flex items-center px-5 py-2.5 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition text-sm"
+                >
+                    Create Your First Post
+                </button>
             </div>
         </div>
+
+        <UpgradeModal
+            :show="showUpgradeModal"
+            title="Post Limit Reached"
+            message="You've used all your posts for this month. Upgrade to create unlimited posts."
+            feature="posts"
+            :required-plan="getRequiredPlan('posts')"
+            @close="showUpgradeModal = false"
+        />
 
         <ConfirmModal
             :show="showDeleteModal"

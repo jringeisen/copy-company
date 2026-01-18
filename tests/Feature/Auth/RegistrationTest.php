@@ -19,5 +19,6 @@ test('new users can register', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    // New users on trial are redirected to the subscribe page
+    $response->assertRedirect('/billing/subscribe');
 });

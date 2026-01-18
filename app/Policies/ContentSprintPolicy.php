@@ -21,7 +21,17 @@ class ContentSprintPolicy
 
     public function create(User $user): bool
     {
-        return $user->currentBrand() !== null && $user->can('sprints.create');
+        if ($user->currentBrand() === null || ! $user->can('sprints.create')) {
+            return false;
+        }
+
+        // Check subscription content sprint limits
+        $account = $user->currentAccount();
+        if ($account && ! $account->subscriptionLimits()->canCreateContentSprint()) {
+            return false;
+        }
+
+        return true;
     }
 
     public function update(User $user, ContentSprint $contentSprint): bool

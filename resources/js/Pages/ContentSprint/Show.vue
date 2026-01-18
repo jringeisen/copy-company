@@ -1,8 +1,9 @@
 <script setup>
 import { Head, Link, router, useForm, InfiniteScroll } from '@inertiajs/vue3';
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
+import UpgradeModal from '@/Components/UpgradeModal.vue';
 import { usePermissions } from '@/Composables/usePermissions';
 
 const { canManageSprints } = usePermissions();
@@ -11,12 +12,24 @@ const props = defineProps({
     sprint: Object,
     ideas: Object,
     brand: Object,
+    postLimits: Object,
 });
 
 const selectedIdeas = ref([]);
 const pollInterval = ref(null);
 const showDeleteModal = ref(false);
+const showUpgradeModal = ref(false);
 const isDeleting = ref(false);
+
+// Post limits
+const hasPostLimit = computed(() => !props.postLimits?.unlimited);
+const remainingPosts = computed(() => props.postLimits?.remaining ?? null);
+const canCreateAnyPosts = computed(() => props.postLimits?.unlimited || (props.postLimits?.remaining > 0));
+const isAtPostLimit = computed(() => hasPostLimit.value && remainingPosts.value === 0);
+const selectionExceedsLimit = computed(() => {
+    if (!hasPostLimit.value) return false;
+    return selectedIdeas.value.length > remainingPosts.value;
+});
 
 const isGenerating = computed(() => ['pending', 'generating'].includes(props.sprint.status));
 const isCompleted = computed(() => props.sprint.status === 'completed');
@@ -43,7 +56,7 @@ const acceptForm = useForm({
 onMounted(() => {
     if (isGenerating.value) {
         pollInterval.value = setInterval(() => {
-            router.reload({ only: ['sprint'] });
+            router.reload({ only: ['sprint', 'ideas'] });
         }, 3000);
     }
 });
@@ -62,10 +75,12 @@ const stopPolling = () => {
     }
 };
 
-// Watch for status changes
-if (isCompleted.value || isFailed.value) {
-    stopPolling();
-}
+// Watch for status changes to stop polling
+watch(() => props.sprint.status, (newStatus) => {
+    if (newStatus === 'completed' || newStatus === 'failed') {
+        stopPolling();
+    }
+});
 
 const toggleIdea = (index) => {
     // Don't allow toggling converted ideas
@@ -73,8 +88,14 @@ const toggleIdea = (index) => {
 
     const idx = selectedIdeas.value.indexOf(index);
     if (idx > -1) {
+        // Always allow deselecting
         selectedIdeas.value.splice(idx, 1);
     } else {
+        // Check if selecting would exceed the limit
+        if (hasPostLimit.value && selectedIdeas.value.length >= remainingPosts.value) {
+            showUpgradeModal.value = true;
+            return;
+        }
         selectedIdeas.value.push(index);
     }
 };
@@ -84,11 +105,29 @@ const selectAll = () => {
     if (allUnconvertedSelected.value) {
         selectedIdeas.value = [];
     } else {
-        selectedIdeas.value = unconvertedIdeas.value.map(idea => idea.original_index);
+        // Limit selection to remaining posts if there's a limit
+        const ideasToSelect = unconvertedIdeas.value.map(idea => idea.original_index);
+        if (hasPostLimit.value && ideasToSelect.length > remainingPosts.value) {
+            selectedIdeas.value = ideasToSelect.slice(0, remainingPosts.value);
+        } else {
+            selectedIdeas.value = ideasToSelect;
+        }
     }
 };
 
 const createPosts = () => {
+    // Check if user has no posts remaining
+    if (isAtPostLimit.value) {
+        showUpgradeModal.value = true;
+        return;
+    }
+
+    // Check if selection exceeds limit (shouldn't happen with UI guards, but backend will catch it too)
+    if (selectionExceedsLimit.value) {
+        showUpgradeModal.value = true;
+        return;
+    }
+
     acceptForm.idea_indices = selectedIdeas.value;
     acceptForm.post(`/content-sprints/${props.sprint.id}/accept`);
 };
@@ -198,6 +237,36 @@ const deleteSprint = () => {
 
             <!-- Completed State - Show Ideas -->
             <div v-else-if="isCompleted">
+                <!-- Post Limit Warning -->
+                <div v-if="hasPostLimit && remainingPosts <= 3 && remainingPosts > 0" class="mb-4 bg-[#a1854f]/10 border border-[#a1854f]/20 rounded-xl p-4 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-[#a1854f] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="text-sm text-[#a1854f]">
+                            You can create {{ remainingPosts }} more post{{ remainingPosts !== 1 ? 's' : '' }} this month.
+                        </span>
+                    </div>
+                    <Link href="/billing/subscribe" class="text-sm text-[#a1854f] hover:text-[#0b1215] font-medium">
+                        Upgrade
+                    </Link>
+                </div>
+
+                <!-- At Limit Warning -->
+                <div v-else-if="isAtPostLimit" class="mb-4 bg-red-50 border border-red-200 rounded-xl p-4 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <span class="text-sm text-red-700">
+                            You've reached your post limit for this month.
+                        </span>
+                    </div>
+                    <Link href="/billing/subscribe" class="text-sm text-red-700 hover:text-red-900 font-medium">
+                        Upgrade to Continue
+                    </Link>
+                </div>
+
                 <!-- Header -->
                 <div class="mb-6 flex items-center justify-between">
                     <div>
@@ -208,8 +277,12 @@ const deleteSprint = () => {
                             </span>
                         </h2>
                         <p class="text-sm text-[#0b1215]/60">
-                            <template v-if="sprint.unconverted_ideas_count > 0">
+                            <template v-if="isAtPostLimit">
+                                Upgrade your plan to create posts from these ideas
+                            </template>
+                            <template v-else-if="sprint.unconverted_ideas_count > 0">
                                 Select the ideas you want to turn into draft posts
+                                <span v-if="hasPostLimit" class="text-[#a1854f]">({{ remainingPosts }} remaining this month)</span>
                             </template>
                             <template v-else>
                                 All ideas have been converted to posts
@@ -217,11 +290,13 @@ const deleteSprint = () => {
                         </p>
                     </div>
                     <button
-                        v-if="canManageSprints && unconvertedIdeas.length > 0"
+                        v-if="canManageSprints && unconvertedIdeas.length > 0 && canCreateAnyPosts"
                         @click="selectAll"
                         class="text-sm text-[#a1854f] hover:text-[#a1854f]/80 font-medium"
                     >
-                        {{ allUnconvertedSelected ? 'Deselect All' : 'Select All' }}
+                        <template v-if="allUnconvertedSelected">Deselect All</template>
+                        <template v-else-if="hasPostLimit && unconvertedIdeas.length > remainingPosts">Select {{ remainingPosts }}</template>
+                        <template v-else>Select All</template>
                     </button>
                 </div>
 
@@ -329,6 +404,15 @@ const deleteSprint = () => {
             :processing="isDeleting"
             @confirm="deleteSprint"
             @cancel="showDeleteModal = false"
+        />
+
+        <UpgradeModal
+            :show="showUpgradeModal"
+            title="Post Limit Reached"
+            message="You've used all your posts for this month. Upgrade to create unlimited posts from your content sprints."
+            feature="posts"
+            required-plan="creator"
+            @close="showUpgradeModal = false"
         />
     </AppLayout>
 </template>

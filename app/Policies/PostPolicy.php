@@ -21,7 +21,17 @@ class PostPolicy
 
     public function create(User $user): bool
     {
-        return $user->currentBrand() !== null && $user->can('posts.create');
+        if ($user->currentBrand() === null || ! $user->can('posts.create')) {
+            return false;
+        }
+
+        // Check subscription post limits
+        $account = $user->currentAccount();
+        if ($account && ! $account->subscriptionLimits()->canCreatePost()) {
+            return false;
+        }
+
+        return true;
     }
 
     public function update(User $user, Post $post): bool

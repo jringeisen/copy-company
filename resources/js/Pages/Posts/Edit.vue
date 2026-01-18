@@ -5,8 +5,11 @@ import AIAssistantPanel from '@/Components/Editor/AIAssistantPanel.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
 import MediaPickerModal from '@/Components/Media/MediaPickerModal.vue';
 import { useAutosave } from '@/Composables/useAutosave';
+import { useSubscription } from '@/Composables/useSubscription';
 import { ref, computed, watch } from 'vue';
 import { marked } from 'marked';
+
+const { canSendNewsletter } = useSubscription();
 
 const props = defineProps({
     post: Object,
@@ -354,14 +357,29 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
                                     />
                                     <span class="ml-2 text-sm text-[#0b1215]/70">Publish to blog</span>
                                 </label>
-                                <label class="flex items-center">
-                                    <input
-                                        v-model="form.send_as_newsletter"
-                                        type="checkbox"
-                                        class="rounded border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
-                                    />
-                                    <span class="ml-2 text-sm text-[#0b1215]/70">Send as newsletter</span>
-                                </label>
+                                <div class="flex items-center justify-between">
+                                    <label class="flex items-center">
+                                        <input
+                                            v-model="form.send_as_newsletter"
+                                            type="checkbox"
+                                            :disabled="!canSendNewsletter"
+                                            :class="[
+                                                'rounded border-[#0b1215]/20 focus:ring-[#0b1215]/20',
+                                                canSendNewsletter ? 'text-[#0b1215]' : 'text-[#0b1215]/30 cursor-not-allowed'
+                                            ]"
+                                        />
+                                        <span :class="['ml-2 text-sm', canSendNewsletter ? 'text-[#0b1215]/70' : 'text-[#0b1215]/40']">
+                                            Send as newsletter
+                                        </span>
+                                    </label>
+                                    <Link
+                                        v-if="!canSendNewsletter"
+                                        href="/billing/subscribe"
+                                        class="text-xs text-[#a1854f] hover:text-[#a1854f]/80 font-medium"
+                                    >
+                                        Upgrade to unlock
+                                    </Link>
+                                </div>
                                 <label class="flex items-center">
                                     <input
                                         v-model="form.generate_social"
@@ -423,16 +441,31 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
 
                     <!-- Send as Newsletter -->
                     <div class="mb-6">
-                        <label class="flex items-center">
-                            <input
-                                v-model="publishForm.send_as_newsletter"
-                                type="checkbox"
-                                class="rounded border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
-                            />
-                            <span class="ml-2 font-medium text-[#0b1215]">Send as newsletter</span>
-                        </label>
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center">
+                                <input
+                                    v-model="publishForm.send_as_newsletter"
+                                    type="checkbox"
+                                    :disabled="!canSendNewsletter"
+                                    :class="[
+                                        'rounded border-[#0b1215]/20 focus:ring-[#0b1215]/20',
+                                        canSendNewsletter ? 'text-[#0b1215]' : 'text-[#0b1215]/30 cursor-not-allowed'
+                                    ]"
+                                />
+                                <span :class="['ml-2 font-medium', canSendNewsletter ? 'text-[#0b1215]' : 'text-[#0b1215]/40']">
+                                    Send as newsletter
+                                </span>
+                            </label>
+                            <Link
+                                v-if="!canSendNewsletter"
+                                href="/billing/subscribe"
+                                class="text-xs text-[#a1854f] hover:text-[#a1854f]/80 font-medium"
+                            >
+                                Upgrade to unlock
+                            </Link>
+                        </div>
 
-                        <div v-if="publishForm.send_as_newsletter" class="ml-6 mt-3 space-y-3">
+                        <div v-if="publishForm.send_as_newsletter && canSendNewsletter" class="ml-6 mt-3 space-y-3">
                             <div>
                                 <label class="block text-sm text-[#0b1215]/70 mb-1">Subject line</label>
                                 <input

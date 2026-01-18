@@ -2,12 +2,18 @@
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import PostEditor from '@/Components/Editor/PostEditor.vue';
 import AIAssistantPanel from '@/Components/Editor/AIAssistantPanel.vue';
+import UpgradeModal from '@/Components/UpgradeModal.vue';
 import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { marked } from 'marked';
+import { useSubscription } from '@/Composables/useSubscription';
+
+const { canCreatePost, canSendNewsletter, getRequiredPlan } = useSubscription();
 
 defineProps({
     brand: Object,
 });
+
+const showUpgradeModal = ref(false);
 
 const STORAGE_KEY = 'new_post_draft';
 
@@ -37,7 +43,7 @@ const form = useForm({
     content_html: storedDraft?.content_html || '',
     excerpt: storedDraft?.excerpt || '',
     publish_to_blog: true,
-    send_as_newsletter: true,
+    send_as_newsletter: canSendNewsletter.value,
     generate_social: true,
 });
 
@@ -134,6 +140,12 @@ const updateHtml = (html) => {
 };
 
 const saveDraft = () => {
+    // Check subscription limit first
+    if (!canCreatePost.value) {
+        showUpgradeModal.value = true;
+        return;
+    }
+
     isSaving.value = true;
     form.post('/posts', {
         preserveScroll: true,
@@ -289,14 +301,29 @@ const handleInsertContent = (content) => {
                                     />
                                     <span class="ml-2 text-sm text-[#0b1215]/70">Publish to blog</span>
                                 </label>
-                                <label class="flex items-center">
-                                    <input
-                                        v-model="form.send_as_newsletter"
-                                        type="checkbox"
-                                        class="rounded border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
-                                    />
-                                    <span class="ml-2 text-sm text-[#0b1215]/70">Send as newsletter</span>
-                                </label>
+                                <div class="flex items-center justify-between">
+                                    <label class="flex items-center">
+                                        <input
+                                            v-model="form.send_as_newsletter"
+                                            type="checkbox"
+                                            :disabled="!canSendNewsletter"
+                                            :class="[
+                                                'rounded border-[#0b1215]/20 focus:ring-[#0b1215]/20',
+                                                canSendNewsletter ? 'text-[#0b1215]' : 'text-[#0b1215]/30 cursor-not-allowed'
+                                            ]"
+                                        />
+                                        <span :class="['ml-2 text-sm', canSendNewsletter ? 'text-[#0b1215]/70' : 'text-[#0b1215]/40']">
+                                            Send as newsletter
+                                        </span>
+                                    </label>
+                                    <Link
+                                        v-if="!canSendNewsletter"
+                                        href="/billing/subscribe"
+                                        class="text-xs text-[#a1854f] hover:text-[#a1854f]/80 font-medium"
+                                    >
+                                        Upgrade to unlock
+                                    </Link>
+                                </div>
                                 <label class="flex items-center">
                                     <input
                                         v-model="form.generate_social"
@@ -320,5 +347,14 @@ const handleInsertContent = (content) => {
                 />
             </div>
         </div>
+
+        <UpgradeModal
+            :show="showUpgradeModal"
+            title="Post Limit Reached"
+            message="You've used all your posts for this month. Upgrade to create unlimited posts."
+            feature="posts"
+            :required-plan="getRequiredPlan('posts')"
+            @close="showUpgradeModal = false"
+        />
     </div>
 </template>

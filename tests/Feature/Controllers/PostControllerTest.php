@@ -310,3 +310,85 @@ test('bulk delete rejects non-existent post ids', function () {
     // Authorization fails because none of the IDs belong to the user's brand
     $response->assertForbidden();
 });
+
+test('trial users cannot send newsletters', function () {
+    $user = User::factory()->create();
+    $brand = Brand::factory()->forUser($user)->create();
+    $account = $user->currentAccount();
+
+    // Set up trial
+    $account->update(['trial_ends_at' => now()->addDays(14)]);
+
+    $post = Post::factory()->forBrand($brand)->draft()->create();
+
+    setupUserWithPermissions($user);
+
+    $response = $this->actingAs($user)->post(route('posts.publish', $post), [
+        'schedule_mode' => 'now',
+        'publish_to_blog' => true,
+        'send_as_newsletter' => true,
+        'subject_line' => 'Test Newsletter',
+    ]);
+
+    $response->assertSessionHasErrors('send_as_newsletter');
+    $this->assertDatabaseHas('posts', [
+        'id' => $post->id,
+        'status' => \App\Enums\PostStatus::Draft->value,
+    ]);
+});
+
+test('subscribed users can send newsletters', function () {
+    $user = User::factory()->create();
+    $brand = Brand::factory()->forUser($user)->create();
+    $account = $user->currentAccount();
+
+    // Give user a subscription
+    $account->subscriptions()->create([
+        'type' => 'default',
+        'stripe_id' => 'sub_test',
+        'stripe_status' => 'active',
+        'stripe_price' => \App\Enums\SubscriptionPlan::Creator->monthlyPriceId(),
+    ]);
+
+    $post = Post::factory()->forBrand($brand)->draft()->create();
+
+    setupUserWithPermissions($user);
+
+    $response = $this->actingAs($user)->post(route('posts.publish', $post), [
+        'schedule_mode' => 'now',
+        'publish_to_blog' => true,
+        'send_as_newsletter' => true,
+        'subject_line' => 'Test Newsletter',
+    ]);
+
+    $response->assertRedirect(route('posts.index'));
+    $this->assertDatabaseHas('posts', [
+        'id' => $post->id,
+        'status' => \App\Enums\PostStatus::Published->value,
+    ]);
+});
+
+test('trial users can publish posts without newsletter', function () {
+    $user = User::factory()->create();
+    $brand = Brand::factory()->forUser($user)->create();
+    $account = $user->currentAccount();
+
+    // Set up trial
+    $account->update(['trial_ends_at' => now()->addDays(14)]);
+
+    $post = Post::factory()->forBrand($brand)->draft()->create();
+
+    setupUserWithPermissions($user);
+
+    $response = $this->actingAs($user)->post(route('posts.publish', $post), [
+        'schedule_mode' => 'now',
+        'publish_to_blog' => true,
+        'send_as_newsletter' => false,
+    ]);
+
+    $response->assertRedirect(route('posts.index'));
+    $this->assertDatabaseHas('posts', [
+        'id' => $post->id,
+        'status' => \App\Enums\PostStatus::Published->value,
+    ]);
+});

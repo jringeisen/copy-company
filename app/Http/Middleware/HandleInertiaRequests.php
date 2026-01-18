@@ -38,6 +38,9 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
 
+            // CSRF token for traditional form submissions
+            'csrf_token' => csrf_token(),
+
             // Flash messages
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
@@ -83,6 +86,38 @@ class HandleInertiaRequests extends Middleware
                     ? $request->user()->getAllPermissions()->pluck('name')->toArray()
                     : [],
             ],
+
+            // Subscription data for current account
+            'subscription' => function () use ($request) {
+                /** @var \App\Models\User|null $user */
+                $user = $request->user();
+                $account = $user?->currentAccount();
+
+                if (! $account) {
+                    return null;
+                }
+
+                $limits = $account->subscriptionLimits();
+
+                return [
+                    'plan' => $limits->getPlan()?->value,
+                    'plan_label' => $limits->getPlan()?->label() ?? 'No Plan',
+                    'on_trial' => $limits->onTrial(),
+                    'is_free_trial_only' => $limits->isOnFreeTrialOnly(),
+                    'is_subscribed' => ! $limits->isOnFreeTrialOnly() && $limits->hasActiveSubscription(),
+                    'has_subscription' => $limits->hasActiveSubscription(),
+                    'can_create_post' => $limits->canCreatePost(),
+                    'can_create_sprint' => $limits->canCreateContentSprint(),
+                    'can_add_social' => $limits->canAddSocialAccount(),
+                    'can_send_newsletter' => ! $limits->isOnFreeTrialOnly(),
+                    'features' => [
+                        'custom_domain' => $limits->canUseCustomDomain(),
+                        'custom_email_domain' => $limits->canUseCustomEmailDomain(),
+                        'remove_branding' => $limits->canRemoveBranding(),
+                        'analytics' => $limits->hasAnalytics(),
+                    ],
+                ];
+            },
         ];
     }
 }

@@ -1,14 +1,28 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import UpgradeModal from '@/Components/UpgradeModal.vue';
 import { usePermissions } from '@/Composables/usePermissions';
+import { useSubscription } from '@/Composables/useSubscription';
 
 const { canCreateSprints } = usePermissions();
+const { canCreateSprint, getRequiredPlan } = useSubscription();
 
 const props = defineProps({
     sprints: Array,
     brand: Object,
 });
+
+const showUpgradeModal = ref(false);
+
+const handleNewSprint = () => {
+    if (!canCreateSprint.value) {
+        showUpgradeModal.value = true;
+        return;
+    }
+    // Navigation happens via Link component
+};
 
 const statusColors = {
     pending: 'bg-[#0b1215]/10 text-[#0b1215]/70',
@@ -30,12 +44,19 @@ const statusColors = {
                     <p class="text-[#0b1215]/60">Generate blog post ideas with AI</p>
                 </div>
                 <Link
-                    v-if="canCreateSprints"
+                    v-if="canCreateSprints && canCreateSprint"
                     href="/content-sprints/create"
                     class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition"
                 >
                     New Sprint
                 </Link>
+                <button
+                    v-else-if="canCreateSprints && !canCreateSprint"
+                    @click="showUpgradeModal = true"
+                    class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition"
+                >
+                    New Sprint
+                </button>
             </div>
 
             <!-- Sprints List -->
@@ -83,13 +104,29 @@ const statusColors = {
                     {{ canCreateSprints ? 'Start a sprint to generate a month of blog post ideas.' : 'No content sprints have been created yet.' }}
                 </p>
                 <Link
-                    v-if="canCreateSprints"
+                    v-if="canCreateSprints && canCreateSprint"
                     href="/content-sprints/create"
                     class="mt-4 inline-block px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition"
                 >
                     Start Your First Sprint
                 </Link>
+                <button
+                    v-else-if="canCreateSprints && !canCreateSprint"
+                    @click="showUpgradeModal = true"
+                    class="mt-4 inline-block px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition"
+                >
+                    Start Your First Sprint
+                </button>
             </div>
         </div>
+
+        <UpgradeModal
+            :show="showUpgradeModal"
+            title="Content Sprint Limit Reached"
+            message="You've used all your content sprints for this month. Upgrade to generate more AI content ideas."
+            feature="content_sprints"
+            :required-plan="getRequiredPlan('content_sprints')"
+            @close="showUpgradeModal = false"
+        />
     </AppLayout>
 </template>

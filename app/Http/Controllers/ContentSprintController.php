@@ -110,6 +110,12 @@ class ContentSprintController extends Controller
             ['path' => $request->url()]
         );
 
+        // Get subscription limits for post creation
+        $account = auth()->user()->currentAccount();
+        $limits = $account?->subscriptionLimits();
+        $postLimit = $limits?->getPostLimit();
+        $remainingPosts = $limits?->getRemainingPosts();
+
         return Inertia::render('ContentSprint/Show', [
             'sprint' => [
                 'id' => $contentSprint->id,
@@ -125,6 +131,11 @@ class ContentSprintController extends Controller
             ],
             'ideas' => Inertia::scroll(fn () => $paginatedIdeas),
             'brand' => $brand,
+            'postLimits' => [
+                'limit' => $postLimit,
+                'remaining' => $remainingPosts,
+                'unlimited' => $postLimit === null,
+            ],
         ]);
     }
 

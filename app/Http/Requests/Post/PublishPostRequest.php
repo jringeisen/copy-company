@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Post;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 class PublishPostRequest extends FormRequest
 {
@@ -30,5 +31,40 @@ class PublishPostRequest extends FormRequest
             'scheduled_at.required_if' => 'A schedule date is required when scheduling for later.',
             'scheduled_at.after' => 'The scheduled date must be in the future.',
         ];
+    }
+
+    public function after(): array
+    {
+        return [
+            function (Validator $validator) {
+                $this->validateNewsletterSubscription($validator);
+            },
+        ];
+    }
+
+    protected function validateNewsletterSubscription(Validator $validator): void
+    {
+        // Only validate if trying to send newsletter
+        if (! $this->boolean('send_as_newsletter')) {
+            return;
+        }
+
+        /** @var \App\Models\User $user */
+        $user = $this->user();
+        $account = $user->currentAccount();
+
+        if (! $account) {
+            return;
+        }
+
+        $limits = $account->subscriptionLimits();
+
+        // Trial users cannot send newsletters
+        if ($limits->isOnFreeTrialOnly()) {
+            $validator->errors()->add(
+                'send_as_newsletter',
+                'Newsletter sending requires an active subscription. Please upgrade your plan to send newsletters.'
+            );
+        }
     }
 }

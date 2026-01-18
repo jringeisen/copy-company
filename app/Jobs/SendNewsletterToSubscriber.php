@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Mail\NewsletterMail;
 use App\Models\EmailEvent;
+use App\Models\EmailUsage;
 use App\Models\NewsletterSend;
 use App\Models\Subscriber;
 use Illuminate\Bus\Batchable;
@@ -65,6 +66,11 @@ class SendNewsletterToSubscriber implements ShouldQueue
             }
 
             $this->newsletterSend->increment('sent_count');
+
+            // Record email usage for metered billing
+            if ($account = $this->newsletterSend->brand?->account) {
+                EmailUsage::recordEmailSent($account);
+            }
 
             Log::debug('Newsletter sent to subscriber', [
                 'newsletter_send_id' => $this->newsletterSend->id,
