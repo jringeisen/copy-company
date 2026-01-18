@@ -38,6 +38,7 @@ class SubscriptionLimitsService
 
         if (! $priceId) {
             // Multi-price subscription - get from items
+            /** @var \Laravel\Cashier\SubscriptionItem|null $item */
             $item = $subscription->items->first();
             $priceId = $item?->stripe_price;
         }
@@ -59,6 +60,7 @@ class SubscriptionLimitsService
         $priceId = $subscription->stripe_price;
 
         if (! $priceId) {
+            /** @var \Laravel\Cashier\SubscriptionItem|null $item */
             $item = $subscription->items->first();
             $priceId = $item?->stripe_price;
         }

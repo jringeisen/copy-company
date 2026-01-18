@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Cashier\Billable;
 
+/**
+ * @property \Carbon\Carbon|null $trial_ends_at
+ */
 class Account extends Model
 {
     use Billable;

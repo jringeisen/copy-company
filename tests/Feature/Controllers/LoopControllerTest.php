@@ -1,7 +1,6 @@
 <?php
 
 use App\Enums\DayOfWeek;
-use App\Enums\SocialPlatform;
 use App\Models\Brand;
 use App\Models\Loop;
 use App\Models\LoopItem;

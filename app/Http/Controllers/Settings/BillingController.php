@@ -33,13 +33,13 @@ class BillingController extends Controller
         // Build invoices data
         $invoices = [];
         if ($account->hasStripeId()) {
-            $invoices = $account->invoices()->map(function ($invoice) {
+            $invoices = $account->invoices()->map(function (\Laravel\Cashier\Invoice $invoice) {
                 return [
-                    'id' => $invoice->id,
+                    'id' => $invoice->asStripeInvoice()->id,
                     'date' => $invoice->date()->format('M j, Y'),
                     'total' => $invoice->total(),
-                    'status' => $invoice->status,
-                    'download_url' => route('billing.invoice.download', $invoice->id),
+                    'status' => $invoice->asStripeInvoice()->status,
+                    'download_url' => route('billing.invoice.download', $invoice->asStripeInvoice()->id),
                 ];
             })->toArray();
         }
@@ -143,7 +143,7 @@ class BillingController extends Controller
                 ]);
         } catch (IncompletePayment $e) {
             return redirect()->route('cashier.payment', [
-                $e->payment->id,
+                $e->payment->asStripePaymentIntent()->id,
                 'redirect' => route('settings.billing'),
             ]);
         } catch (\Exception $e) {

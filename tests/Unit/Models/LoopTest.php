@@ -4,7 +4,6 @@ use App\Models\Brand;
 use App\Models\Loop;
 use App\Models\LoopItem;
 use App\Models\LoopSchedule;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
