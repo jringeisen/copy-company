@@ -4,8 +4,12 @@ import { ref, computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
 import UpgradeModal from '@/Components/UpgradeModal.vue';
+import SkeletonLoader from '@/Components/SkeletonLoader.vue';
 import { usePermissions } from '@/Composables/usePermissions';
 import { useSubscription } from '@/Composables/useSubscription';
+import { usePageLoading } from '@/Composables/usePageLoading';
+
+const { isLoading } = usePageLoading();
 
 const props = defineProps({
     posts: Object,
@@ -144,7 +148,11 @@ const getStatusColor = (status) => {
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-[#0b1215]/5">
-                        <tr v-for="post in posts.data" :key="post.id" class="hover:bg-[#0b1215]/[0.02] transition-colors">
+                        <!-- Loading skeleton rows -->
+                        <template v-if="isLoading">
+                            <SkeletonLoader v-for="i in 5" :key="i" type="table-row" />
+                        </template>
+                        <tr v-else v-for="post in posts.data" :key="post.id" class="hover:bg-[#0b1215]/[0.02] transition-colors">
                             <td v-if="canDeletePosts" class="px-6 py-4">
                                 <input
                                     type="checkbox"

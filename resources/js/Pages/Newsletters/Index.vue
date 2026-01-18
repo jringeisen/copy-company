@@ -1,10 +1,13 @@
 <script setup>
 import { Head, Link, InfiniteScroll } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { usePageLoading } from '@/Composables/usePageLoading';
 
 const props = defineProps({
     newsletters: Object,
 });
+
+const { isLoading } = usePageLoading();
 
 const statusColors = {
     draft: 'bg-[#0b1215]/10 text-[#0b1215]/70',
@@ -32,7 +35,27 @@ const formatNumber = (num) => {
             </div>
 
             <!-- Newsletter List -->
-            <InfiniteScroll v-if="newsletters.data.length > 0" data="newsletters" only-next class="space-y-4">
+            <div v-if="isLoading" class="space-y-4">
+                <!-- Skeleton cards -->
+                <div v-for="i in 4" :key="i" class="bg-white rounded-2xl border border-[#0b1215]/10 p-6 animate-pulse">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="h-5 bg-[#0b1215]/10 rounded w-64"></div>
+                                <div class="h-6 w-16 bg-[#0b1215]/10 rounded-full"></div>
+                            </div>
+                            <div class="h-4 bg-[#0b1215]/10 rounded w-48 mb-3"></div>
+                            <div class="flex flex-wrap items-center gap-4">
+                                <div class="h-4 bg-[#0b1215]/10 rounded w-24"></div>
+                                <div class="h-4 bg-[#0b1215]/10 rounded w-20"></div>
+                                <div class="h-4 bg-[#0b1215]/10 rounded w-20"></div>
+                            </div>
+                        </div>
+                        <div class="h-4 bg-[#0b1215]/10 rounded w-32 ml-4"></div>
+                    </div>
+                </div>
+            </div>
+            <InfiniteScroll v-else-if="newsletters.data.length > 0" data="newsletters" only-next class="space-y-4">
                 <Link
                     v-for="newsletter in newsletters.data"
                     :key="newsletter.id"

@@ -5,9 +5,11 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import UpgradeModal from '@/Components/UpgradeModal.vue';
 import { usePermissions } from '@/Composables/usePermissions';
 import { useSubscription } from '@/Composables/useSubscription';
+import { usePageLoading } from '@/Composables/usePageLoading';
 
 const { canCreateSprints } = usePermissions();
 const { canCreateSprint, getRequiredPlan } = useSubscription();
+const { isLoading } = usePageLoading();
 
 const props = defineProps({
     sprints: Array,
@@ -60,7 +62,27 @@ const statusColors = {
             </div>
 
             <!-- Sprints List -->
-            <div v-if="sprints.length > 0" class="space-y-4">
+            <div v-if="isLoading" class="space-y-4">
+                <!-- Skeleton cards -->
+                <div v-for="i in 3" :key="i" class="bg-white rounded-2xl border border-[#0b1215]/10 p-6 animate-pulse">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="h-5 bg-[#0b1215]/10 rounded w-48 mb-2"></div>
+                            <div class="flex items-center space-x-4 text-sm mb-2">
+                                <div class="h-4 bg-[#0b1215]/10 rounded w-24"></div>
+                                <div class="h-4 bg-[#0b1215]/10 rounded w-16"></div>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <div class="h-6 w-16 bg-[#0b1215]/10 rounded-lg"></div>
+                                <div class="h-6 w-20 bg-[#0b1215]/10 rounded-lg"></div>
+                                <div class="h-6 w-14 bg-[#0b1215]/10 rounded-lg"></div>
+                            </div>
+                        </div>
+                        <div class="h-7 w-20 bg-[#0b1215]/10 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+            <div v-else-if="sprints.length > 0" class="space-y-4">
                 <Link
                     v-for="sprint in sprints"
                     :key="sprint.id"

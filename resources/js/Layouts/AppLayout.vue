@@ -1,6 +1,7 @@
 <script setup>
 import { Link, usePage, useForm, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
+import ToastContainer from '@/Components/ToastContainer.vue';
 
 const props = defineProps({
     currentPage: {
@@ -521,5 +522,8 @@ const closeMobileMenu = () => {
                 <slot />
             </main>
         </div>
+
+        <!-- Toast Notifications -->
+        <ToastContainer />
     </div>
 </template>

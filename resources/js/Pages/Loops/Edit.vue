@@ -1,6 +1,6 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, watch, onMounted, onUnmounted } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({
@@ -19,6 +19,33 @@ const form = useForm({
         time_of_day: s.time_of_day,
         platform: s.platform,
     })) || [],
+});
+
+// Track unsaved changes
+const hasUnsavedChanges = ref(false);
+
+watch(
+    () => [form.name, form.description, form.platforms, form.is_active, form.schedules],
+    () => {
+        hasUnsavedChanges.value = true;
+    },
+    { deep: true }
+);
+
+// Warn before leaving with unsaved changes
+const handleBeforeUnload = (e) => {
+    if (hasUnsavedChanges.value) {
+        e.preventDefault();
+        e.returnValue = '';
+    }
+};
+
+onMounted(() => {
+    window.addEventListener('beforeunload', handleBeforeUnload);
+});
+
+onUnmounted(() => {
+    window.removeEventListener('beforeunload', handleBeforeUnload);
 });
 
 const showScheduleForm = ref(false);
@@ -43,7 +70,11 @@ const removeSchedule = (index) => {
 };
 
 const submit = () => {
-    form.put(`/loops/${props.loop.id}`);
+    form.put(`/loops/${props.loop.id}`, {
+        onSuccess: () => {
+            hasUnsavedChanges.value = false;
+        },
+    });
 };
 
 const getDayName = (dayValue) => {
@@ -68,8 +99,8 @@ const formatTime = (time) => {
         <div class="max-w-2xl mx-auto">
             <!-- Header -->
             <div class="mb-8">
-                <Link :href="`/loops/${loop.id}`" class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-4">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <Link :href="`/loops/${loop.id}`" class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-4" aria-label="Back to loop details">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
                     Back to Loop
@@ -115,6 +146,9 @@ const formatTime = (time) => {
                                     'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
                                     form.is_active ? 'bg-green-500' : 'bg-gray-200'
                                 ]"
+                                role="switch"
+                                :aria-checked="form.is_active"
+                                :aria-label="form.is_active ? 'Loop is active' : 'Loop is paused'"
                             >
                                 <span
                                     :class="[
@@ -188,8 +222,9 @@ const formatTime = (time) => {
                                 type="button"
                                 @click="removeSchedule(index)"
                                 class="text-gray-400 hover:text-red-500 transition-colors"
+                                aria-label="Remove schedule"
                             >
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
@@ -254,6 +289,9 @@ const formatTime = (time) => {
 
                 <!-- Submit -->
                 <div class="flex items-center justify-end gap-4">
+                    <span v-if="hasUnsavedChanges" class="text-sm text-[#a1854f]">
+                        Unsaved changes
+                    </span>
                     <Link :href="`/loops/${loop.id}`" class="px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
                         Cancel
                     </Link>

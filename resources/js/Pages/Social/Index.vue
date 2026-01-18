@@ -6,8 +6,12 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import SocialPostCard from '@/Components/Social/SocialPostCard.vue';
 import SocialPostEditor from '@/Components/Social/SocialPostEditor.vue';
 import { usePermissions } from '@/Composables/usePermissions';
+import { useToast } from '@/Composables/useToast';
+import { usePageLoading } from '@/Composables/usePageLoading';
 
 const { canManageSocial } = usePermissions();
+const toast = useToast();
+const { isLoading } = usePageLoading();
 
 const timezoneLabels = {
     'America/New_York': 'Eastern Time',
@@ -153,7 +157,7 @@ const generateSocialPosts = async () => {
         }
     } catch (error) {
         console.error('Failed to generate social posts:', error);
-        alert('Failed to generate social posts. Please try again.');
+        toast.error('Failed to generate social posts. Please try again.');
     } finally {
         isGenerating.value = false;
     }
@@ -232,7 +236,25 @@ const availablePlatformsForGenerate = [
             </div>
 
             <!-- Social Posts Grid -->
-            <div v-if="socialPosts.data.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div v-if="isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Skeleton cards -->
+                <div v-for="i in 6" :key="i" class="bg-white rounded-2xl border border-[#0b1215]/10 p-5 animate-pulse">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="h-5 w-20 bg-[#0b1215]/10 rounded-full"></div>
+                        <div class="h-6 w-16 bg-[#0b1215]/10 rounded-full"></div>
+                    </div>
+                    <div class="space-y-2 mb-4">
+                        <div class="h-4 bg-[#0b1215]/10 rounded w-full"></div>
+                        <div class="h-4 bg-[#0b1215]/10 rounded w-full"></div>
+                        <div class="h-4 bg-[#0b1215]/10 rounded w-3/4"></div>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="h-6 w-16 bg-[#0b1215]/10 rounded-full"></div>
+                        <div class="h-6 w-16 bg-[#0b1215]/10 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+            <div v-else-if="socialPosts.data.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <SocialPostCard
                     v-for="socialPost in socialPosts.data"
                     :key="socialPost.id"

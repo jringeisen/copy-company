@@ -6,7 +6,7 @@ import ConfirmModal from '@/Components/ConfirmModal.vue';
 import MediaPickerModal from '@/Components/Media/MediaPickerModal.vue';
 import { useAutosave } from '@/Composables/useAutosave';
 import { useSubscription } from '@/Composables/useSubscription';
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { marked } from 'marked';
 
 const { canSendNewsletter } = useSubscription();
@@ -157,6 +157,22 @@ const save = async () => {
     await autosaveNow();
 };
 
+// Keyboard shortcut for saving (Cmd+S / Ctrl+S)
+const handleKeydown = (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault();
+        save();
+    }
+};
+
+onMounted(() => {
+    document.addEventListener('keydown', handleKeydown);
+});
+
+onUnmounted(() => {
+    document.removeEventListener('keydown', handleKeydown);
+});
+
 // Computed for save status display
 const saveStatusText = computed(() => {
     if (autosaveStatus.value === 'saving' || form.processing) {
@@ -215,8 +231,8 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
                     <div class="flex items-center space-x-4">
-                        <Link href="/posts" :preserve-state="false" class="text-[#0b1215]/50 hover:text-[#0b1215] transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <Link href="/posts" :preserve-state="false" class="text-[#0b1215]/50 hover:text-[#0b1215] transition-colors" aria-label="Back to posts">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                             </svg>
                         </Link>
@@ -230,16 +246,33 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
                         </span>
                     </div>
                     <div class="flex items-center space-x-3">
-                        <span v-if="saveStatusText" class="text-sm" :class="saveStatusClass">
-                            {{ saveStatusText }}
-                        </span>
+                        <div v-if="saveStatusText" class="flex items-center gap-2">
+                            <!-- Saving spinner -->
+                            <svg v-if="autosaveStatus === 'saving' || form.processing" class="animate-spin h-4 w-4 text-[#0b1215]/50" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <!-- Success checkmark -->
+                            <svg v-else-if="autosaveStatus === 'saved'" class="h-4 w-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <!-- Error icon -->
+                            <svg v-else-if="autosaveStatus === 'error'" class="h-4 w-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="text-sm" :class="saveStatusClass">
+                                {{ saveStatusText }}
+                            </span>
+                        </div>
 
                         <button
                             @click="save"
                             :disabled="form.processing || autosaveStatus === 'saving'"
-                            class="px-4 py-2 border border-[#0b1215]/20 text-[#0b1215] font-medium rounded-full hover:bg-[#0b1215]/5 transition disabled:opacity-50 text-sm"
+                            class="px-4 py-2 border border-[#0b1215]/20 text-[#0b1215] font-medium rounded-full hover:bg-[#0b1215]/5 transition disabled:opacity-50 text-sm flex items-center gap-1.5"
+                            title="Save (⌘S)"
                         >
                             Save
+                            <kbd class="hidden sm:inline text-xs font-normal text-[#0b1215]/40 bg-[#0b1215]/5 px-1.5 py-0.5 rounded">⌘S</kbd>
                         </button>
 
                         <button
@@ -311,9 +344,9 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
                                         type="button"
                                         @click="showFeaturedImagePicker = true"
                                         class="p-1.5 bg-white/90 text-[#0b1215]/60 rounded-lg hover:bg-white hover:text-[#0b1215] transition shadow-sm"
-                                        title="Change image"
+                                        aria-label="Change featured image"
                                     >
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
                                         </svg>
                                     </button>
@@ -321,9 +354,9 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
                                         type="button"
                                         @click="removeFeaturedImage"
                                         class="p-1.5 bg-white/90 text-red-600 rounded-lg hover:bg-white transition shadow-sm"
-                                        title="Remove image"
+                                        aria-label="Remove featured image"
                                     >
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                         </svg>
                                     </button>
