@@ -44,6 +44,15 @@ Route::get('/', function () {
     return Inertia::render('Welcome');
 })->name('home');
 
+// Legal pages
+Route::get('/privacy-policy', function () {
+    return Inertia::render('PrivacyPolicy');
+})->name('privacy-policy');
+
+Route::get('/terms-of-service', function () {
+    return Inertia::render('TermsOfService');
+})->name('terms-of-service');
+
 // Public blog routes (/@username format)
 Route::get('/@{brand:slug}', [BlogController::class, 'index'])->name('public.blog.index');
 Route::get('/@{brand:slug}/{post:slug}', [BlogController::class, 'show'])->name('public.blog.show');

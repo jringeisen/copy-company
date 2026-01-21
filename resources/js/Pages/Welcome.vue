@@ -852,8 +852,16 @@ const formatCurrency = (num) => {
 
         <!-- Footer -->
         <footer class="bg-[#fcfbf8] border-t border-[#0b1215]/5 py-12 px-6 lg:px-12">
-            <div class="max-w-7xl mx-auto text-center text-[#0b1215]/50 text-sm">
-                &copy; {{ new Date().getFullYear() }} Copy Company. All rights reserved.
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="text-[#0b1215]/50 text-sm">
+                        &copy; {{ new Date().getFullYear() }} Copy Company. All rights reserved.
+                    </div>
+                    <div class="flex items-center gap-6 text-sm">
+                        <Link href="/privacy-policy" class="text-[#0b1215]/70 hover:text-[#0b1215] transition">Privacy Policy</Link>
+                        <Link href="/terms-of-service" class="text-[#0b1215]/70 hover:text-[#0b1215] transition">Terms of Service</Link>
+                    </div>
+                </div>
             </div>
         </footer>
     </div>
