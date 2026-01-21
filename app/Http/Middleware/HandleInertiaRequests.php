@@ -115,8 +115,22 @@ class HandleInertiaRequests extends Middleware
                         'custom_email_domain' => $limits->canUseCustomEmailDomain(),
                         'remove_branding' => $limits->canRemoveBranding(),
                         'analytics' => $limits->hasAnalytics(),
+                        'dedicated_ip' => $limits->canUseDedicatedIp(),
                     ],
                 ];
+            },
+
+            // Dedicated IP status for current brand
+            'dedicatedIp' => function () use ($request) {
+                /** @var \App\Models\User|null $user */
+                $user = $request->user();
+                $brand = $user?->currentBrand();
+
+                if (! $brand) {
+                    return null;
+                }
+
+                return $brand->getDedicatedIpInfo();
             },
         ];
     }

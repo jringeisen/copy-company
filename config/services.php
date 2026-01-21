@@ -40,6 +40,19 @@ return [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+        'configuration_set' => env('SES_CONFIGURATION_SET', 'shared-pool'),
+        'sns_topic_arn' => env('SES_SNS_TOPIC_ARN'),
+        'available_ip_pool' => env('SES_AVAILABLE_IP_POOL', 'available-pool'),
+        'warmup_percentages' => [
+            1 => 5,   2 => 10,  3 => 15,  4 => 20,  5 => 25,
+            6 => 30,  7 => 35,  8 => 40,  9 => 45,  10 => 50,
+            11 => 55, 12 => 60, 13 => 65, 14 => 70, 15 => 75,
+            16 => 80, 17 => 85, 18 => 90, 19 => 95, 20 => 100,
+        ],
+        'warmup_inactivity_days' => 7,
+        'bounce_rate_threshold' => 0.05,
+        'complaint_rate_threshold' => 0.001,
+        'min_available_ips_alert' => 3,
     ],
 
     'slack' => [

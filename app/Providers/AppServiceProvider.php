@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Listeners\HandleProSubscription;
+use App\Listeners\HandleSubscriptionDowngrade;
 use App\Models\Account;
 use App\Services\Newsletter\BuiltInNewsletterService;
 use App\Services\Newsletter\NewsletterServiceInterface;
@@ -10,6 +12,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Cashier\Cashier;
+use Laravel\Cashier\Events\WebhookReceived;
 use SocialiteProviders\Manager\SocialiteWasCalled;
 use SocialiteProviders\Pinterest\PinterestExtendSocialite;
 use SocialiteProviders\TikTok\TikTokExtendSocialite;
@@ -44,5 +47,9 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('ses-sending', function (object $job) {
             return Limit::perSecond(10);
         });
+
+        // Handle dedicated IP provisioning/release on subscription changes
+        Event::listen(WebhookReceived::class, HandleProSubscription::class);
+        Event::listen(WebhookReceived::class, HandleSubscriptionDowngrade::class);
     }
 }

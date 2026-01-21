@@ -278,6 +278,14 @@ class SubscriptionLimitsService
     }
 
     /**
+     * Check if the current plan includes dedicated IP support.
+     */
+    public function canUseDedicatedIp(): bool
+    {
+        return $this->getPlan()?->hasDedicatedIpSupport() ?? false;
+    }
+
+    /**
      * Get the number of emails sent this billing period (current month).
      */
     public function getEmailsSentThisMonth(): int
@@ -346,6 +354,7 @@ class SubscriptionLimitsService
                 'custom_email_domain' => $this->canUseCustomEmailDomain(),
                 'remove_branding' => $this->canRemoveBranding(),
                 'analytics' => $this->hasAnalytics(),
+                'dedicated_ip' => $this->canUseDedicatedIp(),
             ],
             'emails' => [
                 'sent' => $this->getEmailsSentThisMonth(),
@@ -362,7 +371,7 @@ class SubscriptionLimitsService
     {
         return match ($feature) {
             'custom_domain', 'analytics' => SubscriptionPlan::Creator,
-            'custom_email_domain', 'remove_branding' => SubscriptionPlan::Pro,
+            'custom_email_domain', 'remove_branding', 'dedicated_ip' => SubscriptionPlan::Pro,
             default => SubscriptionPlan::Starter,
         };
     }
