@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Enums\DedicatedIpStatus;
 use App\Models\Brand;
-use App\Models\DedicatedIp;
 use App\Models\DedicatedIpLog;
 use App\Models\User;
 use Aws\SesV2\SesV2Client;
@@ -27,22 +26,22 @@ class SesDedicatedIpService
     }
 
     /**
-     * Provision AWS resources for a brand's dedicated IP.
-     * Creates Configuration Set and IP Pool in AWS.
+     * Provision managed dedicated IP access for a Pro user.
+     * Creates Configuration Set pointing to the shared managed IP pool.
      *
      * @return array{success: bool, message: string}
      */
-    public function provisionDedicatedIp(Brand $brand, ?User $admin = null): array
+    public function provisionForProUser(Brand $brand, ?User $admin = null): array
     {
         $configSetName = "brand-{$brand->id}-config";
-        $poolName = "brand-{$brand->id}-pool";
+        $managedPoolName = config('services.ses.managed_ip_pool', 'pro-managed-pool');
 
         try {
-            // Create Configuration Set
+            // Create Configuration Set pointing to managed pool
             $this->ses->createConfigurationSet([
                 'ConfigurationSetName' => $configSetName,
                 'DeliveryOptions' => [
-                    'SendingPoolName' => config('services.ses.available_ip_pool', 'available-pool'),
+                    'SendingPoolName' => $managedPoolName,
                 ],
                 'ReputationOptions' => [
                     'ReputationMetricsEnabled' => true,
@@ -50,12 +49,6 @@ class SesDedicatedIpService
                 'SendingOptions' => [
                     'SendingEnabled' => true,
                 ],
-            ]);
-
-            // Create dedicated IP pool for this brand
-            $this->ses->createDedicatedIpPool([
-                'PoolName' => $poolName,
-                'ScalingMode' => 'STANDARD',
             ]);
 
             // Add event destination for tracking
@@ -76,8 +69,7 @@ class SesDedicatedIpService
 
             $brand->update([
                 'ses_configuration_set' => $configSetName,
-                'ses_dedicated_ip_pool' => $poolName,
-                'dedicated_ip_status' => DedicatedIpStatus::Provisioning,
+                'dedicated_ip_status' => DedicatedIpStatus::Active,
                 'dedicated_ip_provisioned_at' => now(),
             ]);
 
@@ -86,20 +78,20 @@ class SesDedicatedIpService
                 'action' => 'provisioned',
                 'metadata' => [
                     'configuration_set' => $configSetName,
-                    'ip_pool' => $poolName,
+                    'managed_pool' => $managedPoolName,
                 ],
                 'admin_user_id' => $admin?->id,
             ]);
 
-            Log::info('Dedicated IP resources provisioned for brand', [
+            Log::info('Managed dedicated IP access provisioned for brand', [
                 'brand_id' => $brand->id,
                 'configuration_set' => $configSetName,
-                'ip_pool' => $poolName,
+                'managed_pool' => $managedPoolName,
             ]);
 
-            return ['success' => true, 'message' => 'Resources provisioned successfully'];
+            return ['success' => true, 'message' => 'Managed IP access provisioned successfully'];
         } catch (\Exception $e) {
-            Log::error('Failed to provision dedicated IP resources', [
+            Log::error('Failed to provision managed dedicated IP access', [
                 'brand_id' => $brand->id,
                 'error' => $e->getMessage(),
             ]);
@@ -109,155 +101,15 @@ class SesDedicatedIpService
     }
 
     /**
-     * Assign a dedicated IP to a brand's pool and start warmup.
+     * Release a brand's managed dedicated IP access (on downgrade or churn).
      *
      * @return array{success: bool, message: string}
      */
-    public function assignDedicatedIp(Brand $brand, DedicatedIp $dedicatedIp, ?User $admin = null): array
+    public function releaseProUser(Brand $brand, ?User $admin = null, string $reason = 'downgrade'): array
     {
-        if (! $brand->ses_dedicated_ip_pool) {
-            return ['success' => false, 'message' => 'Brand does not have a dedicated IP pool provisioned'];
-        }
-
-        if (! $dedicatedIp->isAvailable()) {
-            return ['success' => false, 'message' => 'IP is not available for assignment'];
-        }
-
-        try {
-            // Move IP from available pool to brand's pool
-            $this->ses->putDedicatedIpInPool([
-                'Ip' => $dedicatedIp->ip_address,
-                'DestinationPoolName' => $brand->ses_dedicated_ip_pool,
-            ]);
-
-            // Update Configuration Set to use brand's pool
-            $this->ses->putConfigurationSetDeliveryOptions([
-                'ConfigurationSetName' => $brand->ses_configuration_set,
-                'SendingPoolName' => $brand->ses_dedicated_ip_pool,
-            ]);
-
-            // Update dedicated IP record
-            $dedicatedIp->update([
-                'status' => 'assigned',
-                'brand_id' => $brand->id,
-                'assigned_at' => now(),
-            ]);
-
-            // Update brand
-            $brand->update([
-                'dedicated_ip_address' => $dedicatedIp->ip_address,
-                'dedicated_ip_status' => DedicatedIpStatus::Warming,
-                'dedicated_ip_warmup_started_at' => now(),
-                'warmup_day' => 1,
-                'warmup_daily_stats' => [],
-                'warmup_paused' => false,
-            ]);
-
-            DedicatedIpLog::create([
-                'brand_id' => $brand->id,
-                'action' => 'ip_assigned',
-                'ip_address' => $dedicatedIp->ip_address,
-                'metadata' => [
-                    'warmup_started' => true,
-                ],
-                'admin_user_id' => $admin?->id,
-            ]);
-
-            Log::info('Dedicated IP assigned to brand', [
-                'brand_id' => $brand->id,
-                'ip_address' => $dedicatedIp->ip_address,
-            ]);
-
-            return ['success' => true, 'message' => 'IP assigned successfully, warmup started'];
-        } catch (\Exception $e) {
-            Log::error('Failed to assign dedicated IP', [
-                'brand_id' => $brand->id,
-                'ip_address' => $dedicatedIp->ip_address,
-                'error' => $e->getMessage(),
-            ]);
-
-            return ['success' => false, 'message' => $e->getMessage()];
-        }
-    }
-
-    /**
-     * Get warmup status for a brand's dedicated IP.
-     *
-     * @return array{success: bool, data?: array<string, mixed>, message?: string}
-     */
-    public function getWarmupStatus(Brand $brand): array
-    {
-        if (! $brand->dedicated_ip_address) {
-            return ['success' => false, 'message' => 'Brand does not have a dedicated IP'];
-        }
-
-        try {
-            $result = $this->ses->getDedicatedIp([
-                'Ip' => $brand->dedicated_ip_address,
-            ]);
-
-            $ip = $result['DedicatedIp'];
-
-            return [
-                'success' => true,
-                'data' => [
-                    'ip_address' => $ip['Ip'],
-                    'warmup_status' => $ip['WarmupStatus'],
-                    'warmup_percentage' => $ip['WarmupPercentage'],
-                ],
-            ];
-        } catch (\Exception $e) {
-            Log::error('Failed to get warmup status', [
-                'brand_id' => $brand->id,
-                'error' => $e->getMessage(),
-            ]);
-
-            return ['success' => false, 'message' => $e->getMessage()];
-        }
-    }
-
-    /**
-     * Release a brand's dedicated IP (on downgrade or churn).
-     *
-     * @return array{success: bool, message: string}
-     */
-    public function releaseDedicatedIp(Brand $brand, ?User $admin = null, string $reason = 'downgrade'): array
-    {
-        $ipAddress = $brand->dedicated_ip_address;
-        $poolName = $brand->ses_dedicated_ip_pool;
         $configSetName = $brand->ses_configuration_set;
 
         try {
-            // Move IP back to available pool
-            if ($ipAddress) {
-                $availablePool = config('services.ses.available_ip_pool', 'available-pool');
-                $this->ses->putDedicatedIpInPool([
-                    'Ip' => $ipAddress,
-                    'DestinationPoolName' => $availablePool,
-                ]);
-
-                // Update the dedicated IP record
-                DedicatedIp::where('ip_address', $ipAddress)->update([
-                    'status' => 'available',
-                    'brand_id' => null,
-                    'released_at' => now(),
-                ]);
-            }
-
-            // Delete brand's IP pool
-            if ($poolName) {
-                try {
-                    $this->ses->deleteDedicatedIpPool([
-                        'PoolName' => $poolName,
-                    ]);
-                } catch (\Exception $e) {
-                    Log::warning('Could not delete IP pool (may not exist)', [
-                        'pool' => $poolName,
-                        'error' => $e->getMessage(),
-                    ]);
-                }
-            }
-
             // Delete Configuration Set
             if ($configSetName) {
                 try {
@@ -275,33 +127,28 @@ class SesDedicatedIpService
             // Update brand
             $brand->update([
                 'ses_configuration_set' => null,
-                'ses_dedicated_ip_pool' => null,
-                'dedicated_ip_address' => null,
                 'dedicated_ip_status' => DedicatedIpStatus::Released,
-                'warmup_day' => null,
-                'warmup_daily_stats' => null,
-                'warmup_paused' => false,
             ]);
 
             DedicatedIpLog::create([
                 'brand_id' => $brand->id,
-                'action' => 'ip_released',
-                'ip_address' => $ipAddress,
+                'action' => 'released',
                 'metadata' => [
                     'reason' => $reason,
+                    'configuration_set' => $configSetName,
                 ],
                 'admin_user_id' => $admin?->id,
             ]);
 
-            Log::info('Dedicated IP released from brand', [
+            Log::info('Managed dedicated IP access released from brand', [
                 'brand_id' => $brand->id,
-                'ip_address' => $ipAddress,
+                'configuration_set' => $configSetName,
                 'reason' => $reason,
             ]);
 
-            return ['success' => true, 'message' => 'IP released successfully'];
+            return ['success' => true, 'message' => 'Managed IP access released successfully'];
         } catch (\Exception $e) {
-            Log::error('Failed to release dedicated IP', [
+            Log::error('Failed to release managed dedicated IP access', [
                 'brand_id' => $brand->id,
                 'error' => $e->getMessage(),
             ]);
@@ -325,7 +172,6 @@ class SesDedicatedIpService
             DedicatedIpLog::create([
                 'brand_id' => $brand->id,
                 'action' => 'suspended',
-                'ip_address' => $brand->dedicated_ip_address,
                 'metadata' => [
                     'bounce_rate' => $metrics['bounce_rate'] ?? null,
                     'complaint_rate' => $metrics['complaint_rate'] ?? null,
@@ -333,15 +179,14 @@ class SesDedicatedIpService
                 'admin_user_id' => $admin?->id,
             ]);
 
-            Log::warning('Dedicated IP suspended due to reputation issues', [
+            Log::warning('Dedicated IP access suspended due to reputation issues', [
                 'brand_id' => $brand->id,
-                'ip_address' => $brand->dedicated_ip_address,
                 'metrics' => $metrics,
             ]);
 
-            return ['success' => true, 'message' => 'IP suspended'];
+            return ['success' => true, 'message' => 'Dedicated IP access suspended'];
         } catch (\Exception $e) {
-            Log::error('Failed to suspend dedicated IP', [
+            Log::error('Failed to suspend dedicated IP access', [
                 'brand_id' => $brand->id,
                 'error' => $e->getMessage(),
             ]);
@@ -358,7 +203,7 @@ class SesDedicatedIpService
     public function reactivateDedicatedIp(Brand $brand, ?User $admin = null): array
     {
         if ($brand->dedicated_ip_status !== DedicatedIpStatus::Suspended) {
-            return ['success' => false, 'message' => 'IP is not suspended'];
+            return ['success' => false, 'message' => 'Dedicated IP access is not suspended'];
         }
 
         try {
@@ -369,83 +214,16 @@ class SesDedicatedIpService
             DedicatedIpLog::create([
                 'brand_id' => $brand->id,
                 'action' => 'reactivated',
-                'ip_address' => $brand->dedicated_ip_address,
                 'admin_user_id' => $admin?->id,
             ]);
 
-            Log::info('Dedicated IP reactivated', [
+            Log::info('Dedicated IP access reactivated', [
                 'brand_id' => $brand->id,
-                'ip_address' => $brand->dedicated_ip_address,
             ]);
 
-            return ['success' => true, 'message' => 'IP reactivated'];
+            return ['success' => true, 'message' => 'Dedicated IP access reactivated'];
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
         }
-    }
-
-    /**
-     * Get list of available IPs in the pool.
-     *
-     * @return array<int, array{ip_address: string, warmup_status: string}>
-     */
-    public function getAvailableIps(): array
-    {
-        try {
-            $poolName = config('services.ses.available_ip_pool', 'available-pool');
-            $result = $this->ses->getDedicatedIpsFromPool([
-                'PoolName' => $poolName,
-            ]);
-
-            return collect($result['DedicatedIps'] ?? [])->map(fn ($ip) => [
-                'ip_address' => $ip['Ip'],
-                'warmup_status' => $ip['WarmupStatus'],
-                'warmup_percentage' => $ip['WarmupPercentage'],
-            ])->toArray();
-        } catch (\Exception $e) {
-            Log::error('Failed to get available IPs', ['error' => $e->getMessage()]);
-
-            return [];
-        }
-    }
-
-    /**
-     * Sync AWS dedicated IPs with local database.
-     */
-    public function syncDedicatedIps(): void
-    {
-        $awsIps = $this->getAvailableIps();
-
-        foreach ($awsIps as $awsIp) {
-            DedicatedIp::updateOrCreate(
-                ['ip_address' => $awsIp['ip_address']],
-                [
-                    'status' => 'available',
-                    'purchased_at' => now(),
-                ]
-            );
-        }
-    }
-
-    /**
-     * Mark warmup as complete for a brand.
-     */
-    public function completeWarmup(Brand $brand): void
-    {
-        $brand->update([
-            'dedicated_ip_status' => DedicatedIpStatus::Active,
-            'dedicated_ip_warmup_completed_at' => now(),
-        ]);
-
-        DedicatedIpLog::create([
-            'brand_id' => $brand->id,
-            'action' => 'warmup_completed',
-            'ip_address' => $brand->dedicated_ip_address,
-        ]);
-
-        Log::info('Dedicated IP warmup completed', [
-            'brand_id' => $brand->id,
-            'ip_address' => $brand->dedicated_ip_address,
-        ]);
     }
 }

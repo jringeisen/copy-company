@@ -4,11 +4,8 @@ namespace App\Listeners;
 
 use App\Enums\SubscriptionPlan;
 use App\Models\Account;
-use App\Models\User;
-use App\Notifications\DedicatedIpAssignmentNeeded;
 use App\Services\SesDedicatedIpService;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Notification;
 use Laravel\Cashier\Events\WebhookReceived;
 
 class HandleProSubscription
@@ -66,41 +63,17 @@ class HandleProSubscription
             return;
         }
 
-        // Provision dedicated IP resources for each brand
+        // Provision managed dedicated IP access for each brand
         foreach ($account->brands as $brand) {
             if (! $brand->hasDedicatedIp()) {
-                $result = $this->service->provisionDedicatedIp($brand);
+                $result = $this->service->provisionForProUser($brand);
 
-                Log::info('Provisioned dedicated IP resources for new Pro brand', [
+                Log::info('Provisioned managed dedicated IP access for new Pro brand', [
                     'brand_id' => $brand->id,
                     'account_id' => $account->id,
                     'result' => $result,
                 ]);
             }
-        }
-
-        // Notify admins that IP assignment is needed
-        $this->notifyAdmins($account);
-    }
-
-    private function notifyAdmins(Account $account): void
-    {
-        // Get admin users - customize this based on your admin role system
-        $admins = User::where('email', 'like', '%@'.parse_url(config('app.url'), PHP_URL_HOST))->get();
-
-        if ($admins->isEmpty()) {
-            Log::warning('No admins found to notify about IP assignment');
-
-            return;
-        }
-
-        try {
-            Notification::send($admins, new DedicatedIpAssignmentNeeded($account));
-        } catch (\Exception $e) {
-            Log::error('Failed to send IP assignment notification', [
-                'account_id' => $account->id,
-                'error' => $e->getMessage(),
-            ]);
         }
     }
 }

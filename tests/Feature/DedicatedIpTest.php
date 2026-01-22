@@ -3,7 +3,6 @@
 use App\Enums\DedicatedIpStatus;
 use App\Enums\SubscriptionPlan;
 use App\Models\Brand;
-use App\Models\DedicatedIp;
 use App\Models\DedicatedIpLog;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -23,21 +22,10 @@ test('brand has no dedicated ip by default', function () {
 test('brand has dedicated ip when status is active', function () {
     $brand = Brand::factory()->create([
         'dedicated_ip_status' => DedicatedIpStatus::Active,
-        'dedicated_ip_address' => '54.240.1.1',
+        'ses_configuration_set' => 'brand-1-config',
     ]);
 
     expect($brand->hasDedicatedIp())->toBeTrue();
-});
-
-test('brand has dedicated ip when status is warming', function () {
-    $brand = Brand::factory()->create([
-        'dedicated_ip_status' => DedicatedIpStatus::Warming,
-        'dedicated_ip_address' => '54.240.1.1',
-        'warmup_day' => 5,
-    ]);
-
-    expect($brand->hasDedicatedIp())->toBeTrue();
-    expect($brand->isInWarmupPeriod())->toBeTrue();
 });
 
 test('brand does not have dedicated ip when released', function () {
@@ -48,82 +36,12 @@ test('brand does not have dedicated ip when released', function () {
     expect($brand->hasDedicatedIp())->toBeFalse();
 });
 
-// Warmup Logic Tests
-
-test('brand should always use dedicated ip when active', function () {
+test('brand does not have dedicated ip when suspended', function () {
     $brand = Brand::factory()->create([
-        'dedicated_ip_status' => DedicatedIpStatus::Active,
-        'dedicated_ip_address' => '54.240.1.1',
+        'dedicated_ip_status' => DedicatedIpStatus::Suspended,
     ]);
 
-    // Run 100 times to ensure it's always true for active status
-    for ($i = 0; $i < 100; $i++) {
-        expect($brand->shouldUseDedicatedIp())->toBeTrue();
-    }
-});
-
-test('brand should never use dedicated ip when none', function () {
-    $brand = Brand::factory()->create([
-        'dedicated_ip_status' => DedicatedIpStatus::None,
-    ]);
-
-    for ($i = 0; $i < 100; $i++) {
-        expect($brand->shouldUseDedicatedIp())->toBeFalse();
-    }
-});
-
-test('brand uses percentage-based routing during warmup', function () {
-    $brand = Brand::factory()->create([
-        'dedicated_ip_status' => DedicatedIpStatus::Warming,
-        'dedicated_ip_address' => '54.240.1.1',
-        'warmup_day' => 10, // Day 10 = 50% according to config
-    ]);
-
-    // Run many iterations and check that it's roughly 50%
-    $usedDedicatedIp = 0;
-    $iterations = 1000;
-
-    for ($i = 0; $i < $iterations; $i++) {
-        if ($brand->shouldUseDedicatedIp()) {
-            $usedDedicatedIp++;
-        }
-    }
-
-    // Should be roughly 50% with some variance
-    $percentage = ($usedDedicatedIp / $iterations) * 100;
-    expect($percentage)->toBeGreaterThan(40);
-    expect($percentage)->toBeLessThan(60);
-});
-
-test('warmup progress is calculated correctly', function () {
-    $brand = Brand::factory()->create([
-        'dedicated_ip_status' => DedicatedIpStatus::Warming,
-        'warmup_day' => 10,
-    ]);
-
-    expect($brand->getWarmupProgress())->toBe(50);
-
-    $brand->warmup_day = 20;
-    expect($brand->getWarmupProgress())->toBe(100);
-
-    $brand->warmup_day = 1;
-    expect($brand->getWarmupProgress())->toBe(5);
-});
-
-test('warmup progress is 100 when active', function () {
-    $brand = Brand::factory()->create([
-        'dedicated_ip_status' => DedicatedIpStatus::Active,
-    ]);
-
-    expect($brand->getWarmupProgress())->toBe(100);
-});
-
-test('warmup progress is 0 when not warming', function () {
-    $brand = Brand::factory()->create([
-        'dedicated_ip_status' => DedicatedIpStatus::None,
-    ]);
-
-    expect($brand->getWarmupProgress())->toBe(0);
+    expect($brand->hasDedicatedIp())->toBeFalse();
 });
 
 // Configuration Set Tests
@@ -147,55 +65,42 @@ test('brand returns dedicated configuration set when active', function () {
     expect($brand->getSesConfigurationSet())->toBe('brand-123-config');
 });
 
+test('brand returns shared configuration set when suspended', function () {
+    $brand = Brand::factory()->create([
+        'dedicated_ip_status' => DedicatedIpStatus::Suspended,
+        'ses_configuration_set' => 'brand-123-config',
+    ]);
+
+    // Suspended brands still have config set but hasDedicatedIp returns false
+    expect($brand->getSesConfigurationSet())->toBe('brand-123-config');
+    expect($brand->hasDedicatedIp())->toBeFalse();
+});
+
 // Dedicated IP Info Tests
 
-test('brand returns correct dedicated ip info', function () {
+test('brand returns correct dedicated ip info when active', function () {
     $brand = Brand::factory()->create([
-        'dedicated_ip_status' => DedicatedIpStatus::Warming,
-        'dedicated_ip_address' => '54.240.1.1',
-        'warmup_day' => 10,
-        'warmup_paused' => false,
+        'dedicated_ip_status' => DedicatedIpStatus::Active,
+        'ses_configuration_set' => 'brand-1-config',
     ]);
 
     $info = $brand->getDedicatedIpInfo();
 
-    expect($info['status'])->toBe('warming');
-    expect($info['status_label'])->toBe('Warming Up');
+    expect($info['status'])->toBe('active');
+    expect($info['status_label'])->toBe('Active');
     expect($info['has_dedicated_ip'])->toBeTrue();
-    expect($info['is_warming'])->toBeTrue();
-    expect($info['warmup_day'])->toBe(10);
-    expect($info['warmup_progress'])->toBe(50);
-    expect($info['warmup_paused'])->toBeFalse();
-    expect($info['ip_address'])->toBe('54.240.1.1');
 });
 
-// Dedicated IP Model Tests
-
-test('dedicated ip can be created', function () {
-    $ip = DedicatedIp::factory()->create([
-        'ip_address' => '54.240.1.100',
-        'status' => 'available',
+test('brand returns correct dedicated ip info when none', function () {
+    $brand = Brand::factory()->create([
+        'dedicated_ip_status' => DedicatedIpStatus::None,
     ]);
 
-    expect($ip->ip_address)->toBe('54.240.1.100');
-    expect($ip->isAvailable())->toBeTrue();
-});
+    $info = $brand->getDedicatedIpInfo();
 
-test('dedicated ip can be assigned to brand', function () {
-    $brand = Brand::factory()->create();
-    $ip = DedicatedIp::factory()->assigned()->create([
-        'brand_id' => $brand->id,
-    ]);
-
-    expect($ip->isAssigned())->toBeTrue();
-    expect($ip->brand->id)->toBe($brand->id);
-});
-
-test('available scope returns only available ips', function () {
-    DedicatedIp::factory()->count(3)->create(['status' => 'available']);
-    DedicatedIp::factory()->count(2)->create(['status' => 'assigned']);
-
-    expect(DedicatedIp::available()->count())->toBe(3);
+    expect($info['status'])->toBe('none');
+    expect($info['status_label'])->toBe('No Dedicated IP');
+    expect($info['has_dedicated_ip'])->toBeFalse();
 });
 
 // Dedicated IP Log Tests
@@ -206,16 +111,15 @@ test('dedicated ip log can be created', function () {
 
     $log = DedicatedIpLog::create([
         'brand_id' => $brand->id,
-        'action' => 'ip_assigned',
-        'ip_address' => '54.240.1.1',
-        'metadata' => ['warmup_started' => true],
+        'action' => 'provisioned',
+        'metadata' => ['configuration_set' => 'brand-1-config', 'managed_pool' => 'pro-managed-pool'],
         'admin_user_id' => $user->id,
     ]);
 
-    expect($log->action)->toBe('ip_assigned');
+    expect($log->action)->toBe('provisioned');
     expect($log->brand->id)->toBe($brand->id);
     expect($log->adminUser->id)->toBe($user->id);
-    expect($log->metadata)->toBe(['warmup_started' => true]);
+    expect($log->metadata)->toBe(['configuration_set' => 'brand-1-config', 'managed_pool' => 'pro-managed-pool']);
 });
 
 // Subscription Plan Tests
@@ -241,8 +145,6 @@ test('pro plan has updated pricing', function () {
 
 test('dedicated ip status has correct labels', function () {
     expect(DedicatedIpStatus::None->label())->toBe('No Dedicated IP');
-    expect(DedicatedIpStatus::Provisioning->label())->toBe('Provisioning');
-    expect(DedicatedIpStatus::Warming->label())->toBe('Warming Up');
     expect(DedicatedIpStatus::Active->label())->toBe('Active');
     expect(DedicatedIpStatus::Suspended->label())->toBe('Suspended');
     expect(DedicatedIpStatus::Released->label())->toBe('Released');
@@ -250,8 +152,6 @@ test('dedicated ip status has correct labels', function () {
 
 test('dedicated ip status knows if it can use dedicated ip', function () {
     expect(DedicatedIpStatus::None->canUseDedicatedIp())->toBeFalse();
-    expect(DedicatedIpStatus::Provisioning->canUseDedicatedIp())->toBeFalse();
-    expect(DedicatedIpStatus::Warming->canUseDedicatedIp())->toBeTrue();
     expect(DedicatedIpStatus::Active->canUseDedicatedIp())->toBeTrue();
     expect(DedicatedIpStatus::Suspended->canUseDedicatedIp())->toBeFalse();
     expect(DedicatedIpStatus::Released->canUseDedicatedIp())->toBeFalse();

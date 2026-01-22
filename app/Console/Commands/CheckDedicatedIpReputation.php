@@ -20,11 +20,9 @@ class CheckDedicatedIpReputation extends Command
 
     public function handle(SesDedicatedIpService $service): int
     {
-        $brands = Brand::where('dedicated_ip_status', DedicatedIpStatus::Active)
-            ->orWhere('dedicated_ip_status', DedicatedIpStatus::Warming)
-            ->get();
+        $brands = Brand::where('dedicated_ip_status', DedicatedIpStatus::Active)->get();
 
-        $this->info("Checking reputation for {$brands->count()} brands with dedicated IPs...");
+        $this->info("Checking reputation for {$brands->count()} brands with dedicated IP access...");
 
         $bounceThreshold = config('services.ses.bounce_rate_threshold', 0.05);
         $complaintThreshold = config('services.ses.complaint_rate_threshold', 0.001);
@@ -111,6 +109,6 @@ class CheckDedicatedIpReputation extends Command
             }
         }
 
-        $this->warn("Brand {$brand->id}: Dedicated IP suspended due to reputation issues");
+        $this->warn("Brand {$brand->id}: Dedicated IP access suspended due to reputation issues");
     }
 }

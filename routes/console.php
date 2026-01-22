@@ -28,11 +28,5 @@ Schedule::command('ses:check-reputation')->hourly();
 // Report email usage to Stripe for metered billing (hourly)
 Schedule::command('billing:report-email-usage')->hourly();
 
-// Process dedicated IP warmup daily at 00:05
-Schedule::command('dedicated-ip:process-warmup')->dailyAt('00:05');
-
 // Check dedicated IP reputation hourly
 Schedule::command('dedicated-ip:check-reputation')->hourly();
-
-// Check dedicated IP pool availability daily at 09:00
-Schedule::command('dedicated-ip:check-pool')->dailyAt('09:00');

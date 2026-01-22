@@ -53,7 +53,7 @@ class HandleSubscriptionDowngrade
         // Release dedicated IPs for all brands in this account
         foreach ($account->brands as $brand) {
             if ($brand->hasDedicatedIp()) {
-                $result = $this->service->releaseDedicatedIp($brand, null, 'subscription_downgrade');
+                $result = $this->service->releaseProUser($brand, null, 'subscription_downgrade');
 
                 Log::info('Released dedicated IP on subscription downgrade', [
                     'brand_id' => $brand->id,

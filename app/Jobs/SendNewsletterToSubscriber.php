@@ -54,11 +54,8 @@ class SendNewsletterToSubscriber implements ShouldQueue
             /** @var Brand $brand */
             $brand = $this->newsletterSend->brand;
 
-            // Determine if this email should use the dedicated IP
-            $useDedicatedIp = $brand->shouldUseDedicatedIp();
-            $configSet = $useDedicatedIp
-                ? $brand->getSesConfigurationSet()
-                : config('services.ses.configuration_set', 'shared-pool');
+            // Use the brand's configuration set (managed pool for Pro, shared pool for others)
+            $configSet = $brand->getSesConfigurationSet();
 
             $mailable = new NewsletterMail($this->newsletterSend, $this->subscriber);
 
@@ -90,18 +87,12 @@ class SendNewsletterToSubscriber implements ShouldQueue
                 EmailUsage::recordEmailSent($account);
             }
 
-            // Track warmup sends if in warmup period
-            if ($brand->isInWarmupPeriod()) {
-                $this->trackWarmupSend($brand, $useDedicatedIp);
-            }
-
             Log::debug('Newsletter sent to subscriber', [
                 'newsletter_send_id' => $this->newsletterSend->id,
                 'subscriber_id' => $this->subscriber->id,
                 'email' => $this->subscriber->email,
                 'ses_message_id' => $messageId,
                 'config_set' => $configSet,
-                'used_dedicated_ip' => $useDedicatedIp,
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to send newsletter to subscriber', [
@@ -116,29 +107,5 @@ class SendNewsletterToSubscriber implements ShouldQueue
             // Re-throw to let the batch know this job failed
             throw $e;
         }
-    }
-
-    /**
-     * Track warmup sending stats.
-     */
-    private function trackWarmupSend(Brand $brand, bool $usedDedicatedIp): void
-    {
-        $stats = $brand->warmup_daily_stats ?? [];
-        $today = now()->toDateString();
-
-        if (! isset($stats[$today])) {
-            $stats[$today] = ['dedicated' => 0, 'shared' => 0];
-        }
-
-        if ($usedDedicatedIp) {
-            $stats[$today]['dedicated']++;
-        } else {
-            $stats[$today]['shared']++;
-        }
-
-        $brand->updateQuietly([
-            'warmup_daily_stats' => $stats,
-            'last_warmup_send_at' => now(),
-        ]);
     }
 }
