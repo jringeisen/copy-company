@@ -62,6 +62,9 @@ class Brand extends Model
         'dedicated_ip_provisioned_at' => 'datetime',
     ];
 
+    /**
+     * @return BelongsTo<Account, $this>
+     */
     public function account(): BelongsTo
     {
         return $this->belongsTo(Account::class);

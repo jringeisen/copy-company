@@ -53,6 +53,8 @@ class Account extends Model
 
     /**
      * Get all brands belonging to this account.
+     *
+     * @return HasMany<Brand, $this>
      */
     public function brands(): HasMany
     {
