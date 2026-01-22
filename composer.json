@@ -17,6 +17,7 @@
         "laravel/fortify": "^1.33",
         "laravel/framework": "^12.0",
         "laravel/horizon": "^5.41",
+        "laravel/passport": "^13.0",
         "laravel/sanctum": "^4.2",
         "laravel/socialite": "^5.24",
         "laravel/tinker": "^2.10.1",

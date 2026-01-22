@@ -3,10 +3,12 @@
 namespace App\Mcp\Concerns;
 
 use App\Models\Brand;
+use App\Models\OAuthTokenContext;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
+use Laravel\Passport\Token;
 use Laravel\Sanctum\PersonalAccessToken;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -23,10 +25,57 @@ trait RequiresBrand
             return Response::error('Authentication required. Set MCP_API_TOKEN environment variable for local servers.');
         }
 
-        $brand = $user->currentBrand();
+        // First, try to get brand from OAuth token context (for OAuth-authenticated requests)
+        $brand = $this->getBrandFromOAuthToken($request);
+
+        // Fall back to session-based brand selection (for local servers or Sanctum)
+        if (! $brand) {
+            $brand = $user->currentBrand();
+        }
 
         if (! $brand) {
             return Response::error('No brand selected. Please set your current brand first.');
+        }
+
+        return $brand;
+    }
+
+    /**
+     * Get the brand from OAuth token context if available.
+     */
+    protected function getBrandFromOAuthToken(Request $request): ?Brand
+    {
+        $user = $request->user();
+
+        if (! $user) {
+            return null;
+        }
+
+        // Check if authenticated via Passport OAuth token
+        $token = $user->token();
+
+        if (! $token instanceof Token) {
+            return null;
+        }
+
+        // Look up the brand context for this token
+        $context = OAuthTokenContext::find($token->id);
+
+        if (! $context) {
+            return null;
+        }
+
+        // Verify the user still has access to this brand
+        $account = $user->currentAccount();
+
+        if (! $account) {
+            return null;
+        }
+
+        $brand = $account->brands()->find($context->brand_id);
+
+        if (! $brand) {
+            return null;
         }
 
         return $brand;

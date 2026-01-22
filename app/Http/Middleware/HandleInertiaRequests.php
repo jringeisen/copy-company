@@ -2,8 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use Closure;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Symfony\Component\HttpFoundation\Response;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -15,6 +17,31 @@ class HandleInertiaRequests extends Middleware
      * @var string
      */
     protected $rootView = 'app';
+
+    /**
+     * Paths that should bypass Inertia processing.
+     *
+     * @var array<string>
+     */
+    protected array $except = [
+        'oauth/*',
+        '.well-known/*',
+    ];
+
+    /**
+     * Handle the incoming request.
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        // Skip Inertia processing for excluded paths (OAuth, etc.)
+        foreach ($this->except as $pattern) {
+            if ($request->is($pattern)) {
+                return $next($request);
+            }
+        }
+
+        return parent::handle($request, $next);
+    }
 
     /**
      * Determines the current asset version.

@@ -40,6 +40,12 @@ class FortifyServiceProvider extends ServiceProvider
 
         // Inertia view rendering
         Fortify::loginView(function () {
+            // Check if this is an OAuth flow - use plain Blade view to avoid Inertia modal issues
+            $intended = session()->get('url.intended', '');
+            if (str_contains($intended, '/oauth/')) {
+                return view('auth.oauth-login');
+            }
+
             return Inertia::render('Auth/Login', [
                 'canResetPassword' => true,
                 'status' => session('status'),
