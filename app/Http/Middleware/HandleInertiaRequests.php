@@ -41,12 +41,16 @@ class HandleInertiaRequests extends Middleware
             // CSRF token for traditional form submissions
             'csrf_token' => csrf_token(),
 
+            // App URL for MCP configuration
+            'appUrl' => config('app.url'),
+
             // Flash messages
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
                 'info' => fn () => $request->session()->get('info'),
                 'message' => fn () => $request->session()->get('message'),
+                'newToken' => fn () => $request->session()->get('newToken'),
             ],
 
             // Authenticated user

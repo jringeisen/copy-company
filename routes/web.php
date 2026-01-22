@@ -15,6 +15,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\Public\BlogController;
 use App\Http\Controllers\Public\SubscribeController;
 use App\Http\Controllers\Settings\AccountInvitationController;
+use App\Http\Controllers\Settings\ApiTokenController;
 use App\Http\Controllers\Settings\BillingController;
 use App\Http\Controllers\Settings\EmailDomainController;
 use App\Http\Controllers\Settings\TeamSettingsController;
@@ -125,6 +126,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/billing/invoice/{invoiceId}', [BillingController::class, 'downloadInvoice'])->name('billing.invoice.download');
     Route::post('/billing/resume', [BillingController::class, 'resume'])->name('billing.resume');
     Route::post('/billing/cancel', [BillingController::class, 'cancel'])->name('billing.cancel');
+
+    // API Token routes
+    Route::get('/settings/api-tokens', [ApiTokenController::class, 'index'])->name('settings.api-tokens');
+    Route::post('/settings/api-tokens', [ApiTokenController::class, 'store'])->name('settings.api-tokens.store');
+    Route::delete('/settings/api-tokens/{token}', [ApiTokenController::class, 'destroy'])->name('settings.api-tokens.destroy');
 
     // Post routes
     Route::delete('/posts/bulk-delete', [PostController::class, 'bulkDestroy'])->name('posts.bulk-destroy');
