@@ -3,6 +3,7 @@ import { Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 const billingPeriod = ref('monthly');
+const mobileMenuOpen = ref(false);
 
 const pricing = {
     starter: { monthly: 8, annual: 6 },
@@ -29,16 +30,50 @@ const features = [
 
     <div class="min-h-screen bg-[#fcfbf8]">
         <!-- Navigation -->
-        <nav class="py-6 px-6 lg:px-12">
+        <nav class="py-6 px-6 lg:px-12 relative">
             <div class="max-w-7xl mx-auto flex justify-between items-center">
                 <img src="/images/logo.svg" alt="Copy Company" class="h-10" />
-                <div class="flex items-center gap-8">
+
+                <!-- Desktop nav -->
+                <div class="hidden md:flex items-center gap-8">
                     <a href="#features" class="text-sm text-[#0b1215]/70 hover:text-[#0b1215] transition">Features</a>
                     <a href="#pricing" class="text-sm text-[#0b1215]/70 hover:text-[#0b1215] transition">Pricing</a>
                     <Link href="/login" class="text-sm text-[#0b1215]/70 hover:text-[#0b1215] transition">Sign in</Link>
                     <Link
                         href="/register"
                         class="px-6 py-2.5 bg-[#0b1215] text-white text-sm rounded-full hover:bg-[#0b1215]/90 transition"
+                    >
+                        Get Started
+                    </Link>
+                </div>
+
+                <!-- Mobile hamburger button -->
+                <button
+                    class="md:hidden p-2 text-[#0b1215]"
+                    @click="mobileMenuOpen = !mobileMenuOpen"
+                    aria-label="Toggle menu"
+                >
+                    <svg v-if="!mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Mobile menu -->
+            <div
+                v-if="mobileMenuOpen"
+                class="md:hidden absolute top-full left-0 right-0 bg-[#fcfbf8] border-t border-[#0b1215]/10 shadow-lg z-50"
+            >
+                <div class="flex flex-col px-6 py-4 gap-4">
+                    <a href="#features" class="text-sm text-[#0b1215]/70 hover:text-[#0b1215] transition py-2" @click="mobileMenuOpen = false">Features</a>
+                    <a href="#pricing" class="text-sm text-[#0b1215]/70 hover:text-[#0b1215] transition py-2" @click="mobileMenuOpen = false">Pricing</a>
+                    <Link href="/login" class="text-sm text-[#0b1215]/70 hover:text-[#0b1215] transition py-2">Sign in</Link>
+                    <Link
+                        href="/register"
+                        class="px-6 py-2.5 bg-[#0b1215] text-white text-sm rounded-full hover:bg-[#0b1215]/90 transition text-center"
                     >
                         Get Started
                     </Link>
