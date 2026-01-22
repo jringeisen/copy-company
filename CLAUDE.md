@@ -52,7 +52,7 @@ User
 
 ### Public Routes
 
-Public blog is accessible at `/@{brand-slug}` and `/@{brand-slug}/{post-slug}`.
+Public blog is accessible at `/blog/{brand-slug}` and `/blog/{brand-slug}/{post-slug}`.
 
 ### Background Jobs
 

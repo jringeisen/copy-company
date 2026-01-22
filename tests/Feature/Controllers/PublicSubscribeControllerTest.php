@@ -11,7 +11,7 @@ uses(RefreshDatabase::class);
 test('visitors can subscribe to a brand newsletter', function () {
     $brand = Brand::factory()->create(['slug' => 'test-brand']);
 
-    $response = $this->post("/@{$brand->slug}/subscribe", [
+    $response = $this->post("/blog/{$brand->slug}/subscribe", [
         'email' => 'subscriber@example.com',
         'name' => 'John Doe',
     ]);
@@ -27,7 +27,7 @@ test('visitors can subscribe to a brand newsletter', function () {
 test('email is required for subscription', function () {
     $brand = Brand::factory()->create(['slug' => 'test-brand']);
 
-    $response = $this->postJson("/@{$brand->slug}/subscribe", [
+    $response = $this->postJson("/blog/{$brand->slug}/subscribe", [
         'name' => 'John',
     ]);
 
@@ -38,7 +38,7 @@ test('email is required for subscription', function () {
 test('email must be valid for subscription', function () {
     $brand = Brand::factory()->create(['slug' => 'test-brand']);
 
-    $response = $this->postJson("/@{$brand->slug}/subscribe", [
+    $response = $this->postJson("/blog/{$brand->slug}/subscribe", [
         'email' => 'not-an-email',
     ]);
 
@@ -50,7 +50,7 @@ test('duplicate email shows already subscribed message', function () {
     $brand = Brand::factory()->create(['slug' => 'test-brand']);
     Subscriber::factory()->forBrand($brand)->confirmed()->create(['email' => 'existing@example.com']);
 
-    $response = $this->post("/@{$brand->slug}/subscribe", [
+    $response = $this->post("/blog/{$brand->slug}/subscribe", [
         'email' => 'existing@example.com',
     ]);
 
@@ -65,7 +65,7 @@ test('subscribers can confirm their subscription', function () {
         'confirmation_token' => 'test-token-123',
     ]);
 
-    $response = $this->get("/@{$brand->slug}/confirm/test-token-123");
+    $response = $this->get("/blog/{$brand->slug}/confirm/test-token-123");
 
     $response->assertRedirect();
     $subscriber->refresh();
@@ -76,7 +76,7 @@ test('subscribers can confirm their subscription', function () {
 test('invalid confirmation token redirects with error', function () {
     $brand = Brand::factory()->create(['slug' => 'test-brand']);
 
-    $response = $this->get("/@{$brand->slug}/confirm/invalid-token");
+    $response = $this->get("/blog/{$brand->slug}/confirm/invalid-token");
 
     $response->assertRedirect();
     $response->assertSessionHas('error', 'Invalid confirmation link.');
@@ -88,7 +88,7 @@ test('subscribers can unsubscribe using their token', function () {
         'unsubscribe_token' => 'unsubscribe-token-123',
     ]);
 
-    $response = $this->get("/@{$brand->slug}/unsubscribe/unsubscribe-token-123");
+    $response = $this->get("/blog/{$brand->slug}/unsubscribe/unsubscribe-token-123");
 
     $response->assertRedirect();
     $subscriber->refresh();
@@ -99,7 +99,7 @@ test('subscribers can unsubscribe using their token', function () {
 test('invalid unsubscribe token redirects with error', function () {
     $brand = Brand::factory()->create(['slug' => 'test-brand']);
 
-    $response = $this->get("/@{$brand->slug}/unsubscribe/invalid-token");
+    $response = $this->get("/blog/{$brand->slug}/unsubscribe/invalid-token");
 
     $response->assertRedirect();
     $response->assertSessionHas('error', 'Invalid unsubscribe link.');
@@ -114,7 +114,7 @@ test('unsubscribed user can resubscribe and receives confirmation email', functi
         'unsubscribed_at' => now()->subDays(7),
     ]);
 
-    $response = $this->post("/@{$brand->slug}/subscribe", [
+    $response = $this->post("/blog/{$brand->slug}/subscribe", [
         'email' => 'resubscribe@example.com',
     ]);
 

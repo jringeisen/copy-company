@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Middleware\CheckFeatureAccess;
-use App\Http\Middleware\ComingSoonMode;
 use App\Http\Middleware\EnsureAccountIsSubscribed;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SetPermissionsTeamContext;
@@ -21,7 +20,6 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->web(append: [
-            ComingSoonMode::class,
             HandleInertiaRequests::class,
             SetPermissionsTeamContext::class,
         ]);

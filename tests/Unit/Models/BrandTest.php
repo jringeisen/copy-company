@@ -37,7 +37,7 @@ test('brand url uses custom domain when verified', function () {
 test('brand url uses app url with slug when no custom domain', function () {
     $brand = Brand::factory()->create(['slug' => 'test-brand']);
 
-    expect($brand->url)->toBe(config('app.url').'/@test-brand');
+    expect($brand->url)->toBe(config('app.url').'/blog/test-brand');
 });
 
 test('active subscribers count only includes confirmed subscribers', function () {

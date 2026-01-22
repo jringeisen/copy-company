@@ -116,8 +116,8 @@ User
 
 ### Public URLs
 
-- Blog index: `/@{brand-slug}`
-- Blog post: `/@{brand-slug}/{post-slug}`
+- Blog index: `/blog/{brand-slug}`
+- Blog post: `/blog/{brand-slug}/{post-slug}`
 
 ## License
 

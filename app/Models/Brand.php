@@ -125,7 +125,7 @@ class Brand extends Model
             return "https://{$this->custom_domain}";
         }
 
-        return config('app.url')."/@{$this->slug}";
+        return config('app.url')."/blog/{$this->slug}";
     }
 
     public function getActiveSubscribersCountAttribute(): int

@@ -16,7 +16,7 @@ const subscribeError = ref('');
 
 const subscribe = () => {
     subscribeError.value = '';
-    subscribeForm.post(`/@${props.brand.slug}/subscribe`, {
+    subscribeForm.post(`/blog/${props.brand.slug}/subscribe`, {
         preserveScroll: true,
         onSuccess: () => {
             subscribeSuccess.value = true;
@@ -39,7 +39,7 @@ const subscribe = () => {
         <!-- Header -->
         <header class="border-b border-gray-100">
             <div class="max-w-3xl mx-auto px-6 py-6">
-                <Link :href="`/@${brand.slug}`" class="flex items-center space-x-3 group">
+                <Link :href="`/blog/${brand.slug}`" class="flex items-center space-x-3 group">
                     <svg class="w-5 h-5 text-gray-400 group-hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
@@ -116,7 +116,7 @@ const subscribe = () => {
         <footer class="border-t border-gray-100">
             <div class="max-w-3xl mx-auto px-6 py-8">
                 <div class="flex items-center justify-between">
-                    <Link :href="`/@${brand.slug}`" class="text-gray-600 hover:text-gray-900">
+                    <Link :href="`/blog/${brand.slug}`" class="text-gray-600 hover:text-gray-900">
                         &larr; Back to {{ brand.name }}
                     </Link>
                 </div>

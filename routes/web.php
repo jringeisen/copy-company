@@ -34,11 +34,6 @@ Route::post('/webhooks/stripe', [StripeWebhookController::class, 'handleWebhook'
     ->name('webhooks.stripe')
     ->withoutMiddleware(['web']);
 
-// Coming soon page (production only)
-Route::get('/coming-soon', function () {
-    return Inertia::render('ComingSoon');
-})->name('coming-soon');
-
 // Public landing page
 Route::get('/', function () {
     return Inertia::render('Welcome');
@@ -53,16 +48,16 @@ Route::get('/terms-of-service', function () {
     return Inertia::render('TermsOfService');
 })->name('terms-of-service');
 
-// Public blog routes (/@username format)
-Route::get('/@{brand:slug}', [BlogController::class, 'index'])->name('public.blog.index');
-Route::get('/@{brand:slug}/{post:slug}', [BlogController::class, 'show'])->name('public.blog.show');
+// Public blog routes
+Route::get('/blog/{brand:slug}', [BlogController::class, 'index'])->name('public.blog.index');
+Route::get('/blog/{brand:slug}/{post:slug}', [BlogController::class, 'show'])->name('public.blog.show');
 
 // Public subscription routes
-Route::post('/@{brand:slug}/subscribe', [SubscribeController::class, 'store'])
+Route::post('/blog/{brand:slug}/subscribe', [SubscribeController::class, 'store'])
     ->middleware('throttle:6,1') // Rate limit: 6 requests per minute
     ->name('public.subscribe');
-Route::get('/@{brand:slug}/confirm/{token}', [SubscribeController::class, 'confirm'])->name('public.subscribe.confirm');
-Route::get('/@{brand:slug}/unsubscribe/{token}', [SubscribeController::class, 'unsubscribe'])->name('public.subscribe.unsubscribe');
+Route::get('/blog/{brand:slug}/confirm/{token}', [SubscribeController::class, 'confirm'])->name('public.subscribe.confirm');
+Route::get('/blog/{brand:slug}/unsubscribe/{token}', [SubscribeController::class, 'unsubscribe'])->name('public.subscribe.unsubscribe');
 
 // Public invitation acceptance route
 Route::get('/invitations/{token}', [AccountInvitationController::class, 'accept'])->name('invitations.accept');

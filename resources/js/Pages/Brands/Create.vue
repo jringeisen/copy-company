@@ -83,7 +83,7 @@ const submit = () => {
                         <label for="slug" class="block text-sm font-medium text-[#0b1215]">URL Slug *</label>
                         <div class="mt-1 flex rounded-xl overflow-hidden border border-[#0b1215]/20">
                             <span class="inline-flex items-center px-4 bg-[#f7f7f7] text-[#0b1215]/50 text-sm border-r border-[#0b1215]/20">
-                                {{ $page.props.appUrl || 'yoursite.com' }}/@
+                                {{ $page.props.appUrl || 'yoursite.com' }}/blog/
                             </span>
                             <input
                                 id="slug"

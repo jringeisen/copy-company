@@ -20,7 +20,7 @@ const subscribeError = ref('');
 
 const subscribe = () => {
     subscribeError.value = '';
-    subscribeForm.post(`/@${props.brand.slug}/subscribe`, {
+    subscribeForm.post(`/blog/${props.brand.slug}/subscribe`, {
         preserveScroll: true,
         onSuccess: (page) => {
             subscribeSuccess.value = true;
@@ -87,7 +87,7 @@ const subscribe = () => {
         <main class="max-w-3xl mx-auto px-6 py-12">
             <div v-if="posts.length > 0" class="space-y-12">
                 <article v-for="post in posts" :key="post.id" class="group">
-                    <Link :href="`/@${brand.slug}/${post.slug}`" class="block">
+                    <Link :href="`/blog/${brand.slug}/${post.slug}`" class="block">
                         <img
                             v-if="post.featured_image"
                             :src="post.featured_image"

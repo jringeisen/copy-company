@@ -1,6 +1,6 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 
 const billingPeriod = ref('monthly');
 
@@ -10,30 +10,18 @@ const pricing = {
     pro: { monthly: 29, annual: 22 },
 };
 
-// Cost calculator
-const subscriberCount = ref(5000);
-const emailsPerMonth = ref(4);
-
-const calculatedCosts = computed(() => {
-    const totalEmails = subscriberCount.value * emailsPerMonth.value;
-    const emailCost = (totalEmails / 1000) * 0.40;
-
-    return {
-        totalEmails,
-        emailCost,
-        starter: pricing.starter[billingPeriod.value] + emailCost,
-        creator: pricing.creator[billingPeriod.value] + emailCost,
-        pro: pricing.pro[billingPeriod.value] + emailCost,
-    };
-});
-
-const formatNumber = (num) => {
-    return new Intl.NumberFormat().format(num);
-};
-
-const formatCurrency = (num) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
-};
+// Feature comparison data
+const features = [
+    { name: 'Subscribers', starter: 'Unlimited', creator: 'Unlimited', pro: 'Unlimited' },
+    { name: 'Posts per month', starter: '5', creator: 'Unlimited', pro: 'Unlimited' },
+    { name: 'Social accounts', starter: '2', creator: '5', pro: '15' },
+    { name: 'AI Content Sprints', starter: '1/month', creator: '10/month', pro: 'Unlimited' },
+    { name: 'Public blog page', starter: true, creator: true, pro: true },
+    { name: 'Newsletter analytics', starter: false, creator: true, pro: true },
+    { name: 'Custom email domain', starter: false, creator: false, pro: true },
+    { name: 'Dedicated IP', starter: false, creator: false, pro: true },
+    { name: 'Priority support', starter: false, creator: false, pro: true },
+];
 </script>
 
 <template>
@@ -350,7 +338,7 @@ const formatCurrency = (num) => {
                                 </svg>
                             </div>
                             <h3 class="text-lg font-medium text-[#0b1215] mb-2">Hosted Public Blog</h3>
-                            <p class="text-[#0b1215]/60">Your own blog page at /@yourbrand. Share your content with the world.</p>
+                            <p class="text-[#0b1215]/60">Your own blog page at /blog/yourbrand. Share your content with the world.</p>
                         </div>
 
                         <!-- Subscriber Management -->
@@ -498,7 +486,7 @@ const formatCurrency = (num) => {
                     </div>
 
                     <!-- Billing Toggle -->
-                    <div class="flex justify-center items-center gap-4 mb-16">
+                    <div class="flex justify-center items-center gap-4 mb-8">
                         <span :class="billingPeriod === 'monthly' ? 'text-[#0b1215] font-medium' : 'text-[#0b1215]/50'" class="text-sm">Monthly</span>
                         <button
                             @click="billingPeriod = billingPeriod === 'monthly' ? 'annual' : 'monthly'"
@@ -516,21 +504,58 @@ const formatCurrency = (num) => {
                         </span>
                     </div>
 
+                    <!-- Pricing Model Explainer -->
+                    <div class="max-w-2xl mx-auto mb-16">
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 bg-white rounded-2xl p-6 border border-[#0b1215]/10">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-[#0b1215] flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                </div>
+                                <div class="text-center sm:text-left">
+                                    <div class="text-sm text-[#0b1215]/50">Platform fee</div>
+                                    <div class="font-medium text-[#0b1215]">From $6/mo</div>
+                                </div>
+                            </div>
+                            <div class="text-2xl font-light text-[#0b1215]/30">+</div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-[#a1854f] flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <div class="text-center sm:text-left">
+                                    <div class="text-sm text-[#0b1215]/50">Email sending</div>
+                                    <div class="font-medium text-[#0b1215]">$0.40 / 1,000 emails</div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-center text-sm text-[#0b1215]/50 mt-4">
+                            Pay only for what you use. No subscriber limits, no hidden fees.
+                        </p>
+                    </div>
+
                     <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
                         <!-- Starter Tier -->
                         <div class="bg-white rounded-3xl p-8 border border-[#0b1215]/5">
-                            <div class="text-center mb-8">
+                            <div class="text-center mb-6">
                                 <h3 class="text-lg font-medium text-[#0b1215] mb-4">Starter</h3>
-                                <div class="mb-2">
+                                <div class="mb-1">
                                     <span class="text-5xl font-light text-[#0b1215]">${{ pricing.starter[billingPeriod] }}</span>
-                                    <span class="text-[#0b1215]/50">/month</span>
+                                    <span class="text-[#0b1215]/50">/mo</span>
                                 </div>
+                                <p class="text-xs text-[#0b1215]/50 mb-3">Platform fee</p>
                                 <Transition name="fade">
                                     <p v-if="billingPeriod === 'annual'" class="text-xs text-[#a1854f]">Billed annually (${{ pricing.starter.annual * 12 }}/year)</p>
                                 </Transition>
-                                <p class="text-sm text-[#0b1215]/60 mt-2">Perfect for getting started</p>
                             </div>
-                            <ul class="space-y-4 mb-8">
+                            <!-- Email Usage Box -->
+                            <div class="bg-[#f7f7f7] rounded-xl p-3 mb-6 text-center">
+                                <span class="text-sm text-[#0b1215]/70">+ <strong class="text-[#0b1215]">$0.40</strong> per 1,000 emails</span>
+                            </div>
+                            <ul class="space-y-3 mb-8">
+                                <!-- Included features -->
                                 <li class="flex items-start gap-3">
                                     <div class="w-5 h-5 rounded-full bg-[#0b1215] flex items-center justify-center shrink-0 mt-0.5">
                                         <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -571,6 +596,31 @@ const formatCurrency = (num) => {
                                     </div>
                                     <span class="text-[#0b1215]/70">Public blog page</span>
                                 </li>
+                                <!-- Not included features -->
+                                <li class="flex items-start gap-3 opacity-40">
+                                    <div class="w-5 h-5 rounded-full bg-[#0b1215]/20 flex items-center justify-center shrink-0 mt-0.5">
+                                        <svg class="w-3 h-3 text-[#0b1215]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-[#0b1215]/50">Newsletter analytics</span>
+                                </li>
+                                <li class="flex items-start gap-3 opacity-40">
+                                    <div class="w-5 h-5 rounded-full bg-[#0b1215]/20 flex items-center justify-center shrink-0 mt-0.5">
+                                        <svg class="w-3 h-3 text-[#0b1215]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-[#0b1215]/50">Custom email domain</span>
+                                </li>
+                                <li class="flex items-start gap-3 opacity-40">
+                                    <div class="w-5 h-5 rounded-full bg-[#0b1215]/20 flex items-center justify-center shrink-0 mt-0.5">
+                                        <svg class="w-3 h-3 text-[#0b1215]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-[#0b1215]/50">Dedicated IP</span>
+                                </li>
                             </ul>
                             <Link
                                 href="/register"
@@ -585,18 +635,23 @@ const formatCurrency = (num) => {
                             <div class="absolute -top-4 left-1/2 -translate-x-1/2">
                                 <span class="bg-[#a1854f] text-white text-xs font-medium px-4 py-1.5 rounded-full tracking-wide">MOST POPULAR</span>
                             </div>
-                            <div class="text-center mb-8">
+                            <div class="text-center mb-6">
                                 <h3 class="text-lg font-medium text-white mb-4">Creator</h3>
-                                <div class="mb-2">
+                                <div class="mb-1">
                                     <span class="text-5xl font-light text-white">${{ pricing.creator[billingPeriod] }}</span>
-                                    <span class="text-white/50">/month</span>
+                                    <span class="text-white/50">/mo</span>
                                 </div>
+                                <p class="text-xs text-white/50 mb-3">Platform fee</p>
                                 <Transition name="fade">
                                     <p v-if="billingPeriod === 'annual'" class="text-xs text-[#a1854f]">Billed annually (${{ pricing.creator.annual * 12 }}/year)</p>
                                 </Transition>
-                                <p class="text-sm text-white/60 mt-2">For growing creators</p>
                             </div>
-                            <ul class="space-y-4 mb-8">
+                            <!-- Email Usage Box -->
+                            <div class="bg-white/10 rounded-xl p-3 mb-6 text-center">
+                                <span class="text-sm text-white/70">+ <strong class="text-white">$0.40</strong> per 1,000 emails</span>
+                            </div>
+                            <ul class="space-y-3 mb-8">
+                                <!-- Included features -->
                                 <li class="flex items-start gap-3">
                                     <div class="w-5 h-5 rounded-full bg-[#a1854f] flex items-center justify-center shrink-0 mt-0.5">
                                         <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -635,15 +690,24 @@ const formatCurrency = (num) => {
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                         </svg>
                                     </div>
-                                    <span class="text-white/70">Custom blog domain</span>
+                                    <span class="text-white/70">Newsletter analytics</span>
                                 </li>
-                                <li class="flex items-start gap-3">
-                                    <div class="w-5 h-5 rounded-full bg-[#a1854f] flex items-center justify-center shrink-0 mt-0.5">
-                                        <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                <!-- Not included features -->
+                                <li class="flex items-start gap-3 opacity-40">
+                                    <div class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0 mt-0.5">
+                                        <svg class="w-3 h-3 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                         </svg>
                                     </div>
-                                    <span class="text-white/70">Newsletter analytics</span>
+                                    <span class="text-white/40">Custom email domain</span>
+                                </li>
+                                <li class="flex items-start gap-3 opacity-40">
+                                    <div class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0 mt-0.5">
+                                        <svg class="w-3 h-3 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-white/40">Dedicated IP</span>
                                 </li>
                             </ul>
                             <Link
@@ -656,18 +720,22 @@ const formatCurrency = (num) => {
 
                         <!-- Pro Tier -->
                         <div class="bg-white rounded-3xl p-8 border border-[#0b1215]/5">
-                            <div class="text-center mb-8">
+                            <div class="text-center mb-6">
                                 <h3 class="text-lg font-medium text-[#0b1215] mb-4">Pro</h3>
-                                <div class="mb-2">
+                                <div class="mb-1">
                                     <span class="text-5xl font-light text-[#0b1215]">${{ pricing.pro[billingPeriod] }}</span>
-                                    <span class="text-[#0b1215]/50">/month</span>
+                                    <span class="text-[#0b1215]/50">/mo</span>
                                 </div>
+                                <p class="text-xs text-[#0b1215]/50 mb-3">Platform fee</p>
                                 <Transition name="fade">
                                     <p v-if="billingPeriod === 'annual'" class="text-xs text-[#a1854f]">Billed annually (${{ pricing.pro.annual * 12 }}/year)</p>
                                 </Transition>
-                                <p class="text-sm text-[#0b1215]/60 mt-2">For professional creators</p>
                             </div>
-                            <ul class="space-y-4 mb-8">
+                            <!-- Email Usage Box -->
+                            <div class="bg-[#f7f7f7] rounded-xl p-3 mb-6 text-center">
+                                <span class="text-sm text-[#0b1215]/70">+ <strong class="text-[#0b1215]">$0.40</strong> per 1,000 emails</span>
+                            </div>
+                            <ul class="space-y-3 mb-8">
                                 <li class="flex items-start gap-3">
                                     <div class="w-5 h-5 rounded-full bg-[#0b1215] flex items-center justify-center shrink-0 mt-0.5">
                                         <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -706,7 +774,7 @@ const formatCurrency = (num) => {
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                         </svg>
                                     </div>
-                                    <span class="text-[#0b1215]/70">Custom blog + email domain</span>
+                                    <span class="text-[#0b1215]/70">Newsletter analytics</span>
                                 </li>
                                 <li class="flex items-start gap-3">
                                     <div class="w-5 h-5 rounded-full bg-[#0b1215] flex items-center justify-center shrink-0 mt-0.5">
@@ -714,7 +782,15 @@ const formatCurrency = (num) => {
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                         </svg>
                                     </div>
-                                    <span class="text-[#0b1215]/70">Remove Copy Company branding</span>
+                                    <span class="text-[#0b1215]/70">Custom email domain</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <div class="w-5 h-5 rounded-full bg-[#0b1215] flex items-center justify-center shrink-0 mt-0.5">
+                                        <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-[#0b1215]/70">Dedicated IP for email</span>
                                 </li>
                                 <li class="flex items-start gap-3">
                                     <div class="w-5 h-5 rounded-full bg-[#0b1215] flex items-center justify-center shrink-0 mt-0.5">
@@ -734,98 +810,82 @@ const formatCurrency = (num) => {
                         </div>
                     </div>
 
-                    <!-- Cost Calculator -->
-                    <div class="mt-16 max-w-3xl mx-auto">
-                        <div class="bg-white rounded-3xl p-8 border border-[#0b1215]/5">
-                            <div class="text-center mb-8">
-                                <h3 class="text-xl font-medium text-[#0b1215] mb-2">Calculate Your Monthly Cost</h3>
-                                <p class="text-sm text-[#0b1215]/60">Adjust the sliders to estimate your total monthly cost</p>
-                            </div>
-
-                            <!-- Sliders -->
-                            <div class="space-y-8 mb-8">
-                                <!-- Subscriber Slider -->
-                                <div>
-                                    <div class="flex justify-between items-center mb-3">
-                                        <label class="text-sm font-medium text-[#0b1215]">Subscribers</label>
-                                        <span class="text-sm font-medium text-[#a1854f]">{{ formatNumber(subscriberCount) }}</span>
-                                    </div>
-                                    <input
-                                        type="range"
-                                        v-model.number="subscriberCount"
-                                        min="500"
-                                        max="100000"
-                                        step="500"
-                                        class="w-full h-2 bg-[#f7f7f7] rounded-lg appearance-none cursor-pointer accent-[#0b1215]"
-                                    />
-                                    <div class="flex justify-between text-xs text-[#0b1215]/40 mt-2 px-1">
-                                        <span>500</span>
-                                        <span>25k</span>
-                                        <span>50k</span>
-                                        <span>75k</span>
-                                        <span>100k</span>
-                                    </div>
-                                </div>
-
-                                <!-- Emails per Month Slider -->
-                                <div>
-                                    <div class="flex justify-between items-center mb-3">
-                                        <label class="text-sm font-medium text-[#0b1215]">Emails per subscriber/month</label>
-                                        <span class="text-sm font-medium text-[#a1854f]">{{ emailsPerMonth }}</span>
-                                    </div>
-                                    <input
-                                        type="range"
-                                        v-model.number="emailsPerMonth"
-                                        min="2"
-                                        max="12"
-                                        step="1"
-                                        class="w-full h-2 bg-[#f7f7f7] rounded-lg appearance-none cursor-pointer accent-[#0b1215]"
-                                    />
-                                    <div class="flex justify-between text-xs text-[#0b1215]/40 mt-2">
-                                        <span>2</span>
-                                        <span>4</span>
-                                        <span>6</span>
-                                        <span>8</span>
-                                        <span>10</span>
-                                        <span>12</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Calculation Summary -->
-                            <div class="bg-[#f7f7f7] rounded-2xl p-5 mb-6">
-                                <div class="flex justify-between items-center text-sm text-[#0b1215]/60 mb-2">
-                                    <span>Total emails per month</span>
-                                    <span class="font-medium text-[#0b1215]">{{ formatNumber(calculatedCosts.totalEmails) }}</span>
-                                </div>
-                                <div class="flex justify-between items-center text-sm text-[#0b1215]/60">
-                                    <span>Email cost ($0.40 per 1,000)</span>
-                                    <span class="font-medium text-[#0b1215]">{{ formatCurrency(calculatedCosts.emailCost) }}</span>
-                                </div>
-                            </div>
-
-                            <!-- Plan Costs -->
-                            <div class="grid grid-cols-3 gap-4">
-                                <div class="bg-[#f7f7f7] rounded-2xl p-4 text-center">
-                                    <div class="text-sm text-[#0b1215]/50 mb-1">Starter</div>
-                                    <div class="text-xl font-medium text-[#0b1215]">{{ formatCurrency(calculatedCosts.starter) }}</div>
-                                    <div class="text-xs text-[#0b1215]/40">/month</div>
-                                </div>
-                                <div class="bg-[#0b1215] rounded-2xl p-4 text-center">
-                                    <div class="text-sm text-[#a1854f] mb-1">Creator</div>
-                                    <div class="text-xl font-medium text-white">{{ formatCurrency(calculatedCosts.creator) }}</div>
-                                    <div class="text-xs text-white/40">/month</div>
-                                </div>
-                                <div class="bg-[#f7f7f7] rounded-2xl p-4 text-center">
-                                    <div class="text-sm text-[#0b1215]/50 mb-1">Pro</div>
-                                    <div class="text-xl font-medium text-[#0b1215]">{{ formatCurrency(calculatedCosts.pro) }}</div>
-                                    <div class="text-xs text-[#0b1215]/40">/month</div>
-                                </div>
+                    <!-- Feature Comparison Table -->
+                    <div class="mt-16 max-w-4xl mx-auto">
+                        <div class="text-center mb-8">
+                            <h3 class="text-2xl font-medium text-[#0b1215]">Compare All Features</h3>
+                        </div>
+                        <div class="bg-white rounded-3xl border border-[#0b1215]/5 overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="border-b border-[#0b1215]/5">
+                                            <th class="py-5 px-6 text-left text-sm font-medium text-[#0b1215]">Feature</th>
+                                            <th class="py-5 px-4 text-center">
+                                                <div class="text-sm font-medium text-[#0b1215]">Starter</div>
+                                                <div class="text-xs text-[#0b1215]/50">${{ pricing.starter[billingPeriod] }}/mo</div>
+                                            </th>
+                                            <th class="py-5 px-4 text-center bg-[#0b1215]/5">
+                                                <div class="text-sm font-medium text-[#0b1215]">Creator</div>
+                                                <div class="text-xs text-[#a1854f]">${{ pricing.creator[billingPeriod] }}/mo</div>
+                                            </th>
+                                            <th class="py-5 px-4 text-center">
+                                                <div class="text-sm font-medium text-[#0b1215]">Pro</div>
+                                                <div class="text-xs text-[#0b1215]/50">${{ pricing.pro[billingPeriod] }}/mo</div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(feature, index) in features" :key="feature.name" :class="index % 2 === 0 ? 'bg-[#f7f7f7]/50' : ''">
+                                            <td class="py-4 px-6 text-sm text-[#0b1215]/70">{{ feature.name }}</td>
+                                            <td class="py-4 px-4 text-center">
+                                                <template v-if="typeof feature.starter === 'boolean'">
+                                                    <svg v-if="feature.starter" class="w-5 h-5 text-[#0b1215] mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                    <svg v-else class="w-5 h-5 text-[#0b1215]/20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </template>
+                                                <span v-else class="text-sm text-[#0b1215]">{{ feature.starter }}</span>
+                                            </td>
+                                            <td class="py-4 px-4 text-center bg-[#0b1215]/5">
+                                                <template v-if="typeof feature.creator === 'boolean'">
+                                                    <svg v-if="feature.creator" class="w-5 h-5 text-[#a1854f] mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                    <svg v-else class="w-5 h-5 text-[#0b1215]/20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </template>
+                                                <span v-else class="text-sm font-medium text-[#0b1215]">{{ feature.creator }}</span>
+                                            </td>
+                                            <td class="py-4 px-4 text-center">
+                                                <template v-if="typeof feature.pro === 'boolean'">
+                                                    <svg v-if="feature.pro" class="w-5 h-5 text-[#0b1215] mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                    <svg v-else class="w-5 h-5 text-[#0b1215]/20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </template>
+                                                <span v-else class="text-sm text-[#0b1215]">{{ feature.pro }}</span>
+                                            </td>
+                                        </tr>
+                                        <!-- Email sending row -->
+                                        <tr class="border-t border-[#0b1215]/10 bg-[#a1854f]/5">
+                                            <td class="py-4 px-6 text-sm font-medium text-[#0b1215]">Email sending</td>
+                                            <td colspan="3" class="py-4 px-4 text-center text-sm text-[#0b1215]/70">
+                                                <strong class="text-[#0b1215]">$0.40</strong> per 1,000 emails <span class="text-[#0b1215]/50">(all plans)</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
 
-                    <p class="text-center text-sm text-[#0b1215]/50 mt-8">
+                    <p class="text-center text-sm text-[#0b1215]/50 mt-12">
                         All plans include a 14-day free trial. No credit card required. Cancel anytime.
                     </p>
                 </div>

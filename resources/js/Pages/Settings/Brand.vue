@@ -137,11 +137,11 @@ const submit = () => {
                         <p class="mt-1 text-sm text-[#0b1215]/50">
                             Your public blog URL:
                             <a
-                                :href="`/@${form.slug}`"
+                                :href="`/blog/${form.slug}`"
                                 target="_blank"
                                 class="text-[#a1854f] hover:text-[#a1854f]/80 hover:underline"
                             >
-                                /@{{ form.slug }}
+                                /blog/{{ form.slug }}
                                 <svg class="inline-block w-3 h-3 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                 </svg>

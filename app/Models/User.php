@@ -39,6 +39,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'industry',
+        'biggest_struggle',
+        'referral_source',
     ];
 
     /**

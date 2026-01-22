@@ -123,19 +123,4 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Coming Soon Mode
-    |--------------------------------------------------------------------------
-    |
-    | When enabled in production, all visitors will be redirected to a
-    | "coming soon" page. This is useful for pre-launch marketing.
-    | Use the bypass token to preview the full site in production.
-    |
-    */
-
-    'coming_soon_mode' => (bool) env('COMING_SOON_MODE', true),
-
-    'coming_soon_bypass_token' => env('COMING_SOON_BYPASS_TOKEN'),
-
 ];

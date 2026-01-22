@@ -33,6 +33,9 @@ class CreateNewUser implements CreatesNewUsers
                 Rule::unique(User::class),
             ],
             'password' => $this->passwordRules(),
+            'industry' => ['required', 'string', 'max:100'],
+            'biggest_struggle' => ['required', 'string', 'max:100'],
+            'referral_source' => ['required', 'string', 'max:100'],
         ])->validate();
 
         return DB::transaction(function () use ($input) {
@@ -40,6 +43,9 @@ class CreateNewUser implements CreatesNewUsers
                 'name' => $input['name'],
                 'email' => $input['email'],
                 'password' => Hash::make($input['password']),
+                'industry' => $input['industry'],
+                'biggest_struggle' => $input['biggest_struggle'],
+                'referral_source' => $input['referral_source'],
             ]);
 
             // Check for pending invitation

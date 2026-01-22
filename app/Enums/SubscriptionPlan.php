@@ -86,7 +86,7 @@ enum SubscriptionPlan: string
         return match ($this) {
             self::Starter => 800,
             self::Creator => 1900,
-            self::Pro => 5900,
+            self::Pro => 2900,
         };
     }
 
@@ -98,7 +98,7 @@ enum SubscriptionPlan: string
         return match ($this) {
             self::Starter => 600,
             self::Creator => 1400,
-            self::Pro => 4900,
+            self::Pro => 2200,
         };
     }
 
