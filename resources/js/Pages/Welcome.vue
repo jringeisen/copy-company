@@ -106,10 +106,10 @@ const features = [
             <!-- Hero Section -->
             <div class="py-24 lg:py-32 px-6 lg:px-12">
                 <div class="max-w-5xl mx-auto text-center">
-                    <h1 class="font-serif text-6xl lg:text-8xl font-light text-[#0b1215] mb-8 tracking-tight leading-none">
+                    <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-light text-[#0b1215] mb-8 tracking-tight leading-none">
                         WRITE ONCE,<br />PUBLISH EVERYWHERE
                     </h1>
-                    <p class="text-xl lg:text-2xl text-[#0b1215]/60 max-w-2xl mx-auto mb-12 font-light leading-relaxed">
+                    <p class="text-lg sm:text-xl lg:text-2xl text-[#0b1215]/60 max-w-2xl mx-auto mb-12 font-light leading-relaxed">
                         A creator-first content platform where your blog post becomes your newsletter,
                         and AI helps you reach your audience on every channel.
                     </p>
