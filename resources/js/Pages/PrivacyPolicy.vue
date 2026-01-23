@@ -1,9 +1,18 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
+import SeoHead from '@/Components/SeoHead.vue';
+
+const props = defineProps({
+    appUrl: String,
+});
 </script>
 
 <template>
-    <Head title="Privacy Policy - Copy Company" />
+    <SeoHead
+        title="Privacy Policy - Copy Company"
+        description="Learn how Copy Company collects, uses, and protects your personal information and content data."
+        :url="`${appUrl}/privacy-policy`"
+    />
 
     <div class="min-h-screen bg-[#fcfbf8]">
         <!-- Navigation -->

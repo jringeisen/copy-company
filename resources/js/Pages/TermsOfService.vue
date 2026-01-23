@@ -1,9 +1,18 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
+import SeoHead from '@/Components/SeoHead.vue';
+
+const props = defineProps({
+    appUrl: String,
+});
 </script>
 
 <template>
-    <Head title="Terms of Service - Copy Company" />
+    <SeoHead
+        title="Terms of Service - Copy Company"
+        description="Read the terms and conditions for using Copy Company, including subscription terms, content policies, and acceptable use."
+        :url="`${appUrl}/terms-of-service`"
+    />
 
     <div class="min-h-screen bg-[#fcfbf8]">
         <!-- Navigation -->

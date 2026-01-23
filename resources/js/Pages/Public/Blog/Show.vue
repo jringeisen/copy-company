@@ -1,11 +1,61 @@
 <script setup>
-import { Head, Link, useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { Link, useForm } from '@inertiajs/vue3';
+import SeoHead from '@/Components/SeoHead.vue';
+import { ref, computed } from 'vue';
 
 const props = defineProps({
     brand: Object,
     post: Object,
+    canonicalUrl: String,
+    appUrl: String,
 });
+
+const jsonLd = computed(() => [
+    {
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        headline: props.post.seo_title || props.post.title,
+        description: props.post.seo_description || props.post.excerpt,
+        image: props.post.featured_image || undefined,
+        datePublished: props.post.published_at_iso,
+        author: {
+            '@type': 'Organization',
+            name: props.brand.name,
+        },
+        publisher: {
+            '@type': 'Organization',
+            name: props.brand.name,
+        },
+        mainEntityOfPage: {
+            '@type': 'WebPage',
+            '@id': props.canonicalUrl,
+        },
+    },
+    {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+            {
+                '@type': 'ListItem',
+                position: 1,
+                name: 'Home',
+                item: props.appUrl,
+            },
+            {
+                '@type': 'ListItem',
+                position: 2,
+                name: props.brand.name,
+                item: `${props.appUrl}/blog/${props.brand.slug}`,
+            },
+            {
+                '@type': 'ListItem',
+                position: 3,
+                name: props.post.title,
+                item: props.canonicalUrl,
+            },
+        ],
+    },
+]);
 
 const subscribeForm = useForm({
     email: '',
@@ -30,10 +80,16 @@ const subscribe = () => {
 </script>
 
 <template>
-    <Head>
-        <title>{{ post.seo_title || post.title }} | {{ brand.name }}</title>
-        <meta name="description" :content="post.seo_description || post.excerpt" />
-    </Head>
+    <SeoHead
+        :title="`${post.seo_title || post.title} | ${brand.name}`"
+        :description="post.seo_description || post.excerpt || ''"
+        :url="canonicalUrl"
+        :image="post.featured_image || ''"
+        type="article"
+        :site-name="brand.name"
+        :published-at="post.published_at_iso"
+        :json-ld="jsonLd"
+    />
 
     <div class="min-h-screen bg-white">
         <!-- Header -->

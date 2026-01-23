@@ -1,9 +1,23 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { Link } from '@inertiajs/vue3';
+import SeoHead from '@/Components/SeoHead.vue';
+import { ref, computed } from 'vue';
+
+const props = defineProps({
+    appUrl: String,
+});
 
 const billingPeriod = ref('monthly');
 const mobileMenuOpen = ref(false);
+
+const jsonLd = computed(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Copy Company',
+    url: props.appUrl,
+    logo: `${props.appUrl}/images/logo.svg`,
+    description: 'A creator-first content platform where your blog post becomes your newsletter, and AI helps you reach your audience on every channel.',
+}));
 
 const pricing = {
     starter: { monthly: 8, annual: 6 },
@@ -26,7 +40,14 @@ const features = [
 </script>
 
 <template>
-    <Head title="Copy Company - Write Once, Publish Everywhere" />
+    <SeoHead
+        title="Copy Company - Write Once, Publish Everywhere"
+        description="A creator-first content platform where your blog post becomes your newsletter, and AI helps you reach your audience on every channel."
+        :url="appUrl"
+        :image="`${appUrl}/images/og-default.png`"
+        type="website"
+        :json-ld="jsonLd"
+    />
 
     <div class="min-h-screen bg-[#fcfbf8]">
         <!-- Navigation -->

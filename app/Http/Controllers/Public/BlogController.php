@@ -37,6 +37,8 @@ class BlogController extends Controller
                 'logo_path' => $brand->logo_path,
             ],
             'posts' => $posts,
+            'canonicalUrl' => url("/blog/{$brand->slug}"),
+            'appUrl' => config('app.url'),
         ]);
     }
 
@@ -49,6 +51,11 @@ class BlogController extends Controller
 
         // Increment view count
         $post->increment('view_count');
+
+        $featuredImage = $post->featured_image;
+        if ($featuredImage && ! str_starts_with($featuredImage, 'http')) {
+            $featuredImage = config('app.url').$featuredImage;
+        }
 
         return Inertia::render('Public/Blog/Show', [
             'brand' => [
@@ -64,11 +71,14 @@ class BlogController extends Controller
                 'slug' => $post->slug,
                 'content_html' => $post->content_html,
                 'excerpt' => $post->excerpt,
-                'featured_image' => $post->featured_image,
+                'featured_image' => $featuredImage,
                 'published_at' => $post->published_at->format('F d, Y'),
+                'published_at_iso' => $post->published_at->toIso8601String(),
                 'seo_title' => $post->seo_title,
                 'seo_description' => $post->seo_description,
             ],
+            'canonicalUrl' => url("/blog/{$brand->slug}/{$post->slug}"),
+            'appUrl' => config('app.url'),
         ]);
     }
 }

@@ -18,6 +18,7 @@ use App\Http\Controllers\Settings\AccountInvitationController;
 use App\Http\Controllers\Settings\BillingController;
 use App\Http\Controllers\Settings\EmailDomainController;
 use App\Http\Controllers\Settings\TeamSettingsController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SocialPostController;
 use App\Http\Controllers\SocialSettingsController;
 use App\Http\Controllers\SubscriberController;
@@ -36,17 +37,26 @@ Route::post('/webhooks/stripe', [StripeWebhookController::class, 'handleWebhook'
 
 // Public landing page
 Route::get('/', function () {
-    return Inertia::render('Welcome');
+    return Inertia::render('Welcome', [
+        'appUrl' => config('app.url'),
+    ]);
 })->name('home');
 
 // Legal pages
 Route::get('/privacy-policy', function () {
-    return Inertia::render('PrivacyPolicy');
+    return Inertia::render('PrivacyPolicy', [
+        'appUrl' => config('app.url'),
+    ]);
 })->name('privacy-policy');
 
 Route::get('/terms-of-service', function () {
-    return Inertia::render('TermsOfService');
+    return Inertia::render('TermsOfService', [
+        'appUrl' => config('app.url'),
+    ]);
 })->name('terms-of-service');
+
+// Sitemap
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 // Public blog routes
 Route::get('/blog/{brand:slug}', [BlogController::class, 'index'])->name('public.blog.index');

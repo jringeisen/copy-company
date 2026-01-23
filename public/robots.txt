@@ -1,2 +1,21 @@
 User-agent: *
-Disallow:
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /posts
+Disallow: /subscribers
+Disallow: /newsletters
+Disallow: /social-posts
+Disallow: /content-sprints
+Disallow: /calendar
+Disallow: /media
+Disallow: /brands
+Disallow: /billing
+Disallow: /loops
+Disallow: /ai
+Disallow: /onboarding
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+
+Sitemap: https://copy-company.test/sitemap.xml

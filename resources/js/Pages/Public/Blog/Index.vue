@@ -1,11 +1,33 @@
 <script setup>
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { Link, useForm, usePage } from '@inertiajs/vue3';
+import SeoHead from '@/Components/SeoHead.vue';
 import { ref, computed } from 'vue';
 
 const props = defineProps({
     brand: Object,
     posts: Array,
+    canonicalUrl: String,
+    appUrl: String,
 });
+
+const jsonLd = computed(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+        {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: props.appUrl,
+        },
+        {
+            '@type': 'ListItem',
+            position: 2,
+            name: props.brand.name,
+            item: props.canonicalUrl,
+        },
+    ],
+}));
 
 const page = usePage();
 const flash = computed(() => page.props.flash || {});
@@ -35,10 +57,13 @@ const subscribe = () => {
 </script>
 
 <template>
-    <Head>
-        <title>{{ brand.name }}</title>
-        <meta name="description" :content="brand.description || brand.tagline" />
-    </Head>
+    <SeoHead
+        :title="brand.name"
+        :description="brand.description || brand.tagline || ''"
+        :url="canonicalUrl"
+        :site-name="brand.name"
+        :json-ld="jsonLd"
+    />
 
     <div class="min-h-screen bg-white">
         <!-- Header -->
