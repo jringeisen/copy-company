@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\CheckFeatureAccess;
 use App\Http\Middleware\EnsureAccountIsSubscribed;
+use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SetPermissionsTeamContext;
 use Illuminate\Foundation\Application;
@@ -27,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'subscribed' => EnsureAccountIsSubscribed::class,
             'feature' => CheckFeatureAccess::class,
+            'admin' => EnsureUserIsAdmin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

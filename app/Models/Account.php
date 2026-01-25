@@ -70,6 +70,16 @@ class Account extends Model
     }
 
     /**
+     * Get all disputes for this account.
+     *
+     * @return HasMany<Dispute, $this>
+     */
+    public function disputes(): HasMany
+    {
+        return $this->hasMany(Dispute::class);
+    }
+
+    /**
      * Get all admin users for this account.
      */
     public function admins(): BelongsToMany

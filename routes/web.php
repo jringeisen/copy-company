@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminDisputeController;
 use App\Http\Controllers\AIAssistantController;
 use App\Http\Controllers\AISelectionController;
 use App\Http\Controllers\BrandController;
@@ -221,4 +222,10 @@ Route::middleware(['auth'])->group(function () {
 
         return redirect('/');
     })->name('logout');
+
+    // Admin routes
+    Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/disputes', [AdminDisputeController::class, 'index'])->name('disputes.index');
+        Route::get('/disputes/{dispute}', [AdminDisputeController::class, 'show'])->name('disputes.show');
+    });
 });
