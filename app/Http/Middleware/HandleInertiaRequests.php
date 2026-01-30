@@ -56,6 +56,18 @@ class HandleInertiaRequests extends Middleware
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
                 ] : null,
+                'is_admin' => function () use ($request) {
+                    $user = $request->user();
+                    if (! $user) {
+                        return false;
+                    }
+
+                    if (app()->environment('local')) {
+                        return true;
+                    }
+
+                    return in_array($user->email, config('admin.emails', []), true);
+                },
                 'brand' => function () use ($request) {
                     /** @var \App\Models\User|null $user */
                     $user = $request->user();
@@ -117,6 +129,22 @@ class HandleInertiaRequests extends Middleware
                         'analytics' => $limits->hasAnalytics(),
                         'dedicated_ip' => $limits->canUseDedicatedIp(),
                     ],
+                ];
+            },
+
+            // Impersonation status
+            'impersonating' => function () use ($request) {
+                $adminId = $request->session()->get('impersonating_from');
+                if (! $adminId) {
+                    return null;
+                }
+
+                $admin = \App\Models\User::find($adminId);
+
+                return [
+                    'admin_id' => $adminId,
+                    'admin_name' => $admin?->name ?? 'Admin',
+                    'user_name' => $request->user()?->name,
                 ];
             },
 

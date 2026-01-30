@@ -20,6 +20,7 @@ const logout = () => {
 
 const navLinks = [
     { name: 'Disputes', href: '/admin/disputes', key: 'disputes', icon: 'exclamation' },
+    { name: 'Users', href: '/admin/users', key: 'users', icon: 'users' },
 ];
 
 const isActive = (key) => props.currentPage === key;
@@ -56,6 +57,9 @@ const isActive = (key) => props.currentPage === key;
                 >
                     <svg v-if="link.icon === 'exclamation'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <svg v-else-if="link.icon === 'users'" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
                     {{ link.name }}
                 </Link>

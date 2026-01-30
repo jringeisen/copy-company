@@ -15,6 +15,13 @@ const user = computed(() => page.props.auth?.user);
 const brand = computed(() => page.props.auth?.brand);
 const brands = computed(() => page.props.auth?.brands || []);
 
+const isAdmin = computed(() => page.props.auth?.is_admin);
+const impersonating = computed(() => page.props.impersonating);
+
+const stopImpersonating = () => {
+    router.post('/admin/impersonate/stop');
+};
+
 const mobileMenuOpen = ref(false);
 const showBrandSwitcher = ref(false);
 const expandedMenus = ref(['social']); // Social expanded by default when on social pages
@@ -81,10 +88,27 @@ const closeMobileMenu = () => {
 </script>
 
 <template>
-    <div class="min-h-screen flex bg-[#fcfbf8]">
+    <!-- Impersonation Banner -->
+    <div
+        v-if="impersonating"
+        class="fixed top-0 left-0 right-0 z-50 bg-red-600 text-white text-center py-2.5 text-sm font-medium flex items-center justify-center gap-3"
+    >
+        <span>You are impersonating <strong>{{ impersonating.user_name }}</strong></span>
+        <button
+            @click="stopImpersonating"
+            class="px-3 py-1 bg-white text-red-600 rounded-lg text-xs font-semibold hover:bg-red-50 transition-colors"
+        >
+            Stop Impersonating
+        </button>
+    </div>
+
+    <div :class="['min-h-screen flex bg-[#fcfbf8]', impersonating ? 'pt-10' : '']">
         <!-- Desktop Sidebar -->
         <aside
-            class="w-64 bg-[#0b1215] flex-col fixed inset-y-0 left-0 z-30 hidden lg:flex"
+            :class="[
+                'w-64 bg-[#0b1215] flex-col fixed left-0 z-30 hidden lg:flex',
+                impersonating ? 'top-10 bottom-0' : 'inset-y-0',
+            ]"
         >
             <!-- Logo -->
             <div class="h-16 flex items-center px-6 border-b border-white/10">
@@ -222,6 +246,20 @@ const closeMobileMenu = () => {
                 </Link>
             </div>
 
+            <!-- Admin Section -->
+            <div v-if="isAdmin" class="px-3 py-4 border-t border-white/10">
+                <p class="px-3 mb-2 text-xs font-medium text-red-400 uppercase tracking-wider">Admin</p>
+                <Link
+                    href="/admin/users"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/60 hover:bg-white/5 hover:text-white transition-colors"
+                >
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                    Admin Panel
+                </Link>
+            </div>
+
             <!-- User/Brand Section -->
             <div class="border-t border-white/10 p-4">
                 <!-- Brand Switcher -->
@@ -296,7 +334,7 @@ const closeMobileMenu = () => {
         </aside>
 
         <!-- Mobile Header -->
-        <div class="lg:hidden fixed top-0 left-0 right-0 h-16 bg-[#0b1215] z-20 flex items-center px-4">
+        <div :class="['lg:hidden fixed left-0 right-0 h-16 bg-[#0b1215] z-20 flex items-center px-4', impersonating ? 'top-10' : 'top-0']">
             <button
                 @click="mobileMenuOpen = true"
                 class="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
@@ -472,6 +510,21 @@ const closeMobileMenu = () => {
                                 </Link>
                             </div>
 
+                            <!-- Admin Section (Mobile) -->
+                            <div v-if="isAdmin" class="px-3 py-4 border-t border-white/10">
+                                <p class="px-3 mb-2 text-xs font-medium text-red-400 uppercase tracking-wider">Admin</p>
+                                <Link
+                                    href="/admin/users"
+                                    @click="closeMobileMenu"
+                                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/60 hover:bg-white/5 hover:text-white transition-colors"
+                                >
+                                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                                    </svg>
+                                    Admin Panel
+                                </Link>
+                            </div>
+
                             <!-- User/Brand Section (Mobile) -->
                             <div class="border-t border-white/10 p-4">
                                 <!-- Brand Switcher -->
@@ -518,7 +571,7 @@ const closeMobileMenu = () => {
 
         <!-- Main Content -->
         <div class="flex-1 lg:ml-64">
-            <main class="min-h-screen bg-[#fcfbf8] py-8 px-4 sm:px-6 lg:px-8 pt-24 lg:pt-8">
+            <main :class="['min-h-screen bg-[#fcfbf8] py-8 px-4 sm:px-6 lg:px-8', impersonating ? 'pt-34 lg:pt-8' : 'pt-24 lg:pt-8']">
                 <slot />
             </main>
         </div>

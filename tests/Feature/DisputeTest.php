@@ -384,6 +384,22 @@ test('admin disputes index page displays for platform admin', function () {
     $response->assertSuccessful();
 });
 
+test('admin disputes show page requires admin access', function () {
+    config(['admin.emails' => ['admin@platform.com']]);
+
+    $account = Account::factory()->create();
+    $user = User::factory()->create(['email' => 'user@example.com']);
+    $account->users()->attach($user->id, ['role' => 'admin']);
+
+    $dispute = Dispute::factory()->create(['account_id' => $account->id]);
+
+    $this->actingAs($user)
+        ->withSession(['current_account_id' => $account->id]);
+    $response = $this->get("/admin/disputes/{$dispute->id}");
+
+    $response->assertForbidden();
+});
+
 test('admin disputes show page displays dispute details', function () {
     config(['admin.emails' => ['admin@platform.com']]);
 

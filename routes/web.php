@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDisputeController;
+use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\ImpersonationController;
 use App\Http\Controllers\AIAssistantController;
 use App\Http\Controllers\AISelectionController;
 use App\Http\Controllers\BrandController;
@@ -223,9 +225,14 @@ Route::middleware(['auth'])->group(function () {
         return redirect('/');
     })->name('logout');
 
+    // Impersonation stop route (outside admin middleware - impersonated user won't pass admin check)
+    Route::post('/admin/impersonate/stop', [ImpersonationController::class, 'stop'])->name('admin.impersonate.stop');
+
     // Admin routes
     Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/disputes', [AdminDisputeController::class, 'index'])->name('disputes.index');
         Route::get('/disputes/{dispute}', [AdminDisputeController::class, 'show'])->name('disputes.show');
+        Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::post('/impersonate/{user}', [ImpersonationController::class, 'start'])->name('impersonate.start');
     });
 });
