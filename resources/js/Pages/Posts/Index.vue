@@ -127,7 +127,7 @@ const getStatusColor = (status) => {
                                     :checked="allSelected"
                                     :indeterminate="someSelected"
                                     @change="toggleAll"
-                                    class="rounded border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
+                                    class="rounded border-[#0b1215]/20 text-[#a1854f] focus:ring-[#a1854f]/30"
                                 />
                             </th>
                             <th class="px-6 py-4 text-left text-xs font-medium text-[#0b1215]/50 uppercase tracking-wider">
@@ -158,7 +158,7 @@ const getStatusColor = (status) => {
                                     type="checkbox"
                                     :checked="selectedIds.includes(post.id)"
                                     @change="togglePost(post.id)"
-                                    class="rounded border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
+                                    class="rounded border-[#0b1215]/20 text-[#a1854f] focus:ring-[#a1854f]/30"
                                 />
                             </td>
                             <td class="px-6 py-4">

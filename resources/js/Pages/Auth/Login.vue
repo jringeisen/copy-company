@@ -35,7 +35,7 @@ const submit = () => {
                     id="email"
                     v-model="form.email"
                     type="email"
-                    class="w-full px-4 py-3 bg-[#f7f7f7] border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0b1215]/20 transition"
+                    class="w-full px-4 py-3 bg-[#f7f7f7] border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#a1854f]/30 transition"
                     required
                     autofocus
                     autocomplete="username"
@@ -50,7 +50,7 @@ const submit = () => {
                     id="password"
                     v-model="form.password"
                     type="password"
-                    class="w-full px-4 py-3 bg-[#f7f7f7] border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0b1215]/20 transition"
+                    class="w-full px-4 py-3 bg-[#f7f7f7] border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#a1854f]/30 transition"
                     required
                     autocomplete="current-password"
                     placeholder="Enter your password"
@@ -63,7 +63,7 @@ const submit = () => {
                     <input
                         v-model="form.remember"
                         type="checkbox"
-                        class="w-4 h-4 rounded border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
+                        class="w-4 h-4 rounded border-[#0b1215]/20 text-[#a1854f] focus:ring-[#a1854f]/30"
                     />
                     <span class="ml-2 text-sm text-[#0b1215]/70">Remember me</span>
                 </label>

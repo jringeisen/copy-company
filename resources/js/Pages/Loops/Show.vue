@@ -745,7 +745,7 @@ const truncateContent = (content, length = 100) => {
                                 <textarea
                                     v-model="editItemForm.content"
                                     rows="4"
-                                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                                     placeholder="Enter your post content..."
                                 />
                             </div>
@@ -754,7 +754,7 @@ const truncateContent = (content, length = 100) => {
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Format</label>
                                 <select
                                     v-model="editItemForm.format"
-                                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                                 >
                                     <option value="feed">Feed</option>
                                     <option value="story">Story</option>
@@ -768,7 +768,7 @@ const truncateContent = (content, length = 100) => {
                                 <input
                                     v-model="editItemForm.link"
                                     type="url"
-                                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                                     placeholder="https://..."
                                 />
                             </div>
@@ -793,7 +793,7 @@ const truncateContent = (content, length = 100) => {
                                     <input
                                         v-model="editHashtagInput"
                                         type="text"
-                                        class="flex-1 px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                                        class="flex-1 px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                                         placeholder="Add hashtag"
                                         @keydown.enter.prevent="addEditHashtag"
                                     />

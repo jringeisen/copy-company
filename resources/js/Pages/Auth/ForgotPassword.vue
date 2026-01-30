@@ -30,7 +30,7 @@ const submit = () => {
                     id="email"
                     v-model="form.email"
                     type="email"
-                    class="w-full px-4 py-3 bg-[#f7f7f7] border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0b1215]/20 transition"
+                    class="w-full px-4 py-3 bg-[#f7f7f7] border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#a1854f]/30 transition"
                     required
                     autofocus
                     autocomplete="username"

@@ -79,7 +79,7 @@ const submit = () => {
                                     v-model="form.topics[index]"
                                     type="text"
                                     placeholder="e.g., productivity, remote work, leadership"
-                                    class="flex-1 border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                                    class="flex-1 border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                                 />
                                 <button
                                     v-if="form.topics.length > 1"
@@ -115,7 +115,7 @@ const submit = () => {
                             v-model="form.goals"
                             rows="3"
                             placeholder="e.g., Establish thought leadership in my industry, drive newsletter signups, educate readers about..."
-                            class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                            class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                         ></textarea>
                         <p v-if="form.errors.goals" class="mt-1 text-sm text-red-600">
                             {{ form.errors.goals }}

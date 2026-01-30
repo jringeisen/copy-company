@@ -77,7 +77,7 @@ const submit = () => {
                             id="name"
                             v-model="form.name"
                             type="text"
-                            class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                            class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                             placeholder="My Awesome Brand"
                             required
                         />
@@ -96,7 +96,7 @@ const submit = () => {
                                 v-model="form.slug"
                                 @input="onSlugInput"
                                 type="text"
-                                class="flex-1 block w-full px-4 py-3 border-0 focus:ring-[#0b1215]/20"
+                                class="flex-1 block w-full px-4 py-3 border-0 focus:ring-[#a1854f]/30"
                                 placeholder="my-brand"
                                 required
                             />
@@ -112,7 +112,7 @@ const submit = () => {
                             id="tagline"
                             v-model="form.tagline"
                             type="text"
-                            class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                            class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                             placeholder="A brief description of what you do"
                         />
                         <p v-if="form.errors.tagline" class="mt-1 text-sm text-red-600">{{ form.errors.tagline }}</p>
@@ -125,7 +125,7 @@ const submit = () => {
                             id="description"
                             v-model="form.description"
                             rows="3"
-                            class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                            class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                             placeholder="Tell your audience what your brand is about..."
                         ></textarea>
                         <p v-if="form.errors.description" class="mt-1 text-sm text-red-600">{{ form.errors.description }}</p>
@@ -137,7 +137,7 @@ const submit = () => {
                         <select
                             id="industry"
                             v-model="form.industry"
-                            class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                            class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                         >
                             <option value="">Select an industry (optional)</option>
                             <option v-for="industry in industries" :key="industry" :value="industry">
@@ -161,7 +161,7 @@ const submit = () => {
                             <input
                                 v-model="form.primary_color"
                                 type="text"
-                                class="flex-1 px-4 py-2 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                                class="flex-1 px-4 py-2 border border-[#0b1215]/20 rounded-xl focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                                 placeholder="#6366f1"
                             />
                         </div>
@@ -175,7 +175,7 @@ const submit = () => {
                         </Link>
                         <button
                             type="submit"
-                            class="px-6 py-3 bg-[#0b1215] text-white font-semibold rounded-full hover:bg-[#0b1215]/90 focus:outline-none focus:ring-2 focus:ring-[#0b1215]/20 focus:ring-offset-2 transition"
+                            class="px-6 py-3 bg-[#0b1215] text-white font-semibold rounded-full hover:bg-[#0b1215]/90 focus:outline-none focus:ring-2 focus:ring-[#a1854f]/30 focus:ring-offset-2 transition"
                             :class="{ 'opacity-50': form.processing }"
                             :disabled="form.processing"
                         >

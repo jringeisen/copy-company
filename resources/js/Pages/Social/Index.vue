@@ -215,7 +215,7 @@ const availablePlatformsForGenerate = [
                     <label class="block text-sm font-medium text-[#0b1215] mb-1">Platform</label>
                     <select
                         v-model="selectedPlatform"
-                        class="border border-[#0b1215]/20 rounded-xl px-3 py-2 text-sm focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                        class="border border-[#0b1215]/20 rounded-xl px-3 py-2 text-sm focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                     >
                         <option v-for="platform in platforms" :key="platform.value" :value="platform.value">
                             {{ platform.label }}
@@ -226,7 +226,7 @@ const availablePlatformsForGenerate = [
                     <label class="block text-sm font-medium text-[#0b1215] mb-1">Status</label>
                     <select
                         v-model="selectedStatus"
-                        class="border border-[#0b1215]/20 rounded-xl px-3 py-2 text-sm focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                        class="border border-[#0b1215]/20 rounded-xl px-3 py-2 text-sm focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                     >
                         <option v-for="status in statuses" :key="status.value" :value="status.value">
                             {{ status.label }}
@@ -314,7 +314,7 @@ const availablePlatformsForGenerate = [
                         <label class="block text-sm font-medium text-[#0b1215] mb-2">Select a blog post</label>
                         <select
                             v-model="generateForm.post_id"
-                            class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                            class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                         >
                             <option value="">Choose a post...</option>
                             <option v-for="post in posts" :key="post.id" :value="post.id">
@@ -381,7 +381,7 @@ const availablePlatformsForGenerate = [
                         <input
                             v-model="scheduleForm.scheduled_at"
                             type="datetime-local"
-                            class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                            class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                         />
                         <p class="mt-1 text-sm text-[#0b1215]/50">
                             Times are in {{ timezoneDisplay }}

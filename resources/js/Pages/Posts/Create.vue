@@ -283,7 +283,7 @@ const handleInsertContent = (content) => {
                                 v-model="form.title"
                                 type="text"
                                 placeholder="Post title..."
-                                class="w-full text-4xl font-bold text-[#0b1215] border-0 border-b-2 border-transparent focus:border-[#a1854f] focus:ring-0 pb-2 placeholder-[#0b1215]/30"
+                                class="w-full text-4xl font-bold text-[#0b1215] border-0 border-b-2 border-transparent focus:border-[#a1854f] focus:ring-0 focus:outline-none pb-2 placeholder-[#0b1215]/30"
                             />
                             <p v-if="form.errors.title" class="mt-1 text-sm text-red-600">{{ form.errors.title }}</p>
                         </div>
@@ -294,7 +294,7 @@ const handleInsertContent = (content) => {
                                 v-model="form.excerpt"
                                 placeholder="Write a brief excerpt or summary (optional)..."
                                 rows="2"
-                                class="w-full text-[#0b1215]/70 border-0 focus:ring-0 resize-none placeholder-[#0b1215]/30"
+                                class="w-full text-[#0b1215]/70 border-0 border-b-2 border-transparent focus:border-[#a1854f] focus:ring-0 focus:outline-none resize-none placeholder-[#0b1215]/30"
                                 maxlength="500"
                             ></textarea>
                             <div class="flex justify-between items-center mt-1">
@@ -323,7 +323,7 @@ const handleInsertContent = (content) => {
                                     <input
                                         v-model="form.publish_to_blog"
                                         type="checkbox"
-                                        class="rounded border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
+                                        class="rounded border-[#0b1215]/20 text-[#a1854f] focus:ring-[#a1854f]/30"
                                     />
                                     <span class="ml-2 text-sm text-[#0b1215]/70">Publish to blog</span>
                                 </label>
@@ -334,8 +334,8 @@ const handleInsertContent = (content) => {
                                             type="checkbox"
                                             :disabled="!canSendNewsletter"
                                             :class="[
-                                                'rounded border-[#0b1215]/20 focus:ring-[#0b1215]/20',
-                                                canSendNewsletter ? 'text-[#0b1215]' : 'text-[#0b1215]/30 cursor-not-allowed'
+                                                'rounded border-[#0b1215]/20 focus:ring-[#a1854f]/30',
+                                                canSendNewsletter ? 'text-[#a1854f]' : 'text-[#0b1215]/30 cursor-not-allowed'
                                             ]"
                                         />
                                         <span :class="['ml-2 text-sm', canSendNewsletter ? 'text-[#0b1215]/70' : 'text-[#0b1215]/40']">
@@ -354,7 +354,7 @@ const handleInsertContent = (content) => {
                                     <input
                                         v-model="form.generate_social"
                                         type="checkbox"
-                                        class="rounded border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
+                                        class="rounded border-[#0b1215]/20 text-[#a1854f] focus:ring-[#a1854f]/30"
                                     />
                                     <span class="ml-2 text-sm text-[#0b1215]/70">Generate social posts</span>
                                 </label>

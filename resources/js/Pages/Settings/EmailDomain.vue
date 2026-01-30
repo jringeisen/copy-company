@@ -137,7 +137,7 @@ const copyToClipboard = (text) => {
                             v-model="domainForm.domain"
                             type="text"
                             placeholder="yourbrand.com"
-                            class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                            class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                             required
                         />
                         <p class="mt-1 text-sm text-[#0b1215]/50">Enter your domain without http:// or www</p>
@@ -153,7 +153,7 @@ const copyToClipboard = (text) => {
                                 v-model="domainForm.from_address"
                                 type="text"
                                 placeholder="hello"
-                                class="flex-1 block w-full px-4 py-3 border-0 focus:ring-[#0b1215]/20"
+                                class="flex-1 block w-full px-4 py-3 border-0 focus:ring-[#a1854f]/30"
                             />
                             <span class="inline-flex items-center px-4 bg-[#f7f7f7] text-[#0b1215]/50 text-sm border-l border-[#0b1215]/20">
                                 @{{ domainForm.domain || 'yourbrand.com' }}
@@ -165,7 +165,7 @@ const copyToClipboard = (text) => {
 
                     <button
                         type="submit"
-                        class="w-full px-6 py-3 bg-[#0b1215] text-white font-semibold rounded-full hover:bg-[#0b1215]/90 focus:outline-none focus:ring-2 focus:ring-[#0b1215]/20 focus:ring-offset-2 transition"
+                        class="w-full px-6 py-3 bg-[#0b1215] text-white font-semibold rounded-full hover:bg-[#0b1215]/90 focus:outline-none focus:ring-2 focus:ring-[#a1854f]/30 focus:ring-offset-2 transition"
                         :class="{ 'opacity-50': domainForm.processing }"
                         :disabled="domainForm.processing"
                     >
@@ -365,7 +365,7 @@ const copyToClipboard = (text) => {
                                     id="edit_from_address"
                                     v-model="fromForm.from_address"
                                     type="text"
-                                    class="flex-1 block w-full px-4 py-3 border-0 focus:ring-[#0b1215]/20"
+                                    class="flex-1 block w-full px-4 py-3 border-0 focus:ring-[#a1854f]/30"
                                 />
                                 <span class="inline-flex items-center px-4 bg-[#f7f7f7] text-[#0b1215]/50 text-sm border-l border-[#0b1215]/20">
                                     @{{ brand.custom_email_domain }}
@@ -376,7 +376,7 @@ const copyToClipboard = (text) => {
                         <div class="flex justify-end">
                             <button
                                 type="submit"
-                                class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 focus:outline-none focus:ring-2 focus:ring-[#0b1215]/20 focus:ring-offset-2 transition"
+                                class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 focus:outline-none focus:ring-2 focus:ring-[#a1854f]/30 focus:ring-offset-2 transition"
                                 :class="{ 'opacity-50': fromForm.processing }"
                                 :disabled="fromForm.processing"
                             >

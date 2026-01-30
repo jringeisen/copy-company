@@ -65,7 +65,7 @@ const submit = () => {
                                         v-model="form.name"
                                         type="text"
                                         placeholder="e.g., Blog Images"
-                                        class="w-full px-3 py-2 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                                        class="w-full px-3 py-2 border border-[#0b1215]/20 rounded-xl focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                                         autofocus
                                     />
                                     <p v-if="form.errors.name" class="mt-1 text-sm text-red-600">

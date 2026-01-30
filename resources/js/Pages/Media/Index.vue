@@ -164,7 +164,7 @@ const deleteMessage = computed(() => {
                                 :checked="allSelected"
                                 :indeterminate="someSelected"
                                 @change="toggleAll"
-                                class="rounded border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
+                                class="rounded border-[#0b1215]/20 text-[#a1854f] focus:ring-[#a1854f]/30"
                             />
                             Select all
                         </label>

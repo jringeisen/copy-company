@@ -65,7 +65,7 @@ const submit = () => {
                     id="name"
                     v-model="form.name"
                     type="text"
-                    class="w-full px-4 py-3 bg-[#f7f7f7] border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0b1215]/20 transition"
+                    class="w-full px-4 py-3 bg-[#f7f7f7] border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#a1854f]/30 transition"
                     required
                     autofocus
                     autocomplete="name"
@@ -80,7 +80,7 @@ const submit = () => {
                     id="email"
                     v-model="form.email"
                     type="email"
-                    class="w-full px-4 py-3 bg-[#f7f7f7] border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0b1215]/20 transition"
+                    class="w-full px-4 py-3 bg-[#f7f7f7] border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#a1854f]/30 transition"
                     required
                     autocomplete="username"
                     placeholder="you@example.com"
@@ -94,7 +94,7 @@ const submit = () => {
                     id="password"
                     v-model="form.password"
                     type="password"
-                    class="w-full px-4 py-3 bg-[#f7f7f7] border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0b1215]/20 transition"
+                    class="w-full px-4 py-3 bg-[#f7f7f7] border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#a1854f]/30 transition"
                     required
                     autocomplete="new-password"
                     placeholder="Create a password"
@@ -108,7 +108,7 @@ const submit = () => {
                     id="password_confirmation"
                     v-model="form.password_confirmation"
                     type="password"
-                    class="w-full px-4 py-3 bg-[#f7f7f7] border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0b1215]/20 transition"
+                    class="w-full px-4 py-3 bg-[#f7f7f7] border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#a1854f]/30 transition"
                     required
                     autocomplete="new-password"
                     placeholder="Confirm your password"
@@ -126,7 +126,7 @@ const submit = () => {
                 <select
                     id="industry"
                     v-model="form.industry"
-                    class="w-full px-4 py-3 bg-[#f7f7f7] border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0b1215]/20 transition appearance-none"
+                    class="w-full px-4 py-3 bg-[#f7f7f7] border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#a1854f]/30 transition appearance-none"
                     required
                 >
                     <option value="" disabled>Select your industry</option>
@@ -142,7 +142,7 @@ const submit = () => {
                 <select
                     id="biggest_struggle"
                     v-model="form.biggest_struggle"
-                    class="w-full px-4 py-3 bg-[#f7f7f7] border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0b1215]/20 transition appearance-none"
+                    class="w-full px-4 py-3 bg-[#f7f7f7] border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#a1854f]/30 transition appearance-none"
                     required
                 >
                     <option value="" disabled>Select your biggest challenge</option>
@@ -158,7 +158,7 @@ const submit = () => {
                 <select
                     id="referral_source"
                     v-model="form.referral_source"
-                    class="w-full px-4 py-3 bg-[#f7f7f7] border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0b1215]/20 transition appearance-none"
+                    class="w-full px-4 py-3 bg-[#f7f7f7] border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#a1854f]/30 transition appearance-none"
                     required
                 >
                     <option value="" disabled>Select how you found us</option>

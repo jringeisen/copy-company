@@ -163,7 +163,7 @@ const handleOutline = async () => {
                                 v-model="draftBullets"
                                 placeholder="Key points to cover (optional)..."
                                 rows="3"
-                                class="w-full text-sm border border-[#0b1215]/10 rounded-xl px-3 py-2 resize-none focus:ring-[#0b1215]/20 focus:border-[#0b1215]/30 placeholder-[#0b1215]/30"
+                                class="w-full text-sm border border-[#0b1215]/10 rounded-xl px-3 py-2 resize-none focus:outline-none focus:ring-[#a1854f]/30 focus:border-[#a1854f] placeholder-[#0b1215]/30"
                             ></textarea>
                             <button
                                 @click="handleGenerateDraft"
@@ -192,7 +192,7 @@ const handleOutline = async () => {
                                 v-model="outlineNotes"
                                 placeholder="Additional notes or ideas (optional)..."
                                 rows="3"
-                                class="w-full text-sm border border-[#0b1215]/10 rounded-xl px-3 py-2 resize-none focus:ring-[#0b1215]/20 focus:border-[#0b1215]/30 placeholder-[#0b1215]/30"
+                                class="w-full text-sm border border-[#0b1215]/10 rounded-xl px-3 py-2 resize-none focus:outline-none focus:ring-[#a1854f]/30 focus:border-[#a1854f] placeholder-[#0b1215]/30"
                             ></textarea>
                             <button
                                 @click="handleOutline"

@@ -148,7 +148,7 @@ onUnmounted(() => {
             @click="openDropdown"
             @keydown="handleKeydown"
             :disabled="disabled"
-            class="w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40 bg-white text-left flex items-center justify-between disabled:bg-gray-100 disabled:cursor-not-allowed"
+            class="w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#a1854f]/30 focus:border-[#a1854f] bg-white text-left flex items-center justify-between disabled:bg-gray-100 disabled:cursor-not-allowed"
         >
             <span :class="selectedLabel ? 'text-[#0b1215]' : 'text-[#0b1215]/50'">
                 {{ selectedLabel || placeholder }}
@@ -177,7 +177,7 @@ onUnmounted(() => {
                     type="text"
                     :placeholder="placeholder"
                     @keydown="handleKeydown"
-                    class="w-full px-3 py-2 border border-[#0b1215]/20 rounded-lg text-sm focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                    class="w-full px-3 py-2 border border-[#0b1215]/20 rounded-lg text-sm focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                 />
             </div>
 

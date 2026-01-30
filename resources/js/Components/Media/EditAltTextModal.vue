@@ -83,7 +83,7 @@ const submit = () => {
                                         v-model="form.alt_text"
                                         rows="2"
                                         placeholder="Describe this image for accessibility..."
-                                        class="w-full px-3 py-2 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                                        class="w-full px-3 py-2 border border-[#0b1215]/20 rounded-xl focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                                     ></textarea>
                                     <p class="mt-1 text-xs text-[#0b1215]/50">
                                         Alt text helps screen readers describe images to visually impaired users.

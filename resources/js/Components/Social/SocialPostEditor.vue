@@ -139,7 +139,7 @@ const save = () => {
                         <label class="block text-sm font-medium text-[#0b1215] mb-2">Format</label>
                         <select
                             v-model="form.format"
-                            class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                            class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                         >
                             <option
                                 v-for="formatOption in formatOptions[socialPost.platform]"
@@ -219,7 +219,7 @@ const save = () => {
                             v-model="form.content"
                             rows="8"
                             :class="[
-                                'w-full border rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40',
+                                'w-full border rounded-xl px-3 py-2 focus:ring-[#a1854f]/30 focus:border-[#a1854f]',
                                 isOverLimit ? 'border-red-300' : 'border-[#0b1215]/20'
                             ]"
                             placeholder="Write your social post content..."
@@ -255,7 +255,7 @@ const save = () => {
                                 @keyup.enter="addHashtag"
                                 type="text"
                                 placeholder="Add hashtag..."
-                                class="flex-1 border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                                class="flex-1 border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                             />
                             <button
                                 @click="addHashtag"
@@ -274,7 +274,7 @@ const save = () => {
                             v-model="form.link"
                             type="url"
                             placeholder="https://..."
-                            class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                            class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                         />
                     </div>
                 </div>

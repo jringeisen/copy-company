@@ -48,7 +48,7 @@ const variantStyles = {
     },
     info: {
         icon: 'text-[#0b1215] bg-[#0b1215]/10',
-        button: 'bg-[#0b1215] hover:bg-[#0b1215]/90 focus:ring-[#0b1215]/50',
+        button: 'bg-[#0b1215] hover:bg-[#0b1215]/90 focus:ring-[#a1854f]/50',
     },
 };
 
@@ -170,7 +170,7 @@ watch(() => props.show, (newVal) => {
                                     type="button"
                                     @click="emit('cancel')"
                                     :disabled="processing"
-                                    class="flex-1 px-4 py-2.5 text-[#0b1215] font-medium bg-white border border-[#0b1215]/20 rounded-xl hover:bg-[#0b1215]/5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0b1215]/20 transition disabled:opacity-50"
+                                    class="flex-1 px-4 py-2.5 text-[#0b1215] font-medium bg-white border border-[#0b1215]/20 rounded-xl hover:bg-[#0b1215]/5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#a1854f]/30 transition disabled:opacity-50"
                                 >
                                     {{ cancelText }}
                                 </button>

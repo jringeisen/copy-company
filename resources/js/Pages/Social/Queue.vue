@@ -159,7 +159,7 @@ const submitPublishNow = () => {
                         type="checkbox"
                         :checked="selectedPosts.length === queuedPosts.length"
                         @change="selectAll"
-                        class="rounded border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
+                        class="rounded border-[#0b1215]/20 text-[#a1854f] focus:ring-[#a1854f]/30"
                     />
                     <span class="ml-2 text-sm text-[#0b1215]/70">Select all</span>
                 </label>
@@ -179,7 +179,7 @@ const submitPublishNow = () => {
                                 type="checkbox"
                                 :checked="selectedPosts.includes(post.id)"
                                 @change="toggleSelect(post.id)"
-                                class="rounded border-[#0b1215]/20 text-[#0b1215] focus:ring-[#0b1215]/20"
+                                class="rounded border-[#0b1215]/20 text-[#a1854f] focus:ring-[#a1854f]/30"
                             />
                         </div>
 
@@ -267,7 +267,7 @@ const submitPublishNow = () => {
                             <input
                                 v-model="bulkScheduleForm.scheduled_at"
                                 type="datetime-local"
-                                class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                                class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                                 :class="{ 'border-red-500': bulkScheduleForm.errors.scheduled_at }"
                             />
                             <p class="mt-1 text-sm text-[#0b1215]/50">
@@ -283,7 +283,7 @@ const submitPublishNow = () => {
                                 v-model.number="bulkScheduleForm.interval_minutes"
                                 type="number"
                                 min="0"
-                                class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                                class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                             />
                             <p class="mt-1 text-sm text-[#0b1215]/50">
                                 Posts will be scheduled {{ bulkScheduleForm.interval_minutes }} minutes apart.
@@ -342,7 +342,7 @@ const submitPublishNow = () => {
                                 v-model.number="bulkPublishNowForm.interval_minutes"
                                 type="number"
                                 min="5"
-                                class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                                class="w-full border border-[#0b1215]/20 rounded-xl px-3 py-2 focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                                 :class="{ 'border-red-500': bulkPublishNowForm.errors.interval_minutes }"
                             />
                             <p class="mt-1 text-sm text-[#0b1215]/50">

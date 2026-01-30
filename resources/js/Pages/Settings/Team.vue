@@ -87,7 +87,7 @@ const getRoleBadgeClass = (role) => {
                 <button
                     v-if="isAdmin"
                     @click="showInviteModal = true"
-                    class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 focus:outline-none focus:ring-2 focus:ring-[#0b1215]/20 focus:ring-offset-2 transition"
+                    class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 focus:outline-none focus:ring-2 focus:ring-[#a1854f]/30 focus:ring-offset-2 transition"
                 >
                     Invite Member
                 </button>
@@ -121,7 +121,7 @@ const getRoleBadgeClass = (role) => {
                                 v-if="isAdmin && !member.is_current_user"
                                 :value="member.role"
                                 @change="updateRole(member.id, $event.target.value)"
-                                class="text-sm border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                                class="text-sm border-[#0b1215]/20 rounded-xl focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                             >
                                 <option v-for="role in roles" :key="role.value" :value="role.value">
                                     {{ role.label }}
@@ -215,7 +215,7 @@ const getRoleBadgeClass = (role) => {
                                 id="invite_email"
                                 v-model="inviteForm.email"
                                 type="email"
-                                class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                                class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                                 placeholder="colleague@example.com"
                                 required
                             />
@@ -227,7 +227,7 @@ const getRoleBadgeClass = (role) => {
                             <select
                                 id="invite_role"
                                 v-model="inviteForm.role"
-                                class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#0b1215]/20 focus:border-[#0b1215]/40"
+                                class="mt-1 block w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
                             >
                                 <option v-for="role in roles" :key="role.value" :value="role.value">
                                     {{ role.label }}
@@ -246,7 +246,7 @@ const getRoleBadgeClass = (role) => {
                             </button>
                             <button
                                 type="submit"
-                                class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 focus:outline-none focus:ring-2 focus:ring-[#0b1215]/20 focus:ring-offset-2 transition"
+                                class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 focus:outline-none focus:ring-2 focus:ring-[#a1854f]/30 focus:ring-offset-2 transition"
                                 :class="{ 'opacity-50': inviteForm.processing }"
                                 :disabled="inviteForm.processing"
                             >
