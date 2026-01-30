@@ -61,11 +61,11 @@ const formatDate = (dateString) => {
                     v-for="platform in platforms"
                     :key="platform.identifier"
                     class="bg-white rounded-2xl border border-[#0b1215]/10 p-6 relative"
-                    :class="{ 'opacity-50': platform.identifier === 'tiktok' }"
+                    :class="{ 'opacity-50': platform.identifier === 'tiktok' || platform.identifier === 'pinterest' }"
                 >
                     <!-- Coming Soon Badge for TikTok -->
                     <span
-                        v-if="platform.identifier === 'tiktok'"
+                        v-if="platform.identifier === 'tiktok' || platform.identifier === 'pinterest'"
                         class="absolute top-3 right-3 px-2 py-1 text-xs font-medium bg-[#a1854f] text-white rounded-full"
                     >
                         Coming Soon
@@ -152,7 +152,7 @@ const formatDate = (dateString) => {
                         </template>
                         <template v-else>
                             <button
-                                v-if="platform.supported && platform.identifier !== 'tiktok'"
+                                v-if="platform.supported && platform.identifier !== 'tiktok' && platform.identifier !== 'pinterest'"
                                 @click="connect(platform.identifier)"
                                 class="flex-1 px-4 py-2 text-sm font-medium text-white bg-[#0b1215] hover:bg-[#0b1215]/90 rounded-full transition"
                             >
