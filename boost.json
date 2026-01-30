@@ -2,11 +2,18 @@
     "agents": [
         "claude_code"
     ],
-    "editors": [
-        "claude_code",
-        "phpstorm"
+    "guidelines": true,
+    "herd_mcp": false,
+    "mcp": true,
+    "packages": [
+        "laravel/fortify",
+        "prism-php/prism"
     ],
-    "guidelines": [
-        "laravel/fortify"
+    "sail": false,
+    "skills": [
+        "pest-testing",
+        "inertia-vue-development",
+        "tailwindcss-development",
+        "developing-with-prism"
     ]
 }

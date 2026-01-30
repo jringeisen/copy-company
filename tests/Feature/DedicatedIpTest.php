@@ -137,8 +137,8 @@ test('starter plan does not have dedicated ip support', function () {
 });
 
 test('pro plan has updated pricing', function () {
-    expect(SubscriptionPlan::Pro->monthlyPriceCents())->toBe(5900);
-    expect(SubscriptionPlan::Pro->annualPricePerMonthCents())->toBe(4900);
+    expect(SubscriptionPlan::Pro->monthlyPriceCents())->toBe(2900);
+    expect(SubscriptionPlan::Pro->annualPricePerMonthCents())->toBe(2200);
 });
 
 // DedicatedIpStatus Enum Tests

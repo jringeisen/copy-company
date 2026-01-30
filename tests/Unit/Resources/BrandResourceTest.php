@@ -43,7 +43,7 @@ test('brand resource includes url attribute', function () {
     $array = $resource->toArray(app(Request::class));
 
     expect($array)->toHaveKey('url');
-    expect($array['url'])->toContain('@my-brand');
+    expect($array['url'])->toContain('/blog/my-brand');
 });
 
 test('brand resource formats dates correctly', function () {

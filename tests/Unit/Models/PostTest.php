@@ -72,7 +72,7 @@ test('post url is constructed from brand url and slug', function () {
     $brand = Brand::factory()->create(['slug' => 'my-brand']);
     $post = Post::factory()->forBrand($brand)->create(['slug' => 'my-post']);
 
-    expect($post->url)->toContain('@my-brand/my-post');
+    expect($post->url)->toContain('/blog/my-brand/my-post');
 });
 
 test('is published returns true for published status', function () {

@@ -23,6 +23,9 @@ test('it creates a new user with valid input', function () {
         'email' => 'john@example.com',
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
+        'industry' => 'technology',
+        'biggest_struggle' => 'content creation',
+        'referral_source' => 'google',
     ]);
 
     expect($user)->toBeInstanceOf(User::class)
@@ -38,6 +41,9 @@ test('it creates an account for new user', function () {
         'email' => 'jane@example.com',
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
+        'industry' => 'technology',
+        'biggest_struggle' => 'content creation',
+        'referral_source' => 'google',
     ]);
 
     expect($user->accounts)->toHaveCount(1)
@@ -52,6 +58,9 @@ test('it assigns admin role to new user', function () {
         'email' => 'admin@example.com',
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
+        'industry' => 'technology',
+        'biggest_struggle' => 'content creation',
+        'referral_source' => 'google',
     ]);
 
     $account = $user->accounts->first();
@@ -128,6 +137,9 @@ test('it accepts pending invitation', function () {
         'email' => 'invited@example.com',
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
+        'industry' => 'technology',
+        'biggest_struggle' => 'content creation',
+        'referral_source' => 'google',
     ]);
 
     expect($user->accounts)->toHaveCount(1)
@@ -160,6 +172,9 @@ test('it ignores expired invitation', function () {
         'email' => 'expired@example.com',
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
+        'industry' => 'technology',
+        'biggest_struggle' => 'content creation',
+        'referral_source' => 'google',
     ]);
 
     // Should create new account since invitation is expired
@@ -189,6 +204,9 @@ test('it ignores invitation with wrong email', function () {
         'email' => 'other@example.com',
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
+        'industry' => 'technology',
+        'biggest_struggle' => 'content creation',
+        'referral_source' => 'google',
     ]);
 
     // Should create new account since emails don't match
@@ -203,6 +221,9 @@ test('it generates unique slug for account', function () {
         'email' => 'test1@example.com',
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
+        'industry' => 'technology',
+        'biggest_struggle' => 'content creation',
+        'referral_source' => 'google',
     ]);
 
     // Create second user with same name
@@ -211,6 +232,9 @@ test('it generates unique slug for account', function () {
         'email' => 'test2@example.com',
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
+        'industry' => 'technology',
+        'biggest_struggle' => 'content creation',
+        'referral_source' => 'google',
     ]);
 
     $account1 = $user1->accounts->first();
@@ -244,6 +268,9 @@ test('it ignores already accepted invitation', function () {
         'email' => 'accepted@example.com',
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
+        'industry' => 'technology',
+        'biggest_struggle' => 'content creation',
+        'referral_source' => 'google',
     ]);
 
     // Should create new account since invitation is already accepted
@@ -258,6 +285,9 @@ test('it hashes the password', function () {
         'email' => 'hash@example.com',
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
+        'industry' => 'technology',
+        'biggest_struggle' => 'content creation',
+        'referral_source' => 'google',
     ]);
 
     expect($user->password)->not->toBe('Password123!')
