@@ -11,9 +11,22 @@ use Carbon\Carbon;
 
 class SubscriptionLimitsService
 {
+    /** @var \Illuminate\Support\Collection<int, int>|null */
+    protected ?\Illuminate\Support\Collection $brandIds = null;
+
     public function __construct(
         protected Account $account
     ) {}
+
+    /**
+     * Get cached brand IDs for this account.
+     *
+     * @return \Illuminate\Support\Collection<int, int>
+     */
+    protected function getBrandIds(): \Illuminate\Support\Collection
+    {
+        return $this->brandIds ??= $this->account->brands()->pluck('id');
+    }
 
     /**
      * Get the current subscription plan for the account.
@@ -123,7 +136,7 @@ class SubscriptionLimitsService
      */
     public function getPostsThisMonth(): int
     {
-        $brandIds = $this->account->brands()->pluck('id');
+        $brandIds = $this->getBrandIds();
 
         return Post::whereIn('brand_id', $brandIds)
             ->where('created_at', '>=', Carbon::now()->startOfMonth())
@@ -171,7 +184,7 @@ class SubscriptionLimitsService
      */
     public function getContentSprintsThisMonth(): int
     {
-        $brandIds = $this->account->brands()->pluck('id');
+        $brandIds = $this->getBrandIds();
 
         return ContentSprint::whereIn('brand_id', $brandIds)
             ->where('created_at', '>=', Carbon::now()->startOfMonth())

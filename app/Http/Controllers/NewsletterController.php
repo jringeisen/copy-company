@@ -2,21 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\HasBrandAuthorization;
 use App\Http\Resources\NewsletterSendResource;
 use App\Models\EmailEvent;
 use App\Models\NewsletterSend;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class NewsletterController extends Controller
 {
-    public function index(Request $request): Response
+    use HasBrandAuthorization;
+
+    public function index(Request $request): Response|RedirectResponse
     {
+        $brand = $this->requireBrand();
+
+        if ($this->isRedirect($brand)) {
+            return $brand;
+        }
+
         return Inertia::render('Newsletters/Index', [
             'newsletters' => Inertia::scroll(fn () => NewsletterSendResource::collection(
-                $request->user()->currentBrand()
-                    ->newsletterSends()
+                $brand->newsletterSends()
                     ->with('post:id,title,slug')
                     ->latest()
                     ->paginate(15)
@@ -24,10 +33,16 @@ class NewsletterController extends Controller
         ]);
     }
 
-    public function show(Request $request, NewsletterSend $newsletterSend): Response
+    public function show(Request $request, NewsletterSend $newsletterSend): Response|RedirectResponse
     {
+        $brand = $this->requireBrand();
+
+        if ($this->isRedirect($brand)) {
+            return $brand;
+        }
+
         // Verify the newsletter belongs to the current brand
-        if ($newsletterSend->brand_id !== $request->user()->currentBrand()->id) {
+        if ($newsletterSend->brand_id !== $brand->id) {
             abort(404);
         }
 

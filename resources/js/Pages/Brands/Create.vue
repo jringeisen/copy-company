@@ -1,6 +1,10 @@
 <script setup>
-import { Head, Link, useForm } from '@inertiajs/vue3';
-import { ref, watch } from 'vue';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { ref, computed, watch } from 'vue';
+import ImpersonationBanner from '@/Components/ImpersonationBanner.vue';
+
+const page = usePage();
+const impersonating = computed(() => page.props.impersonating);
 
 // Auto-detect browser timezone
 const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -55,7 +59,9 @@ const submit = () => {
 <template>
     <Head title="Create Your Brand" />
 
-    <div class="min-h-screen bg-[#fcfbf8] py-12">
+    <ImpersonationBanner />
+
+    <div :class="['min-h-screen bg-[#fcfbf8] py-12', impersonating ? 'pt-22' : '']">
         <div class="max-w-2xl mx-auto px-4">
             <div class="text-center mb-8">
                 <h1 class="text-3xl font-bold text-[#0b1215]">Create Your Brand</h1>

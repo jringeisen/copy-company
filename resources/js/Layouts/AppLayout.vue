@@ -2,6 +2,7 @@
 import { Link, usePage, useForm, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import ToastContainer from '@/Components/ToastContainer.vue';
+import ImpersonationBanner from '@/Components/ImpersonationBanner.vue';
 
 const props = defineProps({
     currentPage: {
@@ -18,13 +19,31 @@ const brands = computed(() => page.props.auth?.brands || []);
 const isAdmin = computed(() => page.props.auth?.is_admin);
 const impersonating = computed(() => page.props.impersonating);
 
-const stopImpersonating = () => {
-    router.post('/admin/impersonate/stop');
-};
+const navLinks = [
+    { name: 'Dashboard', href: '/dashboard', key: 'dashboard', icon: 'home' },
+    { name: 'Posts', href: '/posts', key: 'posts', icon: 'document' },
+    { name: 'Media', href: '/media', key: 'media', icon: 'photo' },
+    {
+        name: 'Social',
+        key: 'social',
+        icon: 'share',
+        children: [
+            { name: 'All Posts', href: '/social-posts', key: 'social-posts' },
+            { name: 'Queue', href: '/social-posts/queue', key: 'social-queue' },
+            { name: 'Loops', href: '/loops', key: 'loops' },
+        ]
+    },
+    { name: 'Subscribers', href: '/subscribers', key: 'subscribers', icon: 'users' },
+    { name: 'Newsletters', href: '/newsletters', key: 'newsletters', icon: 'envelope' },
+    { name: 'Calendar', href: '/calendar', key: 'calendar', icon: 'calendar' },
+    { name: 'Content Sprints', href: '/content-sprints', key: 'sprints', icon: 'bolt' },
+];
 
 const mobileMenuOpen = ref(false);
 const showBrandSwitcher = ref(false);
-const expandedMenus = ref(['social']); // Social expanded by default when on social pages
+const expandedMenus = ref(
+    navLinks.filter(link => link.children?.some(child => props.currentPage === child.key)).map(link => link.key)
+);
 const logoutForm = useForm({});
 
 const logout = () => {
@@ -52,26 +71,6 @@ const isParentActive = (link) => {
     return props.currentPage === link.key;
 };
 
-const navLinks = [
-    { name: 'Dashboard', href: '/dashboard', key: 'dashboard', icon: 'home' },
-    { name: 'Posts', href: '/posts', key: 'posts', icon: 'document' },
-    { name: 'Media', href: '/media', key: 'media', icon: 'photo' },
-    {
-        name: 'Social',
-        key: 'social',
-        icon: 'share',
-        children: [
-            { name: 'All Posts', href: '/social-posts', key: 'social-posts' },
-            { name: 'Queue', href: '/social-posts/queue', key: 'social-queue' },
-            { name: 'Loops', href: '/loops', key: 'loops' },
-        ]
-    },
-    { name: 'Subscribers', href: '/subscribers', key: 'subscribers', icon: 'users' },
-    { name: 'Newsletters', href: '/newsletters', key: 'newsletters', icon: 'envelope' },
-    { name: 'Calendar', href: '/calendar', key: 'calendar', icon: 'calendar' },
-    { name: 'Content Sprints', href: '/content-sprints', key: 'sprints', icon: 'bolt' },
-];
-
 const settingsLinks = [
     { name: 'Billing', href: '/settings/billing', key: 'billing', icon: 'credit-card' },
     { name: 'Team', href: '/settings/team', key: 'team', icon: 'user-group' },
@@ -88,19 +87,7 @@ const closeMobileMenu = () => {
 </script>
 
 <template>
-    <!-- Impersonation Banner -->
-    <div
-        v-if="impersonating"
-        class="fixed top-0 left-0 right-0 z-50 bg-red-600 text-white text-center py-2.5 text-sm font-medium flex items-center justify-center gap-3"
-    >
-        <span>You are impersonating <strong>{{ impersonating.user_name }}</strong></span>
-        <button
-            @click="stopImpersonating"
-            class="px-3 py-1 bg-white text-red-600 rounded-lg text-xs font-semibold hover:bg-red-50 transition-colors"
-        >
-            Stop Impersonating
-        </button>
-    </div>
+    <ImpersonationBanner />
 
     <div :class="['min-h-screen flex bg-[#fcfbf8]', impersonating ? 'pt-10' : '']">
         <!-- Desktop Sidebar -->

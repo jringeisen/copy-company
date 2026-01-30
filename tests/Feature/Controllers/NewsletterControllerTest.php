@@ -18,6 +18,38 @@ test('guests cannot access newsletters index', function () {
     $response->assertRedirect('/login');
 });
 
+test('users without brand are redirected to create brand from newsletters index', function () {
+    $user = User::factory()->create();
+    $account = Account::factory()->create();
+    $account->users()->attach($user->id, ['role' => 'admin']);
+
+    $response = $this->actingAs($user)
+        ->withSession(['current_account_id' => $account->id])
+        ->get(route('newsletters.index'));
+
+    $response->assertRedirect(route('brands.create'));
+});
+
+test('users without brand are redirected to create brand from newsletter show', function () {
+    $user = User::factory()->create();
+    $account = Account::factory()->create();
+    $account->users()->attach($user->id, ['role' => 'admin']);
+
+    $otherAccount = Account::factory()->create();
+    $otherBrand = Brand::factory()->forAccount($otherAccount)->create();
+    $otherPost = Post::factory()->forBrand($otherBrand)->create();
+    $newsletter = NewsletterSend::factory()->create([
+        'brand_id' => $otherBrand->id,
+        'post_id' => $otherPost->id,
+    ]);
+
+    $response = $this->actingAs($user)
+        ->withSession(['current_account_id' => $account->id])
+        ->get(route('newsletters.show', $newsletter));
+
+    $response->assertRedirect(route('brands.create'));
+});
+
 test('users with brand can view newsletters index', function () {
     $user = User::factory()->create();
     $account = Account::factory()->create();

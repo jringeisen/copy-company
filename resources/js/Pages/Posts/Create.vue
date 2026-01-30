@@ -3,6 +3,7 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import PostEditor from '@/Components/Editor/PostEditor.vue';
 import AIAssistantPanel from '@/Components/Editor/AIAssistantPanel.vue';
 import UpgradeModal from '@/Components/UpgradeModal.vue';
+import ImpersonationBanner from '@/Components/ImpersonationBanner.vue';
 import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { marked } from 'marked';
 import { useSubscription } from '@/Composables/useSubscription';
@@ -212,6 +213,8 @@ const handleInsertContent = (content) => {
 
 <template>
     <Head title="New Post" />
+
+    <ImpersonationBanner />
 
     <div class="min-h-screen bg-[#fcfbf8]">
         <!-- Navigation -->

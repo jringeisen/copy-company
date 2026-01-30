@@ -31,7 +31,7 @@ class AdminUserController extends Controller
         $users = $query->paginate(20);
 
         $stats = [
-            'total' => User::query()->count(),
+            'total' => $users->total(),
         ];
 
         return Inertia::render('Admin/Users/Index', [

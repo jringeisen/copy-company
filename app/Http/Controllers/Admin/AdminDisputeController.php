@@ -30,8 +30,10 @@ class AdminDisputeController extends Controller
 
         $disputes = $query->paginate(15);
 
+        $hasFilters = $request->filled('status') || $request->filled('resolution');
+
         $stats = [
-            'total' => Dispute::query()->count(),
+            'total' => $hasFilters ? Dispute::query()->count() : $disputes->total(),
             'open' => Dispute::query()->open()->count(),
             'requiring_action' => Dispute::query()->requiringAction()->count(),
             'won' => Dispute::query()->where('resolution', 'won')->count(),

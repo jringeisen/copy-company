@@ -4,6 +4,7 @@ import PostEditor from '@/Components/Editor/PostEditor.vue';
 import AIAssistantPanel from '@/Components/Editor/AIAssistantPanel.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
 import MediaPickerModal from '@/Components/Media/MediaPickerModal.vue';
+import ImpersonationBanner from '@/Components/ImpersonationBanner.vue';
 import { useAutosave } from '@/Composables/useAutosave';
 import { useSubscription } from '@/Composables/useSubscription';
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
@@ -224,6 +225,8 @@ const isScheduled = computed(() => props.post.status === 'scheduled');
 
 <template>
     <Head :title="post.title || 'Edit Post'" />
+
+    <ImpersonationBanner />
 
     <div class="min-h-screen bg-[#fcfbf8]">
         <!-- Navigation -->
