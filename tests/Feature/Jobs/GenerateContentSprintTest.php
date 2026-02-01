@@ -180,6 +180,6 @@ test('it has correct timeout and retry configuration', function () {
     $job = new GenerateContentSprint($sprint);
 
     expect($job->timeout)->toBe(300)
-        ->and($job->tries)->toBe(2)
-        ->and($job->backoff)->toBe(30);
+        ->and($job->tries)->toBe(3)
+        ->and($job->backoff)->toBe([30, 120]);
 });

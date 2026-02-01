@@ -18,9 +18,10 @@ class GenerateContentSprint implements ShouldQueue
 
     public int $timeout = 300;
 
-    public int $tries = 2;
+    public int $tries = 3;
 
-    public int $backoff = 30;
+    /** @var array<int, int> */
+    public array $backoff = [30, 120];
 
     public function __construct(
         public ContentSprint $sprint
