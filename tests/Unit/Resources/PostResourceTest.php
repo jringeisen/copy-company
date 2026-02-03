@@ -99,3 +99,31 @@ test('post resource handles null published_at', function () {
     expect($array['published_at'])->toBeNull();
     expect($array['published_at_form'])->toBeNull();
 });
+
+test('post resource sanitizes null text nodes from tiptap content', function () {
+    $user = User::factory()->create();
+    $brand = Brand::factory()->forUser($user)->create();
+    $post = Post::factory()->forBrand($brand)->create([
+        'content' => [
+            'type' => 'doc',
+            'content' => [
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        ['type' => 'text', 'text' => null],
+                        ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'Bold text'],
+                        ['type' => 'text', 'text' => null],
+                    ],
+                ],
+            ],
+        ],
+    ]);
+
+    $resource = new PostResource($post);
+    $array = $resource->toArray(app(Request::class));
+
+    $paragraph = $array['content']['content'][0];
+
+    expect($paragraph['content'])->toHaveCount(1)
+        ->and($paragraph['content'][0]['text'])->toBe('Bold text');
+});

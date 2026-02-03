@@ -27,6 +27,53 @@ class PostService
     }
 
     /**
+     * Sanitize TipTap JSON content by removing invalid text nodes.
+     *
+     * Text nodes with null or empty text values cause TipTap to throw
+     * "Invalid text node in JSON" errors when loading content.
+     *
+     * @param  array<string, mixed>|null  $content
+     * @return array<string, mixed>|null
+     */
+    protected function sanitizeTipTapContent(?array $content): ?array
+    {
+        if ($content === null || ! isset($content['content'])) {
+            return $content;
+        }
+
+        $content['content'] = $this->sanitizeNodes($content['content']);
+
+        return $content;
+    }
+
+    /**
+     * Recursively sanitize an array of TipTap nodes.
+     *
+     * @param  array<int, array<string, mixed>>  $nodes
+     * @return array<int, array<string, mixed>>
+     */
+    protected function sanitizeNodes(array $nodes): array
+    {
+        $cleaned = [];
+
+        foreach ($nodes as $node) {
+            if (($node['type'] ?? null) === 'text') {
+                if (! isset($node['text']) || ! is_string($node['text']) || $node['text'] === '') {
+                    continue;
+                }
+            }
+
+            if (isset($node['content']) && is_array($node['content'])) {
+                $node['content'] = $this->sanitizeNodes($node['content']);
+            }
+
+            $cleaned[] = $node;
+        }
+
+        return array_values($cleaned);
+    }
+
+    /**
      * Create a new post from validated data.
      *
      * @param  array<string, mixed>  $validated
@@ -38,7 +85,7 @@ class PostService
             'user_id' => $userId,
             'title' => $validated['title'],
             'slug' => Str::slug($validated['title']),
-            'content' => $validated['content'],
+            'content' => $this->sanitizeTipTapContent($validated['content']),
             'content_html' => $this->sanitizeHtml($validated['content_html'] ?? null),
             'excerpt' => $validated['excerpt'] ?? null,
             'featured_image' => $validated['featured_image'] ?? null,
@@ -61,7 +108,7 @@ class PostService
     {
         $post->update([
             'title' => $validated['title'],
-            'content' => $validated['content'],
+            'content' => $this->sanitizeTipTapContent($validated['content']),
             'content_html' => $this->sanitizeHtml($validated['content_html'] ?? null),
             'excerpt' => $validated['excerpt'] ?? null,
             'featured_image' => $validated['featured_image'] ?? null,

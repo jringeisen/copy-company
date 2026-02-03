@@ -223,3 +223,105 @@ test('schedule does not dispatch newsletter job immediately', function () {
 
     Queue::assertNotPushed(ProcessNewsletterSend::class);
 });
+
+// ==========================================
+// TIPTAP CONTENT SANITIZATION TESTS
+// ==========================================
+
+test('create removes text nodes with null text from tiptap content', function () {
+    $validated = [
+        'title' => 'Test Post',
+        'content' => [
+            'type' => 'doc',
+            'content' => [
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        ['type' => 'text', 'text' => null],
+                        ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'Bold text'],
+                        ['type' => 'text', 'text' => null],
+                    ],
+                ],
+            ],
+        ],
+        'content_html' => '<p><strong>Bold text</strong></p>',
+    ];
+
+    $post = $this->service->create($this->brand, $this->user->id, $validated);
+
+    $content = $post->content;
+    $paragraph = $content['content'][0];
+
+    expect($paragraph['content'])->toHaveCount(1)
+        ->and($paragraph['content'][0]['text'])->toBe('Bold text');
+});
+
+test('update removes text nodes with null text from tiptap content', function () {
+    $post = Post::factory()->forBrand($this->brand)->create();
+
+    $validated = [
+        'title' => 'Updated',
+        'content' => [
+            'type' => 'doc',
+            'content' => [
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        ['type' => 'text', 'text' => null],
+                    ],
+                ],
+            ],
+        ],
+        'content_html' => '<p></p>',
+    ];
+
+    $updatedPost = $this->service->update($post, $validated);
+
+    $paragraph = $updatedPost->content['content'][0];
+
+    expect($paragraph['content'])->toBeEmpty();
+});
+
+test('create preserves valid tiptap content unchanged', function () {
+    $validContent = [
+        'type' => 'doc',
+        'content' => [
+            [
+                'type' => 'heading',
+                'attrs' => ['level' => 1],
+                'content' => [
+                    ['type' => 'text', 'text' => 'Hello World'],
+                ],
+            ],
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'Some text '],
+                    ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
+                ],
+            ],
+        ],
+    ];
+
+    $validated = [
+        'title' => 'Test',
+        'content' => $validContent,
+        'content_html' => '<h1>Hello World</h1><p>Some text <strong>bold</strong></p>',
+    ];
+
+    $post = $this->service->create($this->brand, $this->user->id, $validated);
+
+    expect($post->content)->toBe($validContent);
+});
+
+test('create handles content without nested content key gracefully', function () {
+    $validated = [
+        'title' => 'Test',
+        'content' => ['type' => 'doc'],
+        'content_html' => '',
+    ];
+
+    $post = $this->service->create($this->brand, $this->user->id, $validated);
+
+    expect($post->content)->toBe(['type' => 'doc']);
+});
