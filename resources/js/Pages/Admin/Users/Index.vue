@@ -27,6 +27,10 @@ const getStatusBadgeClass = (status) => {
     return {
         Active: 'bg-green-100 text-green-700',
         Trial: 'bg-yellow-100 text-yellow-700',
+        'Past Due': 'bg-orange-100 text-orange-700',
+        Incomplete: 'bg-orange-100 text-orange-700',
+        Canceled: 'bg-red-100 text-red-700',
+        Paused: 'bg-blue-100 text-blue-700',
         Expired: 'bg-red-100 text-red-700',
         'No Account': 'bg-gray-100 text-gray-700',
     }[status] || 'bg-gray-100 text-gray-700';

@@ -23,10 +23,22 @@ class AdminUserResource extends JsonResource
 
         $status = 'No Account';
         if ($account && $limits) {
-            if ($limits->hasActiveSubscription() && ! $limits->isOnFreeTrialOnly()) {
-                $status = 'Active';
-            } elseif ($limits->isOnFreeTrialOnly()) {
+            $subscription = $account->subscription('default');
+
+            if ($limits->onTrial()) {
                 $status = 'Trial';
+            } elseif ($subscription?->stripe_status === 'paused') {
+                $status = 'Paused';
+            } elseif ($subscription && $subscription->active() && ! $subscription->onGracePeriod()) {
+                $status = 'Active';
+            } elseif ($subscription && $subscription->onGracePeriod()) {
+                $status = 'Canceled';
+            } elseif ($subscription && $subscription->pastDue()) {
+                $status = 'Past Due';
+            } elseif ($subscription && $subscription->hasIncompletePayment()) {
+                $status = 'Incomplete';
+            } elseif ($subscription && $subscription->canceled()) {
+                $status = 'Canceled';
             } else {
                 $status = 'Expired';
             }
