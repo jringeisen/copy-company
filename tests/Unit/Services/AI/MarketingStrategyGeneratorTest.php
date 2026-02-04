@@ -129,6 +129,30 @@ test('JSON parsing handles response with code blocks', function () {
     expect($result['strategy']['week_theme']['title'])->toBe('Theme');
 });
 
+test('context includes strategy context', function () {
+    $this->brand->update(['strategy_context' => 'We help small businesses automate their email marketing.']);
+
+    Prism::fake([createStrategyTextResponse(sampleStrategyJson())]);
+
+    $result = $this->generator->generate($this->brand);
+
+    expect($result['context']['strategy_context'])->toBe('We help small businesses automate their email marketing.');
+});
+
+test('strategy context appears in the user prompt', function () {
+    $this->brand->update(['strategy_context' => 'Our product solves scheduling pain points.']);
+
+    $fake = Prism::fake([createStrategyTextResponse(sampleStrategyJson())]);
+
+    $this->generator->generate($this->brand);
+
+    $fake->assertRequest(function (array $recorded) {
+        $prompt = $recorded[0]->prompt();
+        expect($prompt)->toContain('MARKETING CONTEXT:')
+            ->and($prompt)->toContain('Our product solves scheduling pain points.');
+    });
+});
+
 test('context includes connected platforms', function () {
     $this->brand->social_connections = ['instagram' => ['token' => 'test'], 'facebook' => ['token' => 'test']];
     $this->brand->save();

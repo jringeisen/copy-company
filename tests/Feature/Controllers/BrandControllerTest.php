@@ -154,6 +154,50 @@ test('authenticated users can update their brand', function () {
     ]);
 });
 
+test('authenticated users can save strategy context', function () {
+    $user = User::factory()->create();
+    $account = Account::factory()->create();
+    $account->users()->attach($user->id, ['role' => 'admin']);
+    $brand = Brand::factory()->forAccount($account)->create(['slug' => 'my-brand']);
+
+    setPermissionsTeamId($account->id);
+    $user->assignRole('admin');
+
+    $response = $this->actingAs($user)
+        ->withSession(['current_account_id' => $account->id])
+        ->put(route('settings.brand.update', $brand), [
+            'name' => $brand->name,
+            'slug' => 'my-brand',
+            'strategy_context' => 'We sell AI-powered analytics for e-commerce stores.',
+        ]);
+
+    $response->assertRedirect();
+    $this->assertDatabaseHas('brands', [
+        'id' => $brand->id,
+        'strategy_context' => 'We sell AI-powered analytics for e-commerce stores.',
+    ]);
+});
+
+test('strategy context cannot exceed 2000 characters', function () {
+    $user = User::factory()->create();
+    $account = Account::factory()->create();
+    $account->users()->attach($user->id, ['role' => 'admin']);
+    $brand = Brand::factory()->forAccount($account)->create(['slug' => 'my-brand']);
+
+    setPermissionsTeamId($account->id);
+    $user->assignRole('admin');
+
+    $response = $this->actingAs($user)
+        ->withSession(['current_account_id' => $account->id])
+        ->put(route('settings.brand.update', $brand), [
+            'name' => $brand->name,
+            'slug' => 'my-brand',
+            'strategy_context' => str_repeat('a', 2001),
+        ]);
+
+    $response->assertSessionHasErrors('strategy_context');
+});
+
 test('store brand redirects to dashboard with error when no account', function () {
     $user = User::factory()->create();
     // User without any account association

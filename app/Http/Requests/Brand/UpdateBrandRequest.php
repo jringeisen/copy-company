@@ -23,6 +23,7 @@ class UpdateBrandRequest extends FormRequest
             'timezone' => ['nullable', 'string', 'timezone:all'],
             'primary_color' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'secondary_color' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'strategy_context' => ['nullable', 'string', 'max:2000'],
             'voice_settings' => ['nullable', 'array'],
             'voice_settings.tone' => ['nullable', 'string', 'in:professional,casual,friendly,formal,persuasive'],
             'voice_settings.style' => ['nullable', 'string', 'in:conversational,academic,storytelling,instructional'],

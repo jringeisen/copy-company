@@ -19,6 +19,7 @@ const form = useForm({
     timezone: props.brand.timezone || 'America/New_York',
     primary_color: props.brand.primary_color || '#6366f1',
     secondary_color: props.brand.secondary_color || '#4f46e5',
+    strategy_context: props.brand.strategy_context || '',
     voice_settings: {
         tone: voiceSettings.tone || '',
         style: voiceSettings.style || '',
@@ -236,6 +237,25 @@ const submit = () => {
                                 />
                             </div>
                             <p v-if="form.errors.secondary_color" class="mt-1 text-sm text-red-600">{{ form.errors.secondary_color }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Marketing Context -->
+                    <div class="border-t border-[#0b1215]/10 pt-6 mt-6">
+                        <h3 class="text-lg font-medium text-[#0b1215] mb-2">Marketing Context</h3>
+                        <p class="text-sm text-[#0b1215]/50 mb-4">Describe your product's key features, the pain points you solve, and your value proposition. This helps the AI generate marketing strategies tailored to your brand.</p>
+                        <textarea
+                            id="strategy_context"
+                            v-model="form.strategy_context"
+                            rows="5"
+                            maxlength="2000"
+                            class="w-full px-4 py-3 border border-[#0b1215]/20 rounded-xl focus:ring-[#a1854f]/30 focus:border-[#a1854f]"
+                            placeholder="e.g. We offer an AI-powered email marketing tool for small businesses. Key features: drag-and-drop editor, automated sequences, analytics dashboard. We solve the problem of small teams spending too much time on email campaigns. Our main differentiator is simplicity — no learning curve compared to Mailchimp or HubSpot."
+                        ></textarea>
+                        <div class="mt-1 flex justify-between">
+                            <p v-if="form.errors.strategy_context" class="text-sm text-red-600">{{ form.errors.strategy_context }}</p>
+                            <span v-else></span>
+                            <span class="text-sm text-[#0b1215]/40">{{ form.strategy_context.length }} / 2000</span>
                         </div>
                     </div>
 

@@ -38,6 +38,7 @@ class Brand extends Model
         'secondary_color',
         'industry',
         'voice_settings',
+        'strategy_context',
         'newsletter_provider',
         'newsletter_credentials',
         'social_connections',

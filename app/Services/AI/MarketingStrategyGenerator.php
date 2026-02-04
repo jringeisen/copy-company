@@ -94,6 +94,7 @@ class MarketingStrategyGenerator
             'industry' => $brand->industry,
             'description' => $brand->description,
             'tagline' => $brand->tagline,
+            'strategy_context' => $brand->strategy_context,
             'previous_strategies' => $previousStrategies,
             'recent_posts' => $recentPosts,
             'recent_social_posts' => $recentSocialPosts,
@@ -125,6 +126,10 @@ class MarketingStrategyGenerator
 
         if ($context['tagline']) {
             $prompt .= "Tagline: {$context['tagline']}\n";
+        }
+
+        if ($context['strategy_context']) {
+            $prompt .= "\nMARKETING CONTEXT:\n{$context['strategy_context']}\n";
         }
 
         $prompt .= "\n";

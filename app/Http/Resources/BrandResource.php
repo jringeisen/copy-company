@@ -34,6 +34,7 @@ class BrandResource extends JsonResource
             'domain_verified' => $this->domain_verified,
             'newsletter_provider' => $this->newsletter_provider->value ?? null,
             'voice_settings' => $this->voice_settings,
+            'strategy_context' => $this->strategy_context,
             'url' => $this->url,
             'active_subscribers_count' => $this->when(
                 $this->relationLoaded('subscribers'),
