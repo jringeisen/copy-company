@@ -229,6 +229,7 @@ const props = defineProps({
                         &copy; {{ new Date().getFullYear() }} Copy Company. All rights reserved.
                     </div>
                     <div class="flex items-center gap-6 text-sm">
+                        <Link href="/help" class="text-[#0b1215]/70 hover:text-[#0b1215] transition">Help</Link>
                         <Link href="/privacy-policy" class="text-[#0b1215]/70 hover:text-[#0b1215] transition">Privacy Policy</Link>
                         <Link href="/terms-of-service" class="text-[#0b1215]/70 hover:text-[#0b1215] transition">Terms of Service</Link>
                     </div>

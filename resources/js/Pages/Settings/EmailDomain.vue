@@ -2,6 +2,7 @@
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import HelpLink from '@/Components/HelpLink.vue';
 
 const props = defineProps({
     brand: Object,
@@ -91,10 +92,13 @@ const copyToClipboard = (text) => {
 <template>
     <Head title="Email Domain Settings" />
 
-    <AppLayout current-page="brand-settings">
+    <AppLayout current-page="email-domain">
         <div class="max-w-3xl mx-auto">
             <div class="mb-8">
-                <h1 class="text-2xl font-bold text-[#0b1215]">Email Domain Settings</h1>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-2xl font-bold text-[#0b1215]">Email Domain Settings</h1>
+                    <HelpLink category-slug="custom-domains" article-slug="setting-up-a-custom-email-domain" />
+                </div>
                 <p class="text-[#0b1215]/60 mt-1">Send newsletters from your own domain for better deliverability</p>
             </div>
 

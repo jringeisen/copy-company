@@ -18,6 +18,9 @@ class DatabaseSeeder extends Seeder
         // Seed permissions and roles first
         $this->call(PermissionSeeder::class);
 
+        // Seed knowledge base articles
+        $this->call(KnowledgeBaseSeeder::class);
+
         // User::factory(10)->create();
 
         User::factory()->create([

@@ -5,6 +5,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
 import UpgradeModal from '@/Components/UpgradeModal.vue';
 import SkeletonLoader from '@/Components/SkeletonLoader.vue';
+import HelpLink from '@/Components/HelpLink.vue';
 import { usePermissions } from '@/Composables/usePermissions';
 import { useSubscription } from '@/Composables/useSubscription';
 import { usePageLoading } from '@/Composables/usePageLoading';
@@ -88,7 +89,10 @@ const getStatusColor = (status) => {
             <!-- Header -->
             <div class="flex justify-between items-center mb-8">
                 <div>
-                    <h1 class="text-2xl font-bold text-[#0b1215]">Posts</h1>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-2xl font-bold text-[#0b1215]">Posts</h1>
+                        <HelpLink category-slug="posts" article-slug="writing-your-first-post" />
+                    </div>
                     <p class="text-[#0b1215]/60">Manage your blog posts and newsletters</p>
                 </div>
                 <div class="flex items-center gap-3">

@@ -6,6 +6,7 @@ import UpgradeModal from '@/Components/UpgradeModal.vue';
 import { usePermissions } from '@/Composables/usePermissions';
 import { useSubscription } from '@/Composables/useSubscription';
 import { usePageLoading } from '@/Composables/usePageLoading';
+import HelpLink from '@/Components/HelpLink.vue';
 
 const { canCreateSprints } = usePermissions();
 const { canCreateSprint, getRequiredPlan } = useSubscription();
@@ -42,7 +43,10 @@ const statusColors = {
             <!-- Header -->
             <div class="flex justify-between items-center mb-8">
                 <div>
-                    <h1 class="text-2xl font-bold text-[#0b1215]">Content Sprints</h1>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-2xl font-bold text-[#0b1215]">Content Sprints</h1>
+                        <HelpLink category-slug="content-sprints" article-slug="what-are-content-sprints" />
+                    </div>
                     <p class="text-[#0b1215]/60">Generate blog post ideas with AI</p>
                 </div>
                 <Link

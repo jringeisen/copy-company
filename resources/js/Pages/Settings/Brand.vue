@@ -3,6 +3,7 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Autocomplete from '@/Components/Autocomplete.vue';
+import HelpLink from '@/Components/HelpLink.vue';
 
 const props = defineProps({
     brand: Object,
@@ -100,7 +101,10 @@ const submit = () => {
     <AppLayout current-page="brand-settings">
         <div class="max-w-3xl mx-auto">
             <div class="mb-8">
-                <h1 class="text-2xl font-bold text-[#0b1215]">Brand Settings</h1>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-2xl font-bold text-[#0b1215]">Brand Settings</h1>
+                    <HelpLink category-slug="getting-started" article-slug="customizing-your-brand-settings" />
+                </div>
                 <p class="text-[#0b1215]/60 mt-1">Update your brand identity and preferences</p>
             </div>
 

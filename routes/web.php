@@ -16,6 +16,7 @@ use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\Public\BlogController;
+use App\Http\Controllers\Public\KnowledgeBaseController;
 use App\Http\Controllers\Public\SubscribeController;
 use App\Http\Controllers\Settings\AccountInvitationController;
 use App\Http\Controllers\Settings\BillingController;
@@ -57,6 +58,10 @@ Route::get('/terms-of-service', function () {
         'appUrl' => config('app.url'),
     ]);
 })->name('terms-of-service');
+
+// Help Center
+Route::get('/help', [KnowledgeBaseController::class, 'index'])->name('help.index');
+Route::get('/help/{categorySlug}/{articleSlug}', [KnowledgeBaseController::class, 'show'])->name('help.show');
 
 // Sitemap
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');

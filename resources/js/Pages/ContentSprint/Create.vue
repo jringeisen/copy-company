@@ -3,6 +3,7 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import UpgradeModal from '@/Components/UpgradeModal.vue';
+import HelpLink from '@/Components/HelpLink.vue';
 import { useSubscription } from '@/Composables/useSubscription';
 
 const { canCreateSprint, getRequiredPlan } = useSubscription();
@@ -57,7 +58,10 @@ const submit = () => {
         <div class="max-w-2xl mx-auto">
             <div class="bg-white rounded-2xl border border-[#0b1215]/10 p-8">
                 <div class="mb-6">
-                    <h2 class="text-xl font-semibold text-[#0b1215]">Let's brainstorm your content</h2>
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-xl font-semibold text-[#0b1215]">Let's brainstorm your content</h2>
+                        <HelpLink category-slug="content-sprints" article-slug="creating-a-content-sprint" />
+                    </div>
                     <p class="mt-1 text-sm text-[#0b1215]/60">
                         Tell us about your topics and goals, and we'll generate blog post ideas for you.
                     </p>

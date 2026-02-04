@@ -4,6 +4,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
 import UpgradeModal from '@/Components/UpgradeModal.vue';
+import HelpLink from '@/Components/HelpLink.vue';
 import { usePermissions } from '@/Composables/usePermissions';
 
 const { canManageSprints } = usePermissions();
@@ -163,6 +164,7 @@ const deleteSprint = () => {
                         </Link>
                         <span class="text-[#0b1215]/30">|</span>
                         <h1 class="text-lg font-semibold text-[#0b1215]">{{ sprint.title }}</h1>
+                        <HelpLink category-slug="content-sprints" article-slug="turning-ideas-into-draft-posts" />
                     </div>
                     <div class="flex items-center gap-3">
                         <button
