@@ -128,6 +128,7 @@ class HandleInertiaRequests extends Middleware
                         'remove_branding' => $limits->canRemoveBranding(),
                         'analytics' => $limits->hasAnalytics(),
                         'dedicated_ip' => $limits->canUseDedicatedIp(),
+                        'marketing_strategy' => $limits->canUseMarketingStrategy(),
                     ],
                 ];
             },

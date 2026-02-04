@@ -25,6 +25,7 @@ export function useSubscription() {
     const hasCustomEmailDomain = computed(() => features.value.custom_email_domain || false);
     const hasRemoveBranding = computed(() => features.value.remove_branding || false);
     const hasAnalytics = computed(() => features.value.analytics || false);
+    const hasMarketingStrategy = computed(() => features.value.marketing_strategy || false);
 
     /**
      * Get the required plan for a feature
@@ -36,6 +37,7 @@ export function useSubscription() {
             social_accounts: 'creator',
             custom_domain: 'creator',
             analytics: 'creator',
+            marketing_strategy: 'creator',
             custom_email_domain: 'pro',
             remove_branding: 'pro',
         };
@@ -61,6 +63,7 @@ export function useSubscription() {
         hasCustomEmailDomain,
         hasRemoveBranding,
         hasAnalytics,
+        hasMarketingStrategy,
         // Helpers
         getRequiredPlan,
     };

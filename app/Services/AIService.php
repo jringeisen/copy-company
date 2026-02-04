@@ -6,6 +6,7 @@ use App\Models\Brand;
 use App\Models\Post;
 use App\Services\AI\BlogContentGenerator;
 use App\Services\AI\ContentSprintGenerator;
+use App\Services\AI\MarketingStrategyGenerator;
 use App\Services\AI\SocialContentGenerator;
 
 /**
@@ -25,7 +26,8 @@ class AIService
     public function __construct(
         protected BlogContentGenerator $blogGenerator,
         protected SocialContentGenerator $socialGenerator,
-        protected ContentSprintGenerator $sprintGenerator
+        protected ContentSprintGenerator $sprintGenerator,
+        protected MarketingStrategyGenerator $strategyGenerator
     ) {}
 
     public function generateDraft(Brand $brand, string $title, ?string $bullets = null): string
@@ -84,5 +86,15 @@ class AIService
     public function generateContentSprintIdeas(Brand $brand, array $topics, string $goals = '', int $count = 20): array
     {
         return $this->sprintGenerator->generate($brand, $topics, $goals, $count);
+    }
+
+    /**
+     * Generate a weekly marketing strategy for a brand.
+     *
+     * @return array{strategy: array<string, mixed>, context: array<string, mixed>}
+     */
+    public function generateMarketingStrategy(Brand $brand): array
+    {
+        return $this->strategyGenerator->generate($brand);
     }
 }

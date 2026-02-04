@@ -299,6 +299,14 @@ class SubscriptionLimitsService
     }
 
     /**
+     * Check if the current plan can use the marketing strategy feature.
+     */
+    public function canUseMarketingStrategy(): bool
+    {
+        return $this->getPlan()?->canUseMarketingStrategy() ?? false;
+    }
+
+    /**
      * Get the number of emails sent this billing period (current month).
      */
     public function getEmailsSentThisMonth(): int
@@ -368,6 +376,7 @@ class SubscriptionLimitsService
                 'remove_branding' => $this->canRemoveBranding(),
                 'analytics' => $this->hasAnalytics(),
                 'dedicated_ip' => $this->canUseDedicatedIp(),
+                'marketing_strategy' => $this->canUseMarketingStrategy(),
             ],
             'emails' => [
                 'sent' => $this->getEmailsSentThisMonth(),
@@ -383,7 +392,7 @@ class SubscriptionLimitsService
     public function getRequiredPlanForFeature(string $feature): ?SubscriptionPlan
     {
         return match ($feature) {
-            'custom_domain', 'analytics' => SubscriptionPlan::Creator,
+            'custom_domain', 'analytics', 'marketing_strategy' => SubscriptionPlan::Creator,
             'custom_email_domain', 'remove_branding', 'dedicated_ip' => SubscriptionPlan::Pro,
             default => SubscriptionPlan::Starter,
         };

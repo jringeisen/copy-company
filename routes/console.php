@@ -54,3 +54,8 @@ Schedule::command('billing:report-email-usage')->hourly();
 
 // Check dedicated IP reputation hourly
 Schedule::command('dedicated-ip:check-reputation')->hourly();
+
+// Generate weekly marketing strategies on Sunday midnight
+Schedule::command('strategies:generate-weekly')
+    ->weeklyOn(Carbon\Carbon::SUNDAY, '00:00')
+    ->withoutOverlapping();

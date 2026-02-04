@@ -60,6 +60,7 @@ class CheckFeatureAccess
             'custom_email_domain' => $limits->canUseCustomEmailDomain(),
             'remove_branding' => $limits->canRemoveBranding(),
             'analytics' => $limits->hasAnalytics(),
+            'marketing_strategy' => $limits->canUseMarketingStrategy(),
             default => true,
         };
     }
@@ -89,6 +90,7 @@ class CheckFeatureAccess
             'custom_email_domain' => 'Custom email domains',
             'remove_branding' => 'Removing Copy Company branding',
             'analytics' => 'Analytics',
+            'marketing_strategy' => 'Marketing Strategy',
             default => ucfirst(str_replace('_', ' ', $feature)),
         };
     }

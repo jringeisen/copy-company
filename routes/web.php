@@ -10,6 +10,7 @@ use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ContentSprintController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LoopController;
+use App\Http\Controllers\MarketingStrategyController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\MediaFolderController;
 use App\Http\Controllers\NewsletterController;
@@ -193,6 +194,17 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/loops/{loop}/items/{item}', [LoopController::class, 'removeItem'])->name('loops.items.destroy');
     Route::post('/loops/{loop}/reorder', [LoopController::class, 'reorder'])->name('loops.reorder');
     Route::post('/loops/{loop}/import', [LoopController::class, 'import'])->name('loops.import');
+
+    // Marketing Strategy routes
+    Route::middleware(['feature:marketing_strategy'])->group(function () {
+        Route::get('/strategies', [MarketingStrategyController::class, 'index'])->name('strategies.index');
+        Route::get('/strategies/{marketingStrategy}', [MarketingStrategyController::class, 'show'])->name('strategies.show');
+        Route::post('/strategies/{marketingStrategy}/convert-blog-post', [MarketingStrategyController::class, 'convertBlogPost'])->name('strategies.convert-blog-post');
+        Route::post('/strategies/{marketingStrategy}/convert-social-post', [MarketingStrategyController::class, 'convertSocialPost'])->name('strategies.convert-social-post');
+        Route::post('/strategies/{marketingStrategy}/convert-newsletter', [MarketingStrategyController::class, 'convertNewsletter'])->name('strategies.convert-newsletter');
+        Route::post('/strategies/{marketingStrategy}/convert-loop', [MarketingStrategyController::class, 'convertLoop'])->name('strategies.convert-loop');
+        Route::post('/strategies/{marketingStrategy}/retry', [MarketingStrategyController::class, 'retry'])->name('strategies.retry');
+    });
 
     // AI Assistant routes
     Route::prefix('ai')->group(function () {

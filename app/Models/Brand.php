@@ -109,6 +109,14 @@ class Brand extends Model
         return $this->hasMany(ContentSprint::class);
     }
 
+    /**
+     * @return HasMany<MarketingStrategy, $this>
+     */
+    public function marketingStrategies(): HasMany
+    {
+        return $this->hasMany(MarketingStrategy::class);
+    }
+
     public function media(): HasMany
     {
         return $this->hasMany(Media::class);

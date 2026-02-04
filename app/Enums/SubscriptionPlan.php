@@ -202,4 +202,12 @@ enum SubscriptionPlan: string
     {
         return $this === self::Pro;
     }
+
+    /**
+     * Check if this plan can use the marketing strategy feature.
+     */
+    public function canUseMarketingStrategy(): bool
+    {
+        return $this->tier() >= 2;
+    }
 }
