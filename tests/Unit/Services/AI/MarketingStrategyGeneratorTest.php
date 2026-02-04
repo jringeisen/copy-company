@@ -36,7 +36,7 @@ function sampleStrategyJson(): string
         'blog_posts' => [],
         'newsletter' => ['subject_line' => 'Test', 'topic' => 'Test topic', 'key_points' => [], 'suggested_day' => 'Thursday'],
         'social_posts' => [],
-        'loops' => [],
+        'loop_content' => [],
         'talking_points' => ['Point 1'],
     ]);
 }
@@ -119,7 +119,7 @@ test('context includes active loops', function () {
 
 test('JSON parsing handles response with code blocks', function () {
     $wrappedJson = '```json
-{"week_theme":{"title":"Theme","description":"Desc"},"blog_posts":[],"newsletter":{"subject_line":"Test","topic":"Test","key_points":[],"suggested_day":"Thursday"},"social_posts":[],"loops":[],"talking_points":[]}
+{"week_theme":{"title":"Theme","description":"Desc"},"blog_posts":[],"newsletter":{"subject_line":"Test","topic":"Test","key_points":[],"suggested_day":"Thursday"},"social_posts":[],"loop_content":[],"talking_points":[]}
 ```';
 
     Prism::fake([createStrategyTextResponse($wrappedJson)]);

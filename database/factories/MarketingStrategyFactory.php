@@ -128,18 +128,20 @@ class MarketingStrategyFactory extends Factory
                     'post_type' => 'engagement',
                 ],
             ],
-            'loops' => [
+            'loop_content' => [
                 [
-                    'name' => 'Weekly Tips Series',
-                    'description' => fake()->sentence(),
-                    'platforms' => ['instagram', 'facebook'],
+                    'loop_id' => 1,
+                    'loop_name' => 'Weekly Tips Series',
                     'suggested_items' => [
                         [
                             'content' => fake()->paragraph(),
                             'hashtags' => fake()->words(3),
                         ],
+                        [
+                            'content' => fake()->paragraph(),
+                            'hashtags' => fake()->words(3),
+                        ],
                     ],
-                    'rationale' => fake()->sentence(),
                 ],
             ],
             'talking_points' => [

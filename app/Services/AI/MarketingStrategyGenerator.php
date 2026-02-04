@@ -79,12 +79,15 @@ class MarketingStrategyGenerator
 
         $activeLoops = $brand->loops()
             ->where('is_active', true)
-            ->with(['items' => fn ($q) => $q->limit(3)])
+            ->withCount('items')
+            ->with(['items' => fn ($q) => $q->orderByDesc('created_at')->limit(3)])
             ->get()
             ->map(fn ($loop) => [
+                'id' => $loop->id,
                 'name' => $loop->name,
                 'description' => $loop->description,
                 'platforms' => $loop->platforms,
+                'item_count' => $loop->items_count,
                 'sample_items' => $loop->items->map(fn ($item) => mb_substr($item->content ?? '', 0, 100))->toArray(),
             ])
             ->toArray();
@@ -185,11 +188,19 @@ class MarketingStrategyGenerator
 
         // Active loops
         if (! empty($context['active_loops'])) {
-            $prompt .= "EXISTING ACTIVE LOOPS (suggest complementary new loops, or skip if well-covered):\n";
+            $prompt .= "EXISTING ACTIVE LOOPS (generate 2-3 new content items for EACH loop):\n";
             foreach ($context['active_loops'] as $loop) {
-                $prompt .= "- {$loop['name']}: {$loop['description']}\n";
+                $platforms = implode(', ', $loop['platforms'] ?? []);
+                $prompt .= "- Loop ID: {$loop['id']} | \"{$loop['name']}\": {$loop['description']} (Platforms: {$platforms}, Current items: {$loop['item_count']})\n";
+                if (! empty($loop['sample_items'])) {
+                    foreach ($loop['sample_items'] as $sample) {
+                        $prompt .= "    Sample: \"{$sample}\"\n";
+                    }
+                }
             }
             $prompt .= "\n";
+        } else {
+            $prompt .= "NO ACTIVE LOOPS: Skip the loop_content section and return an empty array.\n\n";
         }
 
         $prompt .= $this->getResponseFormat();
@@ -233,18 +244,16 @@ class MarketingStrategyGenerator
       "post_type": "educational"
     }
   ],
-  "loops": [
+  "loop_content": [
     {
-      "name": "Loop name",
-      "description": "What this loop does",
-      "platforms": ["instagram", "facebook"],
+      "loop_id": 123,
+      "loop_name": "Loop name",
       "suggested_items": [
         {
           "content": "Item content text",
           "hashtags": ["tag1", "tag2"]
         }
-      ],
-      "rationale": "Why this loop is valuable"
+      ]
     }
   ],
   "talking_points": [
@@ -257,7 +266,7 @@ Important guidelines:
 - Generate 2-3 blog post ideas
 - Generate 3-5 social posts across connected platforms
 - Generate 1 newsletter plan
-- Generate 0-2 loop suggestions (only if they complement existing loops)
+- Generate 2-3 content items per existing active loop in loop_content (skip if no active loops)
 - Generate 3-5 talking points
 - Make all content cohesive around the week theme
 - Ensure variety in content types and approaches

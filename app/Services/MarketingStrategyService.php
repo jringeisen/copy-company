@@ -101,36 +101,33 @@ class MarketingStrategyService
     }
 
     /**
-     * Convert a loop recommendation to a new Loop with items.
+     * Convert loop content suggestions into items on an existing loop.
      */
-    public function convertLoop(MarketingStrategy $strategy, Brand $brand, int $index): Loop
+    public function convertLoopContent(MarketingStrategy $strategy, Brand $brand, int $index, int $loopId): Loop
     {
-        $loops = $strategy->strategy_content['loops'] ?? [];
+        $loopContent = $strategy->strategy_content['loop_content'] ?? [];
 
-        if (! isset($loops[$index])) {
-            throw new \InvalidArgumentException('Invalid loop index.');
+        if (! isset($loopContent[$index])) {
+            throw new \InvalidArgumentException('Invalid loop content index.');
         }
 
-        $loopData = $loops[$index];
+        $entry = $loopContent[$index];
 
         /** @var Loop */
-        $loop = $brand->loops()->create([
-            'name' => $loopData['name'],
-            'description' => $loopData['description'] ?? '',
-            'platforms' => $loopData['platforms'] ?? [],
-            'is_active' => false,
-        ]);
+        $loop = $brand->loops()->findOrFail($loopId);
 
-        $suggestedItems = $loopData['suggested_items'] ?? [];
-        foreach ($suggestedItems as $position => $item) {
+        $maxPosition = $loop->items()->max('position') ?? -1;
+
+        $suggestedItems = $entry['suggested_items'] ?? [];
+        foreach ($suggestedItems as $i => $item) {
             $loop->items()->create([
                 'content' => $item['content'],
                 'hashtags' => $item['hashtags'] ?? [],
-                'position' => $position,
+                'position' => $maxPosition + $i + 1,
             ]);
         }
 
-        $this->trackConvertedItem($strategy, 'loops', $index);
+        $this->trackConvertedItem($strategy, 'loop_content', $index);
 
         return $loop;
     }

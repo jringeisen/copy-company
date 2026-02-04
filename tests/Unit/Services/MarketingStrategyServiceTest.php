@@ -54,20 +54,40 @@ test('convertNewsletter creates draft post with newsletter flag', function () {
         ->and($post->send_as_newsletter)->toBeTrue();
 });
 
-test('convertLoop creates loop with items', function () {
+test('convertLoopContent adds items to existing loop', function () {
+    $loop = $this->brand->loops()->create([
+        'name' => 'Weekly Tips',
+        'description' => 'Tips loop',
+        'is_active' => true,
+        'platforms' => ['instagram'],
+    ]);
+
     $strategy = MarketingStrategy::factory()
         ->forBrand($this->brand)
         ->completed()
-        ->create();
+        ->create([
+            'strategy_content' => array_merge(
+                MarketingStrategy::factory()->completed()->make()->strategy_content,
+                ['loop_content' => [
+                    [
+                        'loop_id' => $loop->id,
+                        'loop_name' => 'Weekly Tips',
+                        'suggested_items' => [
+                            ['content' => 'Tip one', 'hashtags' => ['tips']],
+                            ['content' => 'Tip two', 'hashtags' => ['tips']],
+                        ],
+                    ],
+                ]]
+            ),
+        ]);
 
-    $loop = $this->service->convertLoop($strategy, $this->brand, 0);
+    $result = $this->service->convertLoopContent($strategy, $this->brand, 0, $loop->id);
 
-    expect($loop->brand_id)->toBe($this->brand->id)
-        ->and($loop->is_active)->toBeFalse()
-        ->and($loop->name)->toBe($strategy->strategy_content['loops'][0]['name']);
+    expect($result->id)->toBe($loop->id)
+        ->and($result->items()->count())->toBe(2);
 
-    $itemCount = count($strategy->strategy_content['loops'][0]['suggested_items'] ?? []);
-    expect($loop->items()->count())->toBe($itemCount);
+    $strategy->refresh();
+    expect($strategy->converted_items['loop_content'])->toContain(0);
 });
 
 test('trackConvertedItem updates blog_posts correctly', function () {

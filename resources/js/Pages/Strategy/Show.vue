@@ -5,6 +5,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({
     strategy: Object,
+    activeLoops: Array,
 });
 
 const pollInterval = ref(null);
@@ -20,18 +21,19 @@ const weekTheme = computed(() => content.value.week_theme || {});
 const blogPosts = computed(() => content.value.blog_posts || []);
 const newsletter = computed(() => content.value.newsletter || null);
 const socialPosts = computed(() => content.value.social_posts || []);
-const loops = computed(() => content.value.loops || []);
+const loopContent = computed(() => content.value.loop_content || []);
 const talkingPoints = computed(() => content.value.talking_points || []);
 
 const isBlogPostConverted = (index) => (converted.value.blog_posts || []).includes(index);
 const isSocialPostConverted = (index) => (converted.value.social_posts || []).includes(index);
 const isNewsletterConverted = computed(() => converted.value.newsletter === true);
-const isLoopConverted = (index) => (converted.value.loops || []).includes(index);
+const isLoopContentConverted = (index) => (converted.value.loop_content || []).includes(index);
 
 const convertingBlogPost = ref(null);
 const convertingSocialPost = ref(null);
 const convertingNewsletter = ref(false);
 const convertingLoop = ref(null);
+const selectedLoopId = ref({});
 
 const convertBlogPost = (index) => {
     convertingBlogPost.value = index;
@@ -60,8 +62,11 @@ const convertNewsletter = () => {
 };
 
 const convertLoop = (index) => {
+    const loopId = selectedLoopId.value[index];
+    if (!loopId) return;
+
     convertingLoop.value = index;
-    const form = useForm({ index });
+    const form = useForm({ index, loop_id: loopId });
     form.post(`/strategies/${props.strategy.id}/convert-loop`, {
         preserveScroll: true,
         onFinish: () => { convertingLoop.value = null; },
@@ -91,6 +96,16 @@ const platformColor = (platform) => {
         tiktok: 'bg-gray-100 text-gray-700',
     }[platform] || 'bg-gray-100 text-gray-700';
 };
+
+// Pre-select matching loops for loop content entries
+onMounted(() => {
+    const activeLoopIds = (props.activeLoops || []).map(l => l.id);
+    loopContent.value.forEach((entry, index) => {
+        if (entry.loop_id && activeLoopIds.includes(entry.loop_id)) {
+            selectedLoopId.value[index] = entry.loop_id;
+        }
+    });
+});
 
 // Poll for updates if generating
 onMounted(() => {
@@ -335,44 +350,34 @@ watch(() => props.strategy.status, (newStatus) => {
                     </div>
                 </section>
 
-                <!-- Loop Recommendations -->
-                <section v-if="loops.length > 0">
+                <!-- Loop Content -->
+                <section v-if="loopContent.length > 0">
                     <h3 class="text-lg font-semibold text-[#0b1215] mb-4 flex items-center gap-2">
                         <svg class="w-5 h-5 text-[#a1854f]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg>
-                        Loop Recommendations
+                        Loop Content
                     </h3>
                     <div class="space-y-4">
                         <div
-                            v-for="(loop, index) in loops"
+                            v-for="(entry, index) in loopContent"
                             :key="index"
                             :class="[
                                 'bg-white rounded-2xl border p-5',
-                                isLoopConverted(index) ? 'border-green-200 bg-green-50/50 opacity-75' : 'border-[#0b1215]/10',
+                                isLoopContentConverted(index) ? 'border-green-200 bg-green-50/50 opacity-75' : 'border-[#0b1215]/10',
                             ]"
                         >
                             <div class="flex items-start justify-between gap-4">
                                 <div class="flex-1">
                                     <div class="flex items-center gap-2 mb-1">
-                                        <h4 class="font-semibold text-[#0b1215]">{{ loop.name }}</h4>
-                                        <span v-if="isLoopConverted(index)" class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-full">Created</span>
+                                        <h4 class="font-semibold text-[#0b1215]">{{ entry.loop_name }}</h4>
+                                        <span v-if="isLoopContentConverted(index)" class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-full">Added</span>
                                     </div>
-                                    <p class="text-sm text-[#0b1215]/60 mb-3">{{ loop.description }}</p>
-                                    <div v-if="loop.platforms?.length" class="flex flex-wrap gap-2 mb-3">
-                                        <span
-                                            v-for="platform in loop.platforms"
-                                            :key="platform"
-                                            :class="[platformColor(platform), 'px-2 py-0.5 text-xs font-medium rounded-full']"
-                                        >
-                                            {{ platformLabel(platform) }}
-                                        </span>
-                                    </div>
-                                    <div v-if="loop.suggested_items?.length" class="mb-3">
+                                    <div v-if="entry.suggested_items?.length" class="mb-3">
                                         <p class="text-xs font-medium text-[#0b1215]/50 mb-2">Suggested items:</p>
                                         <div class="space-y-2">
                                             <div
-                                                v-for="(item, i) in loop.suggested_items"
+                                                v-for="(item, i) in entry.suggested_items"
                                                 :key="i"
                                                 class="bg-[#0b1215]/5 rounded-lg p-3"
                                             >
@@ -383,18 +388,34 @@ watch(() => props.strategy.status, (newStatus) => {
                                             </div>
                                         </div>
                                     </div>
-                                    <p v-if="loop.rationale" class="text-xs text-[#a1854f] italic">{{ loop.rationale }}</p>
+                                    <div v-if="!isLoopContentConverted(index) && activeLoops?.length" class="mt-3">
+                                        <label class="block text-xs font-medium text-[#0b1215]/50 mb-1">Add to loop:</label>
+                                        <select
+                                            v-model="selectedLoopId[index]"
+                                            class="w-full max-w-xs border border-[#0b1215]/10 rounded-lg px-3 py-1.5 text-sm text-[#0b1215] focus:outline-none focus:ring-2 focus:ring-[#a1854f]/30"
+                                        >
+                                            <option :value="undefined" disabled>Select a loop...</option>
+                                            <option v-for="loop in activeLoops" :key="loop.id" :value="loop.id">
+                                                {{ loop.name }} ({{ loop.items_count }} items)
+                                            </option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <button
-                                    v-if="!isLoopConverted(index)"
+                                    v-if="!isLoopContentConverted(index)"
                                     @click="convertLoop(index)"
-                                    :disabled="convertingLoop === index"
+                                    :disabled="convertingLoop === index || !selectedLoopId[index]"
                                     class="shrink-0 px-4 py-2 bg-[#0b1215] text-white text-sm font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50"
                                 >
-                                    {{ convertingLoop === index ? 'Creating...' : 'Create Loop' }}
+                                    {{ convertingLoop === index ? 'Adding...' : 'Add to Loop' }}
                                 </button>
                             </div>
                         </div>
+                    </div>
+                </section>
+                <section v-else-if="!activeLoops?.length && isCompleted">
+                    <div class="bg-white rounded-2xl border border-[#0b1215]/10 p-5 text-center">
+                        <p class="text-sm text-[#0b1215]/50">Create a loop to receive AI-generated content suggestions.</p>
                     </div>
                 </section>
 

@@ -123,6 +123,6 @@ class MarketingStrategy extends Model
      */
     public function getLoopsCountAttribute(): int
     {
-        return count($this->strategy_content['loops'] ?? []);
+        return count($this->strategy_content['loop_content'] ?? []);
     }
 }

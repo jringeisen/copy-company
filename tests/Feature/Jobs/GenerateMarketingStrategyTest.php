@@ -27,7 +27,7 @@ test('it generates marketing strategy', function () {
             'blog_posts' => [['title' => 'Blog Post 1']],
             'newsletter' => ['subject_line' => 'Newsletter Subject'],
             'social_posts' => [['platform' => 'instagram', 'content' => 'Test content']],
-            'loops' => [],
+            'loop_content' => [],
             'talking_points' => ['Point 1'],
         ],
         'context' => ['brand_name' => $this->brand->name],

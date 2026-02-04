@@ -154,27 +154,46 @@ test('converting newsletter creates draft post with newsletter flag', function (
     expect($strategy->converted_items['newsletter'])->toBeTrue();
 });
 
-test('converting loop creates loop with items', function () {
+test('converting loop content adds items to existing loop', function () {
     [$user, $brand] = createUserWithCreatorPlan();
+
+    $loop = $brand->loops()->create([
+        'name' => 'Weekly Tips',
+        'description' => 'Weekly tips loop',
+        'is_active' => true,
+        'platforms' => ['instagram'],
+    ]);
 
     $strategy = MarketingStrategy::factory()
         ->forBrand($brand)
         ->completed()
-        ->create();
+        ->create([
+            'strategy_content' => array_merge(
+                MarketingStrategy::factory()->completed()->make()->strategy_content,
+                ['loop_content' => [
+                    [
+                        'loop_id' => $loop->id,
+                        'loop_name' => 'Weekly Tips',
+                        'suggested_items' => [
+                            ['content' => 'Tip one content', 'hashtags' => ['tip']],
+                            ['content' => 'Tip two content', 'hashtags' => ['tip']],
+                        ],
+                    ],
+                ]]
+            ),
+        ]);
 
     $response = $this->actingAs($user)->post(route('strategies.convert-loop', $strategy), [
         'index' => 0,
+        'loop_id' => $loop->id,
     ]);
 
     $response->assertRedirect();
 
-    $this->assertDatabaseHas('loops', [
-        'brand_id' => $brand->id,
-        'is_active' => false,
-    ]);
+    expect($loop->items()->count())->toBe(2);
 
     $strategy->refresh();
-    expect($strategy->converted_items['loops'])->toContain(0);
+    expect($strategy->converted_items['loop_content'])->toContain(0);
 });
 
 test('retry resets status and dispatches job', function () {

@@ -8,6 +8,7 @@ use App\Http\Requests\Strategy\ConvertBlogPostRequest;
 use App\Http\Requests\Strategy\ConvertLoopRequest;
 use App\Http\Requests\Strategy\ConvertSocialPostRequest;
 use App\Jobs\GenerateMarketingStrategy;
+use App\Models\Loop;
 use App\Models\MarketingStrategy;
 use App\Services\MarketingStrategyService;
 use Illuminate\Http\RedirectResponse;
@@ -56,6 +57,19 @@ class MarketingStrategyController extends Controller
     {
         $this->authorize('view', $marketingStrategy);
 
+        $brand = $this->currentBrand();
+
+        $activeLoops = $brand->loops()
+            ->where('is_active', true)
+            ->withCount('items')
+            ->get()
+            ->map(fn (Loop $loop) => [
+                'id' => $loop->id,
+                'name' => $loop->name,
+                'platforms' => $loop->platforms,
+                'items_count' => $loop->items_count,
+            ]);
+
         return Inertia::render('Strategy/Show', [
             'strategy' => [
                 'id' => $marketingStrategy->id,
@@ -67,6 +81,7 @@ class MarketingStrategyController extends Controller
                 'converted_items' => $marketingStrategy->converted_items ?? [],
                 'completed_at' => $marketingStrategy->completed_at?->format('M d, Y \a\t g:i A'),
             ],
+            'activeLoops' => $activeLoops,
         ]);
     }
 
@@ -135,13 +150,14 @@ class MarketingStrategyController extends Controller
         $brand = $this->currentBrand();
         $validated = $request->validated();
 
-        $this->strategyService->convertLoop(
+        $this->strategyService->convertLoopContent(
             $marketingStrategy,
             $brand,
-            $validated['index']
+            $validated['index'],
+            $validated['loop_id']
         );
 
-        return back()->with('success', 'Loop created with suggested items.');
+        return back()->with('success', 'Content items added to loop.');
     }
 
     public function retry(MarketingStrategy $marketingStrategy): RedirectResponse

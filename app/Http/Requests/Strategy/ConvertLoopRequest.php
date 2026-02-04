@@ -18,6 +18,7 @@ class ConvertLoopRequest extends FormRequest
     {
         return [
             'index' => ['required', 'integer', 'min:0'],
+            'loop_id' => ['required', 'integer', 'exists:loops,id'],
         ];
     }
 }
