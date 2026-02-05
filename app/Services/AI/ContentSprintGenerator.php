@@ -97,6 +97,7 @@ Important:
                 ->withSystemPrompt($systemPrompt)
                 ->withPrompt($userPrompt)
                 ->withMaxTokens(config('ai.max_tokens', 4096))
+                ->withClientOptions(['timeout' => config('ai.timeout', 120)])
                 ->asText();
 
             return $response->text;

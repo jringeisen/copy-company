@@ -1,6 +1,19 @@
 <?php
 
 return [
+    /*
+    |--------------------------------------------------------------------------
+    | Request Timeout
+    |--------------------------------------------------------------------------
+    |
+    | The default HTTP timeout in seconds for API requests. AI generations
+    | with high token counts (4096+) can take 60-90 seconds, so we set a
+    | generous default of 120 seconds.
+    |
+    */
+
+    'request_timeout' => env('PRISM_REQUEST_TIMEOUT', 120),
+
     'prism_server' => [
         // The middleware that will be applied to the Prism Server routes.
         'middleware' => [],

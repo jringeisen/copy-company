@@ -41,4 +41,16 @@ return [
 
     'max_tokens' => env('AI_MAX_TOKENS', 4096),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Request Timeout
+    |--------------------------------------------------------------------------
+    |
+    | The HTTP timeout in seconds for AI API requests. Complex generations
+    | requesting many tokens can take 60-90 seconds. Default is 120 seconds.
+    |
+    */
+
+    'timeout' => env('AI_TIMEOUT', 120),
+
 ];
