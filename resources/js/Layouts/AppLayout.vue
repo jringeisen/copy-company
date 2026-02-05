@@ -3,6 +3,7 @@ import { Link, usePage, useForm, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import ToastContainer from '@/Components/ToastContainer.vue';
 import ImpersonationBanner from '@/Components/ImpersonationBanner.vue';
+import FeedbackWidget from '@/Components/FeedbackWidget.vue';
 
 const props = defineProps({
     currentPage: {
@@ -562,6 +563,9 @@ const closeMobileMenu = () => {
                 <slot />
             </main>
         </div>
+
+        <!-- Feedback Widget -->
+        <FeedbackWidget />
 
         <!-- Toast Notifications -->
         <ToastContainer />

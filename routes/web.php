@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDisputeController;
+use App\Http\Controllers\Admin\AdminFeedbackController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\ImpersonationController;
 use App\Http\Controllers\AIAssistantController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ContentSprintController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\LoopController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\MediaFolderController;
@@ -199,6 +201,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/loops/{loop}/reorder', [LoopController::class, 'reorder'])->name('loops.reorder');
     Route::post('/loops/{loop}/import', [LoopController::class, 'import'])->name('loops.import');
 
+    // Feedback routes
+    Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback.index');
+    Route::post('/feedback', [FeedbackController::class, 'store'])->name('feedback.store');
+
     // AI Assistant routes
     Route::prefix('ai')->group(function () {
         Route::post('/draft', [AIAssistantController::class, 'draft'])->name('ai.draft');
@@ -238,6 +244,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/disputes', [AdminDisputeController::class, 'index'])->name('disputes.index');
         Route::get('/disputes/{dispute}', [AdminDisputeController::class, 'show'])->name('disputes.show');
         Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::get('/feedback', [AdminFeedbackController::class, 'index'])->name('feedback.index');
+        Route::get('/feedback/{feedback}', [AdminFeedbackController::class, 'show'])->name('feedback.show');
+        Route::put('/feedback/{feedback}', [AdminFeedbackController::class, 'update'])->name('feedback.update');
         Route::post('/impersonate/{user}', [ImpersonationController::class, 'start'])->name('impersonate.start');
     });
 });
