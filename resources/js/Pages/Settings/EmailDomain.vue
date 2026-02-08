@@ -3,6 +3,7 @@ import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import HelpLink from '@/Components/HelpLink.vue';
+import Button from '@/Components/Button.vue';
 
 const props = defineProps({
     brand: Object,
@@ -167,15 +168,15 @@ const copyToClipboard = (text) => {
                         <p v-if="domainForm.errors.from_address" class="mt-1 text-sm text-red-600">{{ domainForm.errors.from_address }}</p>
                     </div>
 
-                    <button
+                    <Button
                         type="submit"
-                        class="w-full px-6 py-3 bg-[#0b1215] text-white font-semibold rounded-full hover:bg-[#0b1215]/90 focus:outline-none focus:ring-2 focus:ring-[#a1854f]/30 focus:ring-offset-2 transition"
-                        :class="{ 'opacity-50': domainForm.processing }"
-                        :disabled="domainForm.processing"
+                        size="lg"
+                        :loading="domainForm.processing"
+                        loading-text="Starting Verification..."
+                        class="w-full font-semibold"
                     >
-                        <span v-if="domainForm.processing">Starting Verification...</span>
-                        <span v-else>Start Domain Verification</span>
-                    </button>
+                        Start Domain Verification
+                    </Button>
                 </form>
             </div>
 
@@ -193,15 +194,16 @@ const copyToClipboard = (text) => {
                             </p>
                         </div>
                         <div class="flex items-center gap-3">
-                            <button
+                            <Button
                                 v-if="isPending || isFailed"
+                                variant="gold"
+                                size="sm"
                                 @click="checkStatus"
-                                class="px-4 py-2 text-sm font-medium text-[#a1854f] bg-[#a1854f]/10 rounded-xl hover:bg-[#a1854f]/20 transition"
-                                :disabled="isChecking"
+                                :loading="isChecking"
+                                loading-text="Checking..."
                             >
-                                <span v-if="isChecking">Checking...</span>
-                                <span v-else>Check Status</span>
-                            </button>
+                                Check Status
+                            </Button>
                             <button
                                 @click="removeDomain"
                                 class="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition"
@@ -378,14 +380,13 @@ const copyToClipboard = (text) => {
                             <p v-if="fromForm.errors.from_address" class="mt-1 text-sm text-red-600">{{ fromForm.errors.from_address }}</p>
                         </div>
                         <div class="flex justify-end">
-                            <button
+                            <Button
                                 type="submit"
-                                class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 focus:outline-none focus:ring-2 focus:ring-[#a1854f]/30 focus:ring-offset-2 transition"
-                                :class="{ 'opacity-50': fromForm.processing }"
-                                :disabled="fromForm.processing"
+                                :loading="fromForm.processing"
+                                loading-text="Updating..."
                             >
                                 Update From Address
-                            </button>
+                            </Button>
                         </div>
                     </form>
                 </div>

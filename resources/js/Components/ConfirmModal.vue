@@ -1,5 +1,6 @@
 <script setup>
 import { watch, onMounted, onUnmounted, ref } from 'vue';
+import Button from '@/Components/Button.vue';
 
 const props = defineProps({
     show: {
@@ -166,14 +167,14 @@ watch(() => props.show, (newVal) => {
 
                             <!-- Actions -->
                             <div class="flex items-center gap-3 p-4 border-t border-[#0b1215]/10 bg-[#f7f7f7] rounded-b-2xl">
-                                <button
-                                    type="button"
+                                <Button
+                                    variant="secondary"
                                     @click="emit('cancel')"
                                     :disabled="processing"
-                                    class="flex-1 px-4 py-2.5 text-[#0b1215] font-medium bg-white border border-[#0b1215]/20 rounded-xl hover:bg-[#0b1215]/5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#a1854f]/30 transition disabled:opacity-50"
+                                    class="flex-1"
                                 >
                                     {{ cancelText }}
-                                </button>
+                                </Button>
                                 <button
                                     ref="confirmButton"
                                     type="button"

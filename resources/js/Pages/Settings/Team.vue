@@ -2,6 +2,7 @@
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Button from '@/Components/Button.vue';
 
 const props = defineProps({
     account: Object,
@@ -84,13 +85,9 @@ const getRoleBadgeClass = (role) => {
                     <h1 class="text-2xl font-bold text-[#0b1215]">Team Settings</h1>
                     <p class="text-[#0b1215]/60 mt-1">Manage who has access to {{ account.name }}</p>
                 </div>
-                <button
-                    v-if="isAdmin"
-                    @click="showInviteModal = true"
-                    class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 focus:outline-none focus:ring-2 focus:ring-[#a1854f]/30 focus:ring-offset-2 transition"
-                >
+                <Button v-if="isAdmin" @click="showInviteModal = true">
                     Invite Member
-                </button>
+                </Button>
             </div>
 
             <!-- Team Members -->
@@ -170,12 +167,13 @@ const getRoleBadgeClass = (role) => {
                             </p>
                         </div>
                         <div v-if="isAdmin" class="flex items-center gap-2">
-                            <button
+                            <Button
+                                variant="gold"
+                                size="sm"
                                 @click="resendInvitation(invitation)"
-                                class="px-3 py-1.5 text-sm font-medium text-[#a1854f] bg-[#a1854f]/10 rounded-xl hover:bg-[#a1854f]/20 transition"
                             >
                                 Resend
-                            </button>
+                            </Button>
                             <button
                                 @click="cancelInvitation(invitation)"
                                 class="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition"
@@ -237,22 +235,19 @@ const getRoleBadgeClass = (role) => {
                         </div>
 
                         <div class="flex justify-end gap-3 mt-6">
-                            <button
-                                type="button"
+                            <Button
+                                variant="secondary"
                                 @click="showInviteModal = false"
-                                class="px-4 py-2 text-sm font-medium text-[#0b1215] bg-white border border-[#0b1215]/20 rounded-xl hover:bg-[#0b1215]/5 transition"
                             >
                                 Cancel
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 type="submit"
-                                class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 focus:outline-none focus:ring-2 focus:ring-[#a1854f]/30 focus:ring-offset-2 transition"
-                                :class="{ 'opacity-50': inviteForm.processing }"
-                                :disabled="inviteForm.processing"
+                                :loading="inviteForm.processing"
+                                loading-text="Sending..."
                             >
-                                <span v-if="inviteForm.processing">Sending...</span>
-                                <span v-else>Send Invitation</span>
-                            </button>
+                                Send Invitation
+                            </Button>
                         </div>
                     </form>
                 </div>

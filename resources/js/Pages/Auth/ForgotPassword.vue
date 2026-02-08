@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
+import Button from '@/Components/Button.vue';
 
 defineProps({
     status: String,
@@ -39,14 +40,15 @@ const submit = () => {
                 <p v-if="form.errors.email" class="mt-2 text-sm text-red-600">{{ form.errors.email }}</p>
             </div>
 
-            <button
+            <Button
                 type="submit"
-                class="w-full mt-6 px-6 py-3.5 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition text-sm"
-                :class="{ 'opacity-50 cursor-not-allowed': form.processing }"
-                :disabled="form.processing"
+                size="lg"
+                :loading="form.processing"
+                loading-text="Sending..."
+                class="w-full mt-6"
             >
                 Send reset link
-            </button>
+            </Button>
         </form>
 
         <template #footer>

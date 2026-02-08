@@ -5,6 +5,7 @@ import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import SocialPostCard from '@/Components/Social/SocialPostCard.vue';
 import SocialPostEditor from '@/Components/Social/SocialPostEditor.vue';
+import Button from '@/Components/Button.vue';
 import { usePermissions } from '@/Composables/usePermissions';
 import { useToast } from '@/Composables/useToast';
 import { usePageLoading } from '@/Composables/usePageLoading';
@@ -194,19 +195,12 @@ const availablePlatformsForGenerate = [
                     <p class="text-[#0b1215]/60">Manage your social media content</p>
                 </div>
                 <div class="flex items-center space-x-3">
-                    <Link
-                        href="/social-posts/queue"
-                        class="px-4 py-2 border border-[#0b1215]/20 text-[#0b1215] font-medium rounded-full hover:bg-[#0b1215]/5 transition"
-                    >
+                    <Button variant="secondary" href="/social-posts/queue" class="rounded-full">
                         View Queue
-                    </Link>
-                    <button
-                        v-if="canManageSocial"
-                        @click="showGenerateModal = true"
-                        class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition"
-                    >
+                    </Button>
+                    <Button v-if="canManageSocial" @click="showGenerateModal = true">
                         Generate from Post
-                    </button>
+                    </Button>
                 </div>
             </div>
             <!-- Filters -->
@@ -274,13 +268,9 @@ const availablePlatformsForGenerate = [
                 <p class="mt-2 text-sm text-[#0b1215]/50">
                     {{ canManageSocial ? 'Generate social posts from your blog content to share across platforms.' : 'No social posts have been created yet.' }}
                 </p>
-                <button
-                    v-if="canManageSocial"
-                    @click="showGenerateModal = true"
-                    class="mt-4 px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition"
-                >
+                <Button v-if="canManageSocial" @click="showGenerateModal = true" class="mt-4">
                     Generate from Post
-                </button>
+                </Button>
             </div>
 
             <!-- Pagination -->
@@ -345,24 +335,17 @@ const availablePlatformsForGenerate = [
 
                     <!-- Actions -->
                     <div class="flex justify-end space-x-3">
-                        <button
-                            @click="showGenerateModal = false"
-                            :disabled="isGenerating"
-                            class="px-4 py-2 text-[#0b1215] font-medium hover:bg-[#0b1215]/5 rounded-xl transition disabled:opacity-50"
-                        >
+                        <Button variant="ghost" @click="showGenerateModal = false" :disabled="isGenerating">
                             Cancel
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             @click="generateSocialPosts"
-                            :disabled="!generateForm.post_id || generateForm.platforms.length === 0 || isGenerating"
-                            class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50 flex items-center"
+                            :loading="isGenerating"
+                            loading-text="Generating..."
+                            :disabled="!generateForm.post_id || generateForm.platforms.length === 0"
                         >
-                            <svg v-if="isGenerating" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            {{ isGenerating ? 'Generating...' : 'Generate Posts' }}
-                        </button>
+                            Generate Posts
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -389,19 +372,12 @@ const availablePlatformsForGenerate = [
                     </div>
 
                     <div class="flex justify-end space-x-3">
-                        <button
-                            @click="showScheduleModal = false"
-                            class="px-4 py-2 text-[#0b1215] font-medium hover:bg-[#0b1215]/5 rounded-xl transition"
-                        >
+                        <Button variant="ghost" @click="showScheduleModal = false">
                             Cancel
-                        </button>
-                        <button
-                            @click="submitSchedule"
-                            :disabled="!scheduleForm.scheduled_at"
-                            class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50"
-                        >
+                        </Button>
+                        <Button @click="submitSchedule" :disabled="!scheduleForm.scheduled_at">
                             Schedule
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>

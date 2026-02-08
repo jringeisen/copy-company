@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Autocomplete from '@/Components/Autocomplete.vue';
 import HelpLink from '@/Components/HelpLink.vue';
+import Button from '@/Components/Button.vue';
 
 const props = defineProps({
     brand: Object,
@@ -352,14 +353,15 @@ const submit = () => {
 
                     <!-- Submit -->
                     <div class="flex justify-end pt-4 border-t border-[#0b1215]/10">
-                        <button
+                        <Button
                             type="submit"
-                            class="px-6 py-3 bg-[#0b1215] text-white font-semibold rounded-full hover:bg-[#0b1215]/90 focus:outline-none focus:ring-2 focus:ring-[#a1854f]/30 focus:ring-offset-2 transition"
-                            :class="{ 'opacity-50': form.processing }"
-                            :disabled="form.processing"
+                            size="lg"
+                            :loading="form.processing"
+                            loading-text="Saving..."
+                            class="font-semibold"
                         >
                             Save Changes
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </div>

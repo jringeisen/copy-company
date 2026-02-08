@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 import { useToast } from '@/Composables/useToast';
+import Button from '@/Components/Button.vue';
 
 const page = usePage();
 const toast = useToast();
@@ -268,28 +269,23 @@ const submit = () => {
 
                                     <!-- Actions -->
                                     <div class="flex items-center gap-3 pt-4 border-t border-[#0b1215]/10">
-                                        <button
-                                            type="button"
+                                        <Button
+                                            variant="secondary"
                                             @click="closeModal"
                                             :disabled="form.processing"
-                                            class="flex-1 px-4 py-2.5 text-[#0b1215] font-medium bg-white border border-[#0b1215]/20 rounded-full hover:bg-[#0b1215]/5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#a1854f]/30 transition disabled:opacity-50"
+                                            class="flex-1 rounded-full"
                                         >
                                             Cancel
-                                        </button>
-                                        <button
+                                        </Button>
+                                        <Button
                                             type="submit"
-                                            :disabled="form.processing || !form.description || form.description.length < 10"
-                                            class="flex-1 px-4 py-2.5 bg-[#0b1215] text-white font-semibold rounded-full hover:bg-[#0b1215]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#a1854f] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                            :loading="form.processing"
+                                            loading-text="Submitting..."
+                                            :disabled="!form.description || form.description.length < 10"
+                                            class="flex-1 font-semibold"
                                         >
-                                            <span v-if="form.processing" class="flex items-center justify-center">
-                                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                </svg>
-                                                Submitting...
-                                            </span>
-                                            <span v-else>Submit Feedback</span>
-                                        </button>
+                                            Submit Feedback
+                                        </Button>
                                     </div>
                                 </form>
                             </div>

@@ -1,7 +1,8 @@
 <script setup>
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { Head, router, useForm } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Button from '@/Components/Button.vue';
 
 const timezoneLabels = {
     'America/New_York': 'Eastern Time',
@@ -130,26 +131,19 @@ const submitPublishNow = () => {
                     </span>
                 </div>
                 <div class="flex items-center space-x-3">
-                    <Link
-                        href="/social-posts"
-                        class="px-4 py-2 border border-[#0b1215]/20 text-[#0b1215] font-medium rounded-full hover:bg-[#0b1215]/5 transition"
-                    >
+                    <Button variant="secondary" href="/social-posts" class="rounded-full">
                         Back to Social Posts
-                    </Link>
+                    </Button>
                     <button
                         v-if="selectedPosts.length > 0"
                         @click="openPublishNow"
-                        class="px-4 py-2 bg-[#a1854f] text-white font-medium rounded-full hover:bg-[#a1854f]/90 transition"
+                        class="px-4 py-2.5 text-sm bg-[#a1854f] text-white font-medium rounded-full hover:bg-[#a1854f]/90 transition inline-flex items-center justify-center"
                     >
                         Publish Now
                     </button>
-                    <button
-                        v-if="selectedPosts.length > 0"
-                        @click="openBulkSchedule"
-                        class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition"
-                    >
+                    <Button v-if="selectedPosts.length > 0" @click="openBulkSchedule">
                         Schedule {{ selectedPosts.length }} Selected
-                    </button>
+                    </Button>
                 </div>
             </div>
             <!-- Select All -->
@@ -235,12 +229,9 @@ const submitPublishNow = () => {
                 <p class="mt-2 text-sm text-[#0b1215]/50">
                     Add social posts to your queue to schedule them for publishing.
                 </p>
-                <Link
-                    href="/social-posts"
-                    class="mt-4 inline-block px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition"
-                >
+                <Button href="/social-posts" class="mt-4">
                     View All Social Posts
-                </Link>
+                </Button>
             </div>
         </div>
 
@@ -292,19 +283,17 @@ const submitPublishNow = () => {
                     </div>
 
                     <div class="mt-6 flex justify-end space-x-3">
-                        <button
-                            @click="showBulkScheduleModal = false"
-                            class="px-4 py-2 text-[#0b1215] font-medium hover:bg-[#0b1215]/5 rounded-xl transition"
-                        >
+                        <Button variant="ghost" @click="showBulkScheduleModal = false">
                             Cancel
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             @click="submitBulkSchedule"
-                            :disabled="!bulkScheduleForm.scheduled_at || bulkScheduleForm.processing"
-                            class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50"
+                            :loading="bulkScheduleForm.processing"
+                            loading-text="Scheduling..."
+                            :disabled="!bulkScheduleForm.scheduled_at"
                         >
-                            {{ bulkScheduleForm.processing ? 'Scheduling...' : 'Schedule All' }}
-                        </button>
+                            Schedule All
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -352,12 +341,9 @@ const submitPublishNow = () => {
                     </div>
 
                     <div class="mt-6 flex justify-end space-x-3">
-                        <button
-                            @click="showPublishNowModal = false"
-                            class="px-4 py-2 text-[#0b1215] font-medium hover:bg-[#0b1215]/5 rounded-xl transition"
-                        >
+                        <Button variant="ghost" @click="showPublishNowModal = false">
                             Cancel
-                        </button>
+                        </Button>
                         <button
                             @click="submitPublishNow"
                             :disabled="bulkPublishNowForm.processing"

@@ -2,6 +2,7 @@
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { ref, computed, watch } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Button from '@/Components/Button.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
 import MediaPickerModal from '@/Components/Media/MediaPickerModal.vue';
 import draggable from 'vuedraggable';
@@ -341,18 +342,12 @@ const truncateContent = (content, length = 100) => {
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-lg font-semibold text-gray-900">Content Items</h2>
                     <div class="flex gap-2">
-                        <button
-                            @click="showImportModal = true"
-                            class="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
-                        >
+                        <Button variant="secondary" @click="showImportModal = true">
                             Import CSV
-                        </button>
-                        <button
-                            @click="showAddItemModal = true"
-                            class="px-4 py-2 text-sm font-medium text-white bg-[#0b1215] rounded-xl hover:bg-[#0b1215]/90 transition-colors"
-                        >
+                        </Button>
+                        <Button @click="showAddItemModal = true" class="rounded-xl">
                             Add Item
-                        </button>
+                        </Button>
                     </div>
                 </div>
 
@@ -646,19 +641,17 @@ const truncateContent = (content, length = 100) => {
                         </div>
 
                         <div class="flex justify-end gap-2 mt-6">
-                            <button
-                                @click="showAddItemModal = false"
-                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors"
-                            >
+                            <Button variant="secondary" @click="showAddItemModal = false" class="bg-gray-100 border-0 hover:bg-gray-200">
                                 Cancel
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 @click="submitAddItem"
-                                :disabled="addItemForm.processing"
-                                class="px-4 py-2 text-sm font-medium text-white bg-[#0b1215] rounded-xl hover:bg-[#0b1215]/90 transition-colors disabled:opacity-50"
+                                :loading="addItemForm.processing"
+                                loading-text="Adding..."
+                                class="rounded-xl"
                             >
-                                {{ addItemForm.processing ? 'Adding...' : 'Add Item' }}
-                            </button>
+                                Add Item
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -701,19 +694,18 @@ const truncateContent = (content, length = 100) => {
                         </div>
 
                         <div class="flex justify-end gap-2">
-                            <button
-                                @click="showImportModal = false"
-                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors"
-                            >
+                            <Button variant="secondary" @click="showImportModal = false" class="bg-gray-100 border-0 hover:bg-gray-200">
                                 Cancel
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 @click="submitImport"
-                                :disabled="importForm.processing || !importForm.file"
-                                class="px-4 py-2 text-sm font-medium text-white bg-[#0b1215] rounded-xl hover:bg-[#0b1215]/90 transition-colors disabled:opacity-50"
+                                :loading="importForm.processing"
+                                loading-text="Importing..."
+                                :disabled="!importForm.file"
+                                class="rounded-xl"
                             >
-                                {{ importForm.processing ? 'Importing...' : 'Import' }}
-                            </button>
+                                Import
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -845,19 +837,17 @@ const truncateContent = (content, length = 100) => {
                         </div>
 
                         <div class="flex justify-end gap-2 mt-6">
-                            <button
-                                @click="cancelEdit"
-                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors"
-                            >
+                            <Button variant="secondary" @click="cancelEdit" class="bg-gray-100 border-0 hover:bg-gray-200">
                                 Cancel
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 @click="submitEditItem"
-                                :disabled="editItemForm.processing"
-                                class="px-4 py-2 text-sm font-medium text-white bg-[#0b1215] rounded-xl hover:bg-[#0b1215]/90 transition-colors disabled:opacity-50"
+                                :loading="editItemForm.processing"
+                                loading-text="Saving..."
+                                class="rounded-xl"
                             >
-                                {{ editItemForm.processing ? 'Saving...' : 'Save Changes' }}
-                            </button>
+                                Save Changes
+                            </Button>
                         </div>
                     </div>
                 </div>

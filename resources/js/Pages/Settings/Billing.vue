@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Button from '@/Components/Button.vue';
 
 const props = defineProps({
     usage: Object,
@@ -70,13 +71,12 @@ const getUsageColor = (used, limit) => {
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <Link
+                        <Button
                             v-if="!subscription || subscription?.canceled"
                             href="/billing/subscribe"
-                            class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition"
                         >
                             {{ subscription?.canceled ? 'Choose New Plan' : 'Subscribe' }}
-                        </Link>
+                        </Button>
                         <a
                             v-else
                             href="/billing/portal"
@@ -94,7 +94,7 @@ const getUsageColor = (used, limit) => {
                     </p>
                     <button
                         @click="resumeSubscription"
-                        class="px-4 py-2 bg-[#a1854f] text-white font-medium rounded-full hover:bg-[#a1854f]/90 transition"
+                        class="px-4 py-2.5 bg-[#a1854f] text-white font-medium rounded-full hover:bg-[#a1854f]/90 transition text-sm"
                     >
                         Resume Subscription
                     </button>

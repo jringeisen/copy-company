@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
+import Button from '@/Components/Button.vue';
 
 const form = useForm({
     name: '',
@@ -169,14 +170,15 @@ const submit = () => {
                 <p v-if="form.errors.referral_source" class="mt-2 text-sm text-red-600">{{ form.errors.referral_source }}</p>
             </div>
 
-            <button
+            <Button
                 type="submit"
-                class="w-full mt-6 px-6 py-3.5 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition text-sm"
-                :class="{ 'opacity-50 cursor-not-allowed': form.processing }"
-                :disabled="form.processing"
+                size="lg"
+                :loading="form.processing"
+                loading-text="Creating account..."
+                class="w-full mt-6"
             >
                 Create account
-            </button>
+            </Button>
         </form>
 
         <template #footer>

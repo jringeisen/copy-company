@@ -2,6 +2,7 @@
 import { Head, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Button from '@/Components/Button.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
 import MediaGrid from '@/Components/Media/MediaGrid.vue';
 import MediaUploader from '@/Components/Media/MediaUploader.vue';
@@ -110,27 +111,27 @@ const deleteMessage = computed(() => {
                     >
                         Move ({{ selectedIds.length }})
                     </button>
-                    <button
+                    <Button
                         v-if="canDeleteMedia && selectedIds.length > 0"
+                        variant="danger"
                         @click="showDeleteModal = true"
-                        class="px-4 py-2.5 bg-red-600 text-white font-medium rounded-full hover:bg-red-700 transition text-sm"
                     >
                         Delete ({{ selectedIds.length }})
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         v-if="canUploadMedia"
+                        variant="secondary"
                         @click="showCreateFolderModal = true"
-                        class="px-4 py-2.5 border border-[#0b1215]/20 text-[#0b1215] font-medium rounded-full hover:bg-[#0b1215]/5 transition text-sm"
+                        class="rounded-full"
                     >
                         New Folder
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         v-if="canUploadMedia"
                         @click="showUploader = true"
-                        class="px-5 py-2.5 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition text-sm"
                     >
                         Upload Images
-                    </button>
+                    </Button>
                 </div>
             </div>
 
@@ -191,13 +192,13 @@ const deleteMessage = computed(() => {
                         <p class="mt-2 text-[#0b1215]/50">
                             {{ currentFolder ? 'This folder is empty.' : (canUploadMedia ? 'Upload your first image to get started.' : 'No images have been uploaded yet.') }}
                         </p>
-                        <button
+                        <Button
                             v-if="canUploadMedia"
                             @click="showUploader = true"
-                            class="mt-6 inline-flex items-center px-5 py-2.5 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition text-sm"
+                            class="mt-6"
                         >
                             Upload Images
-                        </button>
+                        </Button>
                     </div>
 
                     <!-- Pagination -->

@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link, InfiniteScroll } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Button from '@/Components/Button.vue';
 import { usePageLoading } from '@/Composables/usePageLoading';
 
 const props = defineProps({
@@ -35,7 +36,7 @@ const formatNumber = (num) => {
             </div>
 
             <!-- Newsletter List -->
-            <div v-if="isLoading" class="space-y-4">
+            <div v-if="isLoading && newsletters.data.length > 0" class="space-y-4">
                 <!-- Skeleton cards -->
                 <div v-for="i in 4" :key="i" class="bg-white rounded-2xl border border-[#0b1215]/10 p-6 animate-pulse">
                     <div class="flex items-start justify-between">
@@ -128,12 +129,9 @@ const formatNumber = (num) => {
                 <p class="mt-2 text-sm text-[#0b1215]/50">
                     Newsletters will appear here after you send your first one.
                 </p>
-                <Link
-                    href="/posts"
-                    class="mt-4 inline-block px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition"
-                >
+                <Button href="/posts" class="mt-4">
                     Create a Post
-                </Link>
+                </Button>
             </div>
 
         </div>

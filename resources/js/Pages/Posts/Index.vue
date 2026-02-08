@@ -6,6 +6,7 @@ import ConfirmModal from '@/Components/ConfirmModal.vue';
 import UpgradeModal from '@/Components/UpgradeModal.vue';
 import SkeletonLoader from '@/Components/SkeletonLoader.vue';
 import HelpLink from '@/Components/HelpLink.vue';
+import Button from '@/Components/Button.vue';
 import { usePermissions } from '@/Composables/usePermissions';
 import { useSubscription } from '@/Composables/useSubscription';
 import { usePageLoading } from '@/Composables/usePageLoading';
@@ -96,27 +97,25 @@ const getStatusColor = (status) => {
                     <p class="text-[#0b1215]/60">Manage your blog posts and newsletters</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button
+                    <Button
                         v-if="canDeletePosts && selectedIds.length > 0"
+                        variant="danger"
                         @click="showDeleteModal = true"
-                        class="px-4 py-2.5 bg-red-600 text-white font-medium rounded-full hover:bg-red-700 transition text-sm"
                     >
                         Delete ({{ selectedIds.length }})
-                    </button>
-                    <Link
+                    </Button>
+                    <Button
                         v-if="canCreatePosts && canCreatePost"
                         href="/posts/create"
-                        class="px-5 py-2.5 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition text-sm"
                     >
                         New Post
-                    </Link>
-                    <button
+                    </Button>
+                    <Button
                         v-else-if="canCreatePosts && !canCreatePost"
                         @click="showUpgradeModal = true"
-                        class="px-5 py-2.5 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition text-sm"
                     >
                         New Post
-                    </button>
+                    </Button>
                 </div>
             </div>
 
@@ -228,20 +227,20 @@ const getStatusColor = (status) => {
                 <p class="mt-2 text-[#0b1215]/50">
                     {{ canCreatePosts ? 'Get started by creating your first post.' : 'No posts have been created yet.' }}
                 </p>
-                <Link
+                <Button
                     v-if="canCreatePosts && canCreatePost"
                     href="/posts/create"
-                    class="mt-6 inline-flex items-center px-5 py-2.5 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition text-sm"
+                    class="mt-6"
                 >
                     Create Your First Post
-                </Link>
-                <button
+                </Button>
+                <Button
                     v-else-if="canCreatePosts && !canCreatePost"
                     @click="showUpgradeModal = true"
-                    class="mt-6 inline-flex items-center px-5 py-2.5 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition text-sm"
+                    class="mt-6"
                 >
                     Create Your First Post
-                </button>
+                </Button>
             </div>
         </div>
 

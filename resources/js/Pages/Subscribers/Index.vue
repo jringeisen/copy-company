@@ -3,6 +3,7 @@ import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
+import Button from '@/Components/Button.vue';
 import { usePermissions } from '@/Composables/usePermissions';
 
 const { canExportSubscribers, canDeleteSubscribers, canViewSubscribers } = usePermissions();
@@ -99,12 +100,9 @@ const onFileChange = (e) => {
                     <p class="text-[#0b1215]/60 mt-1">Manage your newsletter subscribers</p>
                 </div>
                 <div v-if="canExportSubscribers" class="flex space-x-3">
-                    <a
-                        href="/subscribers/export"
-                        class="px-4 py-2 border border-[#0b1215]/20 text-[#0b1215] font-medium rounded-full hover:bg-[#0b1215]/5 transition"
-                    >
+                    <Button variant="secondary" href="/subscribers/export" class="rounded-full">
                         Export CSV
-                    </a>
+                    </Button>
                 </div>
             </div>
 
@@ -135,13 +133,14 @@ const onFileChange = (e) => {
                         @change="onFileChange"
                         class="text-sm text-[#0b1215]/50 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-[#a1854f]/10 file:text-[#a1854f] hover:file:bg-[#a1854f]/20"
                     />
-                    <button
+                    <Button
                         @click="handleImport"
-                        :disabled="!importFile || isImporting"
-                        class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50"
+                        :loading="isImporting"
+                        loading-text="Importing..."
+                        :disabled="!importFile"
                     >
-                        {{ isImporting ? 'Importing...' : 'Import' }}
-                    </button>
+                        Import
+                    </Button>
                 </div>
             </div>
 
@@ -288,20 +287,19 @@ const onFileChange = (e) => {
                                 </div>
 
                                 <div class="flex justify-end gap-3">
-                                    <button
-                                        type="button"
+                                    <Button
+                                        variant="secondary"
                                         @click="cancelEdit"
-                                        class="px-4 py-2 text-[#0b1215] font-medium bg-white border border-[#0b1215]/20 rounded-xl hover:bg-[#0b1215]/5 transition"
                                     >
                                         Cancel
-                                    </button>
-                                    <button
+                                    </Button>
+                                    <Button
                                         type="submit"
-                                        :disabled="editForm.processing"
-                                        class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50"
+                                        :loading="editForm.processing"
+                                        loading-text="Saving..."
                                     >
-                                        {{ editForm.processing ? 'Saving...' : 'Save' }}
-                                    </button>
+                                        Save
+                                    </Button>
                                 </div>
                             </form>
                         </div>

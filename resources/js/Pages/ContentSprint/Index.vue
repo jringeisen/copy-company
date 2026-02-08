@@ -2,6 +2,7 @@
 import { Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Button from '@/Components/Button.vue';
 import UpgradeModal from '@/Components/UpgradeModal.vue';
 import { usePermissions } from '@/Composables/usePermissions';
 import { useSubscription } from '@/Composables/useSubscription';
@@ -49,24 +50,22 @@ const statusColors = {
                     </div>
                     <p class="text-[#0b1215]/60">Generate blog post ideas with AI</p>
                 </div>
-                <Link
+                <Button
                     v-if="canCreateSprints && canCreateSprint"
                     href="/content-sprints/create"
-                    class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition"
                 >
                     New Sprint
-                </Link>
-                <button
+                </Button>
+                <Button
                     v-else-if="canCreateSprints && !canCreateSprint"
                     @click="showUpgradeModal = true"
-                    class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition"
                 >
                     New Sprint
-                </button>
+                </Button>
             </div>
 
             <!-- Sprints List -->
-            <div v-if="isLoading" class="space-y-4">
+            <div v-if="isLoading && sprints.length > 0" class="space-y-4">
                 <!-- Skeleton cards -->
                 <div v-for="i in 3" :key="i" class="bg-white rounded-2xl border border-[#0b1215]/10 p-6 animate-pulse">
                     <div class="flex items-center justify-between">
@@ -129,20 +128,20 @@ const statusColors = {
                 <p class="mt-2 text-sm text-[#0b1215]/50">
                     {{ canCreateSprints ? 'Start a sprint to generate a month of blog post ideas.' : 'No content sprints have been created yet.' }}
                 </p>
-                <Link
+                <Button
                     v-if="canCreateSprints && canCreateSprint"
                     href="/content-sprints/create"
-                    class="mt-4 inline-block px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition"
+                    class="mt-4"
                 >
                     Start Your First Sprint
-                </Link>
-                <button
+                </Button>
+                <Button
                     v-else-if="canCreateSprints && !canCreateSprint"
                     @click="showUpgradeModal = true"
-                    class="mt-4 inline-block px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition"
+                    class="mt-4"
                 >
                     Start Your First Sprint
-                </button>
+                </Button>
             </div>
         </div>
 

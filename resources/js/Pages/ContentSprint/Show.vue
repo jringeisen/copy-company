@@ -2,6 +2,7 @@
 import { Head, Link, router, useForm, InfiniteScroll } from '@inertiajs/vue3';
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Button from '@/Components/Button.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
 import UpgradeModal from '@/Components/UpgradeModal.vue';
 import HelpLink from '@/Components/HelpLink.vue';
@@ -167,14 +168,14 @@ const deleteSprint = () => {
                         <HelpLink category-slug="content-sprints" article-slug="turning-ideas-into-draft-posts" />
                     </div>
                     <div class="flex items-center gap-3">
-                        <button
+                        <Button
                             v-if="canManageSprints && isCompleted && selectedIdeas.length > 0"
                             @click="createPosts"
-                            :disabled="acceptForm.processing"
-                            class="px-4 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50"
+                            :loading="acceptForm.processing"
+                            loading-text="Creating..."
                         >
                             Create {{ selectedIdeas.length }} Posts
-                        </button>
+                        </Button>
                         <button
                             v-if="canManageSprints"
                             @click="showDeleteModal = true"
@@ -228,13 +229,9 @@ const deleteSprint = () => {
                 <p class="text-[#0b1215]/60 mb-6">
                     Something went wrong while generating your content ideas. Please try again.
                 </p>
-                <button
-                    v-if="canManageSprints"
-                    @click="retry"
-                    class="px-6 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition"
-                >
+                <Button v-if="canManageSprints" @click="retry">
                     Try Again
-                </button>
+                </Button>
             </div>
 
             <!-- Completed State - Show Ideas -->
@@ -386,13 +383,13 @@ const deleteSprint = () => {
                         <span class="text-[#0b1215]/60">
                             {{ selectedIdeas.length }} idea{{ selectedIdeas.length !== 1 ? 's' : '' }} selected
                         </span>
-                        <button
+                        <Button
                             @click="createPosts"
-                            :disabled="acceptForm.processing"
-                            class="px-6 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50"
+                            :loading="acceptForm.processing"
+                            loading-text="Creating..."
                         >
-                            {{ acceptForm.processing ? 'Creating...' : `Create ${selectedIdeas.length} Draft Posts` }}
-                        </button>
+                            Create {{ selectedIdeas.length }} Draft Posts
+                        </Button>
                     </div>
                 </div>
             </div>

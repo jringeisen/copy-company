@@ -2,6 +2,7 @@
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Button from '@/Components/Button.vue';
 
 const props = defineProps({
     platforms: Array,
@@ -135,13 +136,9 @@ const formatTime = (time) => {
                             <h2 class="text-lg font-semibold text-gray-900">Schedule</h2>
                             <p class="text-sm text-gray-500">When should content be posted?</p>
                         </div>
-                        <button
-                            type="button"
-                            @click="showScheduleForm = true"
-                            class="px-4 py-2 text-sm font-medium text-[#0b1215] border border-[#0b1215] rounded-xl hover:bg-[#0b1215]/5 transition-colors"
-                        >
+                        <Button variant="secondary" size="sm" @click="showScheduleForm = true" class="border-[#0b1215]">
                             Add Time Slot
-                        </button>
+                        </Button>
                     </div>
 
                     <!-- Existing Schedules -->
@@ -209,36 +206,29 @@ const formatTime = (time) => {
                             </select>
                         </div>
                         <div class="flex gap-2">
-                            <button
-                                type="button"
-                                @click="addSchedule"
-                                class="px-4 py-2 text-sm font-medium text-white bg-[#0b1215] rounded-xl hover:bg-[#0b1215]/90 transition-colors"
-                            >
+                            <Button size="sm" @click="addSchedule" class="rounded-xl">
                                 Add
-                            </button>
-                            <button
-                                type="button"
-                                @click="showScheduleForm = false"
-                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-xl hover:bg-gray-300 transition-colors"
-                            >
+                            </Button>
+                            <Button variant="secondary" size="sm" @click="showScheduleForm = false" class="bg-gray-200 border-0 text-gray-700 hover:bg-gray-300">
                                 Cancel
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Submit -->
                 <div class="flex items-center justify-end gap-4">
-                    <Link href="/loops" class="px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
+                    <Button variant="ghost" href="/loops">
                         Cancel
-                    </Link>
-                    <button
+                    </Button>
+                    <Button
                         type="submit"
-                        :disabled="form.processing"
-                        class="px-6 py-2.5 text-sm font-medium text-white bg-[#0b1215] rounded-xl hover:bg-[#0b1215]/90 transition-colors disabled:opacity-50"
+                        :loading="form.processing"
+                        loading-text="Creating..."
+                        class="rounded-xl"
                     >
-                        {{ form.processing ? 'Creating...' : 'Create Loop' }}
-                    </button>
+                        Create Loop
+                    </Button>
                 </div>
             </form>
         </div>

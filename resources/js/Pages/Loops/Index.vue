@@ -2,6 +2,7 @@
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Button from '@/Components/Button.vue';
 import ConfirmModal from '@/Components/ConfirmModal.vue';
 
 defineProps({
@@ -48,15 +49,12 @@ const deleteLoop = () => {
                         Create recurring content schedules that post automatically
                     </p>
                 </div>
-                <Link
-                    href="/loops/create"
-                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#0b1215] text-white text-sm font-medium rounded-xl hover:bg-[#0b1215]/90 transition-colors"
-                >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <Button href="/loops/create" class="rounded-xl">
+                    <svg class="w-5 h-5 -ml-1 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                     Create Loop
-                </Link>
+                </Button>
             </div>
 
             <!-- Empty State -->
@@ -68,15 +66,12 @@ const deleteLoop = () => {
                 <p class="mt-2 text-sm text-gray-500 max-w-md mx-auto">
                     Create your first loop to automatically post content on a recurring schedule.
                 </p>
-                <Link
-                    href="/loops/create"
-                    class="mt-6 inline-flex items-center gap-2 px-4 py-2.5 bg-[#0b1215] text-white text-sm font-medium rounded-xl hover:bg-[#0b1215]/90 transition-colors"
-                >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <Button href="/loops/create" class="mt-6 rounded-xl">
+                    <svg class="w-5 h-5 -ml-1 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                     Create your first loop
-                </Link>
+                </Button>
             </div>
 
             <!-- Loops Grid -->

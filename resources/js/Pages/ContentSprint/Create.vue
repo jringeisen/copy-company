@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import UpgradeModal from '@/Components/UpgradeModal.vue';
 import HelpLink from '@/Components/HelpLink.vue';
+import Button from '@/Components/Button.vue';
 import { useSubscription } from '@/Composables/useSubscription';
 
 const { canCreateSprint, getRequiredPlan } = useSubscription();
@@ -151,23 +152,16 @@ const submit = () => {
 
                     <!-- Submit -->
                     <div class="flex justify-end gap-3 pt-4">
-                        <Link
-                            href="/content-sprints"
-                            class="px-4 py-2 text-[#0b1215] font-medium hover:bg-[#0b1215]/5 rounded-xl transition"
-                        >
+                        <Button variant="ghost" href="/content-sprints">
                             Cancel
-                        </Link>
-                        <button
+                        </Button>
+                        <Button
                             type="submit"
-                            :disabled="form.processing"
-                            class="px-6 py-2 bg-[#0b1215] text-white font-medium rounded-full hover:bg-[#0b1215]/90 transition disabled:opacity-50 flex items-center"
+                            :loading="form.processing"
+                            loading-text="Starting..."
                         >
-                            <svg v-if="form.processing" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            {{ form.processing ? 'Starting...' : 'Generate Ideas' }}
-                        </button>
+                            Generate Ideas
+                        </Button>
                     </div>
                 </form>
             </div>
